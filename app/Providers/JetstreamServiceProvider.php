@@ -6,6 +6,11 @@ use App\Actions\Jetstream\DeleteUser;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Jetstream\Jetstream;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Fortify\Fortify;
+
 
 class JetstreamServiceProvider extends ServiceProvider
 {
@@ -27,6 +32,20 @@ class JetstreamServiceProvider extends ServiceProvider
         Jetstream::deleteUsersUsing(DeleteUser::class);
 
         Vite::prefetch(concurrency: 3);
+
+        Fortify::authenticateUsing(function (Request $request) {
+            $request->validate([
+                'username' => 'required',
+                'password' => 'required',
+            ]);
+
+            // Buscar el usuario por `username`
+            $user = User::where('username', $request->username)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                return $user;
+            }
+        });
     }
 
     /**
