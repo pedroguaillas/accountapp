@@ -23,7 +23,10 @@ const submit = () => {
     form.transform(data => ({
         ...data,
         remember: form.remember ? 'on' : '',
-    })).post(route('login'), {
+    })).post(route('login2'), {
+        onSuccess: (page) => {
+            console.log(page)
+        },
         onFinish: () => form.reset('password'),
     });
 };

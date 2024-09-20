@@ -3,8 +3,11 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Stancl\Tenancy\Middleware\InitializeTenancyByPath;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,12 +21,28 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
-Route::middleware([
-    'web',
-    InitializeTenancyByDomain::class,
-    PreventAccessFromCentralDomains::class,
-])->group(function () {
+// Route::middleware([
+//     'web',
+//     InitializeTenancyBySubdomain::class,
+//     PreventAccessFromCentralDomains::class,
+// ])->group(function () {
+//     Route::get('/', function () {
+//         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
+//     });
+//     Route::get('/dashboard', function () {
+//         return Inertia::render('Dashboard');
+//     })->name('tenant.dashboard');
+// });
+
+Route::group([
+    'prefix' => '/{tenant}',
+    'middleware' => [InitializeTenancyByPath::class],
+], function () {
+    // Route::get('/foo', 'FooController@index');
     Route::get('/', function () {
         return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
     });
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('tenant.dashboard');
 });
