@@ -23,15 +23,19 @@ class DatabaseSeeder extends Seeder
 
         // User Tenant example Ariel
         $user = User::factory()->create([
-            'name' => 'Ariel Torres',
-            'username' => 'ariel',
-            'email' => 'ariel@example.com',
+            'name' => 'Ariel4 Torres',
+            'username' => 'ariel4',
+            'email' => 'ariel4@example.com',
         ]);
 
         // Tenant example ariel
-        $tenant = Tenant::create(['id' => 'ariel']);
+        $tenant = Tenant::create(['id' => 'ariel4']);
 
         // Many to Many User with Tenant 
-        $user->tenants()->attach($tenant);
+        $user->tenants()->attach($tenant); //relacion 
+
+
+        //dominio
+        $tenant->domains()->create(['domain' => 'ariel4.localhost']);
     }
 }

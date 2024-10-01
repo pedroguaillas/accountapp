@@ -27,7 +27,7 @@ class CreateTenantsTable extends Migration
             $table->string("tenant_id");
             $table->unsignedBigInteger("user_id");
             $table->unique(["user_id", "tenant_id"]);
-            $table->boolean('is_owner')->default(false);
+           // $table->boolean('is_owner')->default(false);
         });
         Schema::table('users', function (Blueprint $table) {
             $table->string("current_tenant_id")->nullable();

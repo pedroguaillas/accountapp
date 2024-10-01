@@ -32,7 +32,7 @@ return new class extends Migration {
 
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
-            $table->foreign("company_id")->references("id")->on("companies");
+           // $table->foreign("company_id")->references("id")->on("companies");
             $table->string('name');
             $table->smallInteger('number');
             $table->string('ciudad');
@@ -49,7 +49,7 @@ return new class extends Migration {
 
         Schema::create('emision_points', function (Blueprint $table) {
             $table->id();
-            $table->foreign("branch_id")->references("id")->on("branches");
+            //$table->foreign("branch_id")->references("id")->on("branches");
             $table->string('name')->nullable();
             $table->smallInteger('number');
 
