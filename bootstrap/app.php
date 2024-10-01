@@ -12,12 +12,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // $middleware->validateCsrfTokens(except: [
+        //     'stripe/*',
+        // ]);
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
-
-        // $middleware->add(Stancl\Tenancy\Middleware\InitializeTenancyByRequestData::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

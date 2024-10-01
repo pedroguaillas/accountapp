@@ -18,10 +18,20 @@ class CreateTenantsTable extends Migration
         Schema::create('tenants', function (Blueprint $table) {
             $table->string('id')->primary();
 
-            // your custom columns may go here
+            // Datos de la empresa
 
             $table->timestamps();
             $table->json('data')->nullable();
+        });
+        Schema::create('tenant_user', function (Blueprint $table) {
+            $table->string("tenant_id");
+            $table->unsignedBigInteger("user_id");
+            $table->unique(["user_id", "tenant_id"]);
+            $table->boolean('is_owner')->default(false);
+        });
+        Schema::table('users', function (Blueprint $table) {
+            $table->string("current_tenant_id")->nullable();
+            $table->foreign("current_tenant_id")->references("id")->on("tenants");
         });
     }
 
@@ -33,5 +43,6 @@ class CreateTenantsTable extends Migration
     public function down(): void
     {
         Schema::dropIfExists('tenants');
+        Schema::dropIfExists('tenant_user');
     }
 }

@@ -1,7 +1,8 @@
 <script setup>
 
 // Imports
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 // Emits
 defineEmits(['toggle']);
@@ -10,6 +11,10 @@ defineEmits(['toggle']);
 defineProps({
     menu: Boolean
 });
+
+const page = usePage()
+
+const user = computed(() => page.props.auth.user)
 
 </script>
 
@@ -26,9 +31,10 @@ defineProps({
             </button>
         </header>
         <nav class="p-2">
-            <ul class="[&>li>a]:text-white [&>li>a]:inline-block [&>li>a]:w-full [&>li>a]:p-2 [&>li>a>i]:stroke-white">
+            <ul v-show="!user"
+                class="[&>li>a]:text-white [&>li>a]:inline-block [&>li>a]:w-full [&>li>a]:p-2 [&>li>a>i]:stroke-white">
                 <li>
-                    <Link class="rounded bg-slate-500 hover:bg-sky-900" :href="route('dashboard')">
+                    <Link class="rounded bg-slate-500 hover:bg-sky-900" :href="route('costcenter.index')">
                     <i class="fa fa-medal"></i> Contabilidad
                     </Link>
                 </li>
@@ -59,7 +65,15 @@ defineProps({
                 </li>
                 <li>
                     <Link class="rounded hover:bg-sky-900" :href="route('dashboard')">
-                    <i class="fa fa-money-bill"></i> Reportes
+                    <i class="fa fa-money-bill"></i> Ajustes
+                    </Link>
+                </li>
+            </ul>
+            <ul v-show="user"
+                class="[&>li>a]:text-white [&>li>a]:inline-block [&>li>a]:w-full [&>li>a]:p-2 [&>li>a>i]:stroke-white">
+                <li>
+                    <Link class="rounded bg-slate-500 hover:bg-sky-900" :href="route('customers.index')">
+                    <i class="fa fa-medal"></i> Clientes
                     </Link>
                 </li>
             </ul>

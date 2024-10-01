@@ -1,7 +1,8 @@
 <script setup>
 
 // Imports
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 // Emits
 defineEmits(['toggle']);
@@ -15,6 +16,10 @@ const logout = () => {
     router.post(route('logout'));
 };
 
+const page = usePage()
+
+const user = computed(() => page.props.auth.user)
+
 </script>
 
 <template>
@@ -26,9 +31,10 @@ const logout = () => {
             </svg>
         </button>
         <div class="text-white flex">
-            <h3>Peterio</h3>
+            <h3>{{ 'Username' }}</h3>
             <button @click="logout">
-                <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" class="w-6 h-6 stroke-white">
+                <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
+                    class="w-6 h-6 stroke-white">
                     <path strokeLinecap="round" strokeLinejoin="round"
                         d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                 </svg>

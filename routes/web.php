@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Center\LoginController;
+use App\Http\Controllers\Landlord\AuthController;
+use App\Http\Controllers\Landlord\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -8,8 +9,9 @@ use Inertia\Inertia;
 foreach (config('tenancy.central_domains') as $domain) {
 
     Route::domain($domain)->group(function () {
-        
-        Route::post('login2', [LoginController::class, 'login'])->name('login2');
+
+        // Login para todos los usuarios
+        Route::post('login2', [AuthController::class, 'login'])->name('login2');
 
         Route::get('/', function () {
             return Inertia::render('Welcome', [
@@ -28,6 +30,10 @@ foreach (config('tenancy.central_domains') as $domain) {
             Route::get('/dashboard', function () {
                 return Inertia::render('Dashboard');
             })->name('dashboard');
+
+            // Nuestros clientes
+            Route::get('clientes', [UserController::class, 'index'])->name('customers.index');
+            Route::post('customers', [UserController::class, 'store'])->name('customers.store');
         });
     });
 

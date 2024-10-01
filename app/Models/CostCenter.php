@@ -5,13 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TenantUser extends Model
+class CostCenter extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        "tenant_id",
-        "user_id",
-        "role",
-    ];
+    protected $fillable = ["code", "name", "type", "parent_id", "state"];
 }
