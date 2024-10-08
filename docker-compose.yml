@@ -63,6 +63,8 @@ services:
             PGADMIN_DEFAULT_PASSWORD: '${PGADMIN_DEFAULT_PASSWORD}'
         volumes:
             - 'sail-pgadmin:/var/lib/pgadmin'
+        networks:
+            - sail
     redis:
         image: 'redis:alpine'
         container_name: redisapine

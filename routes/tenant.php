@@ -30,19 +30,27 @@ Route::middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Dashboard');
-    })->name('tenant.dashboard');
 
-    // Route::post('logout', 'AuthController@logout')->name('tenant.logout');
-    Route::post('/logout', function () {
-        // Redirigir al dominio principal para procesar el logout
-        return redirect()->away(env('APP_URL') . '/logout');
-    })->name('logout');
+    // Route::middleware([
+    //     'auth:sanctum',
+    //     config('jetstream.auth_session'),
+    //     'verified',
+    // ])->group(function () {
+        
+        Route::get('/', function () {
+            return Inertia::render('Dashboard');
+        })->name('tenant.dashboard');
 
-    // Centro de costos
-    Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
-    Route::post('costcenters', [CostCenterController::class, 'store'])->name('costcenter.store');
+        // Route::post('logout', 'AuthController@logout')->name('tenant.logout');
+        Route::post('/logout', function () {
+            // Redirigir al dominio principal para procesar el logout
+            return redirect()->away(env('APP_URL') . '/logout');
+        })->name('logout');
+
+        // Centro de costos
+        Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
+        Route::post('costcenters', [CostCenterController::class, 'store'])->name('costcenter.store');
+    // });
 });
 
 // Route::group([
