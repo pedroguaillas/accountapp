@@ -22,8 +22,8 @@ return new class extends Migration {
             $table->string('phone', 15)->nullable();
             $table->string('cert_dir', 30)->nullable();
             $table->string('pass_cert')->nullable();
-            $table->date('sign_valid_from')->nullable();
-            $table->date('sign_valid_to')->nullable();
+            $table->timestamp('sign_valid_from')->nullable();
+            $table->timestamp('sign_valid_to')->nullable();
             $table->integer('enviroment_type')->default(1);
 
             $table->timestamps();

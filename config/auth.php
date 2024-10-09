@@ -63,6 +63,7 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+            'username' => 'username', // Asegúrate de que este campo esté configurado
         ],
 
         // 'users' => [

@@ -27,6 +27,17 @@ foreach (config('tenancy.central_domains') as $domain) {
             config('jetstream.auth_session'),
             'verified',
         ])->group(function () {
+
+            Route::get('/debug', function () {
+                return response()->json([
+                    'user' => Auth::user(),
+                    'session' => session()->all(), // Ver contenido de la sesión
+                    'tenant' => tenant('id') // Verificar si el tenant está inicializado
+                ]);
+            });
+
+            Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
             Route::get('/dashboard', function () {
                 return Inertia::render('Dashboard');
             })->name('dashboard');

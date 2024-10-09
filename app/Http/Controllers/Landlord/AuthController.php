@@ -32,12 +32,9 @@ class AuthController extends Controller
             if ($tenant) {
                 // Establecer current_tenant_id
                 $user->update(['current_tenant_id' => $tenant->id]);
-                // Initialize the tenant context
-                // tenancy()->initialize($tenant);
 
-                // Redirect to the tenant's dashboard (using a named route)
                 // Redirigir al subdominio del tenant
-                $tenantDomain = $tenant->id . '.' . config('tenancy.central_domains')[1];
+                $tenantDomain = $tenant->id . '.' . config('tenancy.central_domains')[2];
                 // return redirect()->intended("http://{$tenantDomain}/dashboard");
                 return Inertia::location("http://{$tenantDomain}"); // Ensure this route exists
                 // return redirect()->route('tenant.dashboard', $tenant->id); // Ensure this route exists
@@ -66,6 +63,6 @@ class AuthController extends Controller
 
 
         // Redirigir al usuario a la página de login principal (base de datos central)
-        return redirect()->away('http://localhost/login');
+        return redirect()->away('http://localhost');
     }
 }
