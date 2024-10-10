@@ -37,9 +37,9 @@ class HandleInertiaRequests extends Middleware
                 'location' => $request->url(),
             ],
             // Lazily...
-            // 'auth.user' => fn() => $request->user()
-            //     ? $request->user()->only('id', 'name', 'username', 'current_tenant_id')
-            //     : null,
+            'auth.user' => fn() => $request->user()
+                ? $request->user()->only('id', 'name', 'username', 'current_tenant_id')
+                : null,
         ];
     }
 }

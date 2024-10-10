@@ -31,7 +31,7 @@ const user = computed(() => page.props.auth.user)
             </button>
         </header>
         <nav class="p-2">
-            <ul v-show="!user"
+            <ul v-show="current_tenant_id !== null"
                 class="[&>li>a]:text-white [&>li>a]:inline-block [&>li>a]:w-full [&>li>a]:p-2 [&>li>a>i]:stroke-white">
                 <li>
                     <Link class="rounded bg-slate-500 hover:bg-sky-900" :href="route('costcenter.index')">
@@ -69,7 +69,7 @@ const user = computed(() => page.props.auth.user)
                     </Link>
                 </li>
             </ul>
-            <ul v-show="user"
+            <ul v-show="current_tenant_id === null"
                 class="[&>li>a]:text-white [&>li>a]:inline-block [&>li>a]:w-full [&>li>a]:p-2 [&>li>a>i]:stroke-white">
                 <li>
                     <Link class="rounded bg-slate-500 hover:bg-sky-900" :href="route('customers.index')">

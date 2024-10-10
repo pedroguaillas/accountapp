@@ -31,7 +31,7 @@ const user = computed(() => page.props.auth.user)
             </svg>
         </button>
         <div class="text-white flex">
-            <h3>{{ 'Username' }}</h3>
+            <h3>{{ user.username }}</h3>
             <button @click="logout">
                 <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
                     class="w-6 h-6 stroke-white">
