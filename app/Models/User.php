@@ -30,7 +30,6 @@ class User extends Authenticatable
         'email',
         'username',
         'password',
-        'current_tenant_id',
     ];
 
     /**
@@ -69,6 +68,6 @@ class User extends Authenticatable
 
     public function tenants()
     {
-        return $this->belongsToMany(Tenant::class);//relacion muchos a muchos 
+        return $this->belongsToMany(Tenant::class)->withPivot('is_owner');//relacion muchos a muchos 
     }
 }

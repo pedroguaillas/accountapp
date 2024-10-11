@@ -3,16 +3,14 @@
 namespace App\Http\Controllers\Landlord;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tenant;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        // Validate the incoming request
         $request->validate([
             'username' => 'required',
             'password' => 'required',

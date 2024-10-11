@@ -36,7 +36,7 @@ foreach (config('tenancy.central_domains') as $domain) {
                 ]);
             });
 
-            Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+            // Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
             Route::get('/dashboard', function () {
                 return Inertia::render('Dashboard');
