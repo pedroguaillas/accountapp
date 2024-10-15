@@ -13,7 +13,7 @@ class Branch extends Model
         'company_id', // ID Compania
         'name', // Nombre comercial si tiene
         'number', // Numer de establecimiento
-        'city', // Provicia
+        'city', // Provincia
         'phone',
         'address',
         'logo_path',
