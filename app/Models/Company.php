@@ -12,27 +12,28 @@ class Company extends Model
     protected $fillable = [
         'ruc',
         'company',
-        'economic_activity',
-        'type',
-        'date',
-        'special',
+        'economic_activity_id',
+        'contributor_type_id',
+        'date', // Inicio de activiades
+        'restart_activities', // Reinicio de activiades (importante a la hora de facturar)
+        'special', // Contribuyente especial
         'accounting',
-        'phone',
-        'cert_dir',
-        'pass_cert',
+        'retention_agent',
+        'declaration_type', // mensual o semestral
+        'certificate_path',
+        'certificate_pass',
         'sign_valid_from',
         'sign_valid_to',
-        'enviroment_type'
     ];
 
     protected function casts(): array
     {
         return [
             'date' => 'date',
+            'restart_activities' => 'date',
             'special' => 'integer',
             'accounting' => 'boolean',
-            'enviroment_type' => 'integer'
+            'retention_agent' => 'integer',
         ];
     }
-
 }

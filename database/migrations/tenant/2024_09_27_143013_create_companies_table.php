@@ -36,10 +36,10 @@ return new class extends Migration {
             $table->date('restart_activities')->nullable();   // Reinicio de activiades
             $table->integer('special')->nullable(); // Contribuyente especial
             $table->boolean('accounting')->default(false);
-            $table->integer('retention_agent')->default(null);
+            $table->integer('retention_agent')->nullable();
             $table->string('declaration_type')->nullable(); // mensual o semestral
             $table->string('certificate_path', 30)->nullable();
-            $table->string('certificate_password')->nullable();
+            $table->string('certificate_pass')->nullable();
             $table->timestamp('sign_valid_from')->nullable();
             $table->timestamp('sign_valid_to')->nullable();
 
@@ -83,6 +83,8 @@ return new class extends Migration {
             $table->integer('referral_guide')->default(1);
             $table->integer('purchase_settlement')->default(1);
             $table->integer('lot')->default(1);
+            $table->integer('order_note')->default(1);
+            $table->integer('proforma')->default(1);
 
             $table->timestamps();
             $table->softDeletes();
@@ -99,7 +101,7 @@ return new class extends Migration {
             $table->string('name');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('type');
-            $table->string("state");
+            $table->boolean("is_active")->default(true);
 
             $table->timestamps();
             $table->softDeletes();
@@ -107,51 +109,53 @@ return new class extends Migration {
             $table->foreign("company_id")->references("id")->on("companies");
         });
 
-        Schema::create('chart_accounts', function (Blueprint $table) {
+        // Plan de cuentas
+        Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger("company_id");
+            $table->bigInteger(column: "company_id");
             $table->string('code');
             $table->string('name');
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->string('type');
-            $table->string("state");
+            $table->string('type'); // activo, pasivo, patrimonio, ingreso, gasto y costos
+            $table->boolean("is_active")->default(true);
 
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign("company_id")->references("id")->on("companies");
+            // $table->unique(['code', 'company_id']);
         });
 
-        Schema::create('account_entries', function (Blueprint $table) {
+        // Asiento contable
+        Schema::create('journals', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger("chart_account_id");
-            $table->timestamp(column: 'date');
-            $table->string('gloss');
-            $table->string('not_deductible');
+            $table->date(column: 'date');
+            $table->string('reference')->nullable(); // Numero de asiento contable de cada compania
+            $table->string('description')->nullable();
+            $table->boolean('is_deductible')->default(false);
             $table->string('prefix')->nullable();
-            $table->string('document_id')->nullable();
-            $table->string('table');
+            $table->string('document_id')->nullable(); // Ej. ID compra
+            $table->string('table')->nullable(); // shops
             $table->bigInteger("user_id");
 
             $table->timestamps();
             $table->softDeletes();
-
-            $table->foreign("chart_account_id")->references("id")->on("chart_accounts");
         });
 
-        Schema::create('account_entry_items', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->bigInteger('account_entry_id'); //references table "account_entries"
-            $table->bigInteger('chart_account_id'); //references table "chart_accounts"
-            $table->bigInteger('cost_center_id'); //references table "chart_accounts"
-            $table->decimal('debit', 14, 6)->default(0); //mount debit
-            $table->decimal('have', 14, 6)->default(0);  //mount have
+        // Item de asiento contables
+        Schema::create('journal_entries', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('journal_id');
+            $table->bigInteger('account_id');
+            $table->bigInteger('cost_center_id');
+            $table->decimal('debit', 14, 2)->default(0);
+            $table->decimal('have', 14, 2)->default(0);
 
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('account_entry_id')->references('id')->on('account_entries');
-            $table->foreign('chart_account_id')->references('id')->on('chart_accounts');
+            $table->foreign('journal_id')->references('id')->on('journals');
+            $table->foreign('account_id')->references('id')->on('accounts');
             $table->foreign('cost_center_id')->references('id')->on('cost_centers');
         });
     }
@@ -167,8 +171,8 @@ return new class extends Migration {
         Schema::dropIfExists('branches');
         Schema::dropIfExists('emision_points');
         Schema::dropIfExists('cost_centers');
-        Schema::dropIfExists('chart_accounts');
-        Schema::dropIfExists('account_entries');
-        Schema::dropIfExists('account_entry_items');
+        Schema::dropIfExists('accounts');
+        Schema::dropIfExists('journals');
+        Schema::dropIfExists('journal_entries');
     }
 };

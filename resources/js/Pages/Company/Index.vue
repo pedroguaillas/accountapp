@@ -4,17 +4,21 @@
 import { ref, reactive } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import ModalCompany from './ModalCompany.vue';
+import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 
 //Props
 defineProps({
     companies: { type: Array, default: () => [] },
+    economyActivities: { type: Array, default: () => [] },
+    contributorTypes: { type: Array, default: () => [] },
 })
 
 // Refs
 const modal = ref(false);
 
-const initialCompany = { ruc: '', company: '', economic_activity: '', type: '' }
+//El inicializador de objetos
+const initialCompany = { ruc: '', company: '', economic_activity_id: '', contributor_type_id: '' }
 
 // Reactives
 const company = reactive({ ...initialCompany });
@@ -107,5 +111,6 @@ const save = () => {
 
     </AdminLayout>
 
-    <ModalCompany :show="modal" :company="company" :error="errorForm" @close="toggle" @save="save" />
+    <ModalCompany :show="modal" :company="company" :error="errorForm" :economyActivities="economyActivities"
+        :contributorTypes="contributorTypes" @close="toggle" @save="save" />
 </template>

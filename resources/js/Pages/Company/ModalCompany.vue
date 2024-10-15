@@ -9,7 +9,9 @@ import TextInput from '@/Components/TextInput.vue';
 defineProps({
     company: { type: Object, default: () => ({}) },
     error: { type: Object, default: () => ({}) },
-    show: { type: Boolean, default: false }
+    show: { type: Boolean, default: false },
+    economyActivities: { type: Array, default: () => [] },
+    contributorTypes: { type: Array, default: () => [] },
 });
 
 // Emits
@@ -34,16 +36,19 @@ defineEmits(['close', 'save'])
                         placeholder="Razon social" minlength="3" maxlength="300" />
                     <InputError :message="error.company" class="mt-2" />
 
-                    <TextInput v-model="company.economic_activity" type="text" class="mt-2 block w-full"
-                        placeholder="Actividad economica" minlength="3" maxlength="50" />
-                    <InputError :message="error.economic_activity" class="mt-2" />
-
-                    <select v-model="company.type" class="mt-2 block w-full rounded">
+                    <select v-model="company.economic_activity_id" class="mt-2 block w-full rounded">
                         <option value="">Seleccione</option>
-                        <option value="Comercial">Comercial</option>
-                        <option value="Servicio">Servicio</option>
+                        <option v-for="economyActivity, i in economyActivities" :key="economyActivity.id"
+                            :value=economyActivity.id>{{ economyActivity.name }}</option>
                     </select>
-                    <InputError :message="error.type" class="mt-2" />
+                    <InputError :message="error.economic_activity_id" class="mt-2" />
+
+                    <select v-model="company.contributor_type_id" class="mt-2 block w-full rounded">
+                        <option value="">Seleccione</option>
+                        <option v-for="contributorType, i in contributorTypes" :key="contributorType.id"
+                            :value=contributorType.id>{{ contributorType.name }}</option>
+                    </select>
+                    <InputError :message="error.contributor_type_id" class="mt-2" />
 
                 </form>
             </div>

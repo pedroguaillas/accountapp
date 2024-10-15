@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CostCenter extends Model
+class Account extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        "company_id", // ID Compania
-        "code", // Codigo de centro de costos
-        "name", // Nombre de centro de costos
-        "type", // (T-transaccional,G-global)
-        "parent_id", // Si tiene un ID padre de Centro de Costos
-        "is_active",
+        'company_id', // ID de la compania
+        'code', // Codigo de la cuenta
+        'name', // Nombre de la cuenta
+        'parent_id', // Si tiene una cuenta padre
+        'type', // activo, pasivo, patrimonio, ingreso, gasto
+        'is_active',
     ];
 
     protected function casts(): array
