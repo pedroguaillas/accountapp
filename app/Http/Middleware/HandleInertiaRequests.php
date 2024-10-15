@@ -38,7 +38,7 @@ class HandleInertiaRequests extends Middleware
             ],
             // Lazily...
             'auth.user' => fn() => $request->user()
-                ? $request->user()->only('id', 'name', 'username', 'current_tenant_id')
+                ? $request->user()->only('id', 'name', 'username')
                 : null,
         ];
     }
