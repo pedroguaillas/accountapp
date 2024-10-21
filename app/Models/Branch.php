@@ -10,7 +10,7 @@ class Branch extends Model
     use HasFactory;
 
     protected $fillable = [
-        'company_id', // ID Compania
+        'company_id', // ID Compania  backend
         'name', // Nombre comercial si tiene
         'number', // Numer de establecimiento
         'city', // Provincia

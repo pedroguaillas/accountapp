@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -48,5 +49,9 @@ Route::middleware([
         Route::post('rucs', [CompanyController::class, 'store'])->name('company.store');
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
         Route::post('costcenters', [CostCenterController::class, 'store'])->name('costcenter.store');
+        Route::get('establecimientos', [BranchController::class,'index'])->name('branch.index');
+        Route::post('stores', [BranchController::class,'store'])->name('branch.store');
+        Route::put('stores/{branch}', [BranchController::class,'update'])->name('branch.update');
+
     });
 });
