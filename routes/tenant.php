@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CostCenterController;
 use Illuminate\Support\Facades\Route;
@@ -48,5 +49,9 @@ Route::middleware([
         Route::post('rucs', [CompanyController::class, 'store'])->name('company.store');
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
         Route::post('costcenters', [CostCenterController::class, 'store'])->name('costcenter.store');
+
+        // Contabilidad
+        Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
+        Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
     });
 });

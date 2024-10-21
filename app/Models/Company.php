@@ -36,4 +36,9 @@ class Company extends Model
             'retention_agent' => 'integer',
         ];
     }
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class);
+    }
 }
