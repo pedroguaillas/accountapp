@@ -2,15 +2,20 @@
 
 // Imports
 import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
+import { initFlowbite } from 'flowbite';
 
-// Emits
-defineEmits(['toggle']);
+onMounted(() => {
+    initFlowbite();
+})
 
 // Props
 defineProps({
     menu: Boolean
 });
+
+// Emits
+defineEmits(['toggle']);
 
 const page = usePage()
 
@@ -65,7 +70,7 @@ const user = computed(() => page.props.auth.user)
                             y depreciaciones</Link>
                         </li>
                         <li>
-                            <Link href="#"
+                            <Link :href="route('accounts')"
                                 class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
                             Plan
                             de cuentas</Link>

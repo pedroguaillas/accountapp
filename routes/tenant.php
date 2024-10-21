@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
@@ -53,5 +54,9 @@ Route::middleware([
         Route::post('stores', [BranchController::class,'store'])->name('branch.store');
         Route::put('stores/{branch}', [BranchController::class,'update'])->name('branch.update');
 
+
+        // Contabilidad
+        Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
+        Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
     });
 });
