@@ -18,8 +18,8 @@ class TenantSeeder extends Seeder
         EconomicActivity::create(['name' => 'Construcción']);
         EconomicActivity::create(['name' => 'Servicios Profesiones']);
 
-        ContributorType::create(['name' => 'RÉGIMEN GENERAL']);
-        ContributorType::create(['name' => 'RÉGIMEN RIMPE']);
-        ContributorType::create(['name' => 'RÉGIMEN NEGOCIO POPULAR - RÉGIMEN RIMPE']);
+        ContributorType::create(['name' => 'GENERAL']);
+        ContributorType::create(['name' => 'RIMPE']);
+        ContributorType::create(['name' => 'NEGOCIO POPULAR - RÉGIMEN RIMPE']);
     }
 }

@@ -37,6 +37,10 @@ class Company extends Model
         ];
     }
 
+    public function branches()
+    {
+        return $this->hasMany(Branch::class);//relacion muchos a muchos 
+    }
     public function accounts()
     {
         return $this->hasMany(Account::class);
