@@ -20,4 +20,21 @@ class CostCenterController extends Controller
         $company = Company::first();
         CostCenter::create([...$request->all(), 'company_id' => $company->id]);
     }
+
+    public function update(Request $request,CostCenter $costCenter)
+    {
+        $company = Company::first();
+        
+        $costCenter->update($request->all());
+    }
+
+    public function delete(Request $request,CostCenter $costCenter)
+    {
+        //no tenga relacion el centro de costo con otras
+        //if ()
+        //
+        //else
+        //return(response)
+        $costCenter>delete();
+    }
 }

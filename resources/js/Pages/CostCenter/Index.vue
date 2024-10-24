@@ -57,7 +57,42 @@ const save = () => {
                 });
             })
     }
+    else {
+        axios.put(route('costCenter.update', costCenter.id), costCenter)
+            .then(() => {
+                toggle();
+                resetErrorForm();
+                router.reload({ only: ['costCenters'] });
+            }).catch(error => {
+                resetErrorForm();
+                Object.keys(error.response.data.errors).forEach(key => {
+                    errorForm[key] = error.response.data.errors[key][0];
+                });
+            });
+    }
+
 }
+
+const update = (costCenterEdit) => {
+    resetErrorForm();
+    Object.keys(costCenterEdit).forEach(key => {
+        costCenter[key] = costCenterEdit[key];
+    });
+    toggle();
+}
+
+const removeCostCenter = (costCenterId) => {
+    if (confirm("¿Estás seguro de que deseas eliminar este centro de costos?")) {
+        axios.delete(route('costCenter.delete', costCenterId))
+            .then(() => {
+                router.reload({ only: ['costCenters'] });
+            })
+            .catch(error => {
+                console.error("Error al eliminar el centro de costos", error);
+            });
+    }
+}
+
 
 </script>
 
@@ -97,8 +132,12 @@ const save = () => {
                             <td>{{ costCenter.type }}</td>
                             <td>
                                 <div class="relative inline-flex [&>a>i]:text-white [&>button>i]:text-white">
-                                    <button class="rounded px-2 py-1 bg-red-500 text-white">
+                                    <button class="rounded px-2 py-1 bg-red-500 text-white" @click="removeCostCenter(costCenter.id)">
                                         <i class="fa fa-trash"></i> Eliminar
+                                    </button>
+
+                                    <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(costCenter)">
+                                        <i class="fa fa-edit"></i> Modificar
                                     </button>
                                 </div>
                             </td>

@@ -3,7 +3,7 @@
 // Imports
 import { ref, reactive } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import FormModal from './FormModal.vue';
+import FormModal from './FormModalJournal.vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 

@@ -34,4 +34,20 @@ class CompanyController extends Controller
 
         Company::create($request->all());
     }
+
+
+
+    public function update(Request $request,Company $company)
+    {
+        $request->validate([
+            'ruc' => 'required|min:13|max:13',
+            'company' => 'required|min:3|max:300',
+            'economic_activity_id' => 'required',
+            'contributor_type_id' => 'required',
+        ]);
+
+        $company->update($request->all());
+    
+        
+    }
 }

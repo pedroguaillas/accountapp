@@ -60,6 +60,11 @@ class BranchController extends Controller
 
     public function delete(Request $request,Branch $branch)
     {
-        $branch->delete($request->all());
+        //no tenga relacion el establecimiento con otras
+        //if ()
+        //
+        //else
+        //return(response)
+        $branch->delete();
     }
 }
