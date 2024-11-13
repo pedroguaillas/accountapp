@@ -14,9 +14,12 @@ class AccountController extends Controller
     public function index()
     {
         $company = Company::first();
-        $accounts = Account::select('code', 'name')
-            ->where('company_id', $company->id)
-            ->orderBy('id')->get();
+
+        $accounts = Account::select('accounts.code', 'accounts.name', 'a2.code AS c2')
+            ->leftJoin('accounts AS a2', 'accounts.parent_id', 'a2.id')
+            ->where('accounts.company_id', $company->id)
+            ->orderBy('accounts.id')->get();
+
         return Inertia::render('Account/Index', [
             'accounts' => $accounts
         ]);

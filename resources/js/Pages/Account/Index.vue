@@ -30,6 +30,7 @@ defineProps({
                     <thead>
                         <tr class="[&>th]:py-2">
                             <th class="w-12 text-left">Cuenta</th>
+                            <th class="w-12 text-left">c. padre</th>
                             <th>Descripción</th>
                         </tr>
                     </thead>
@@ -37,6 +38,9 @@ defineProps({
                         <tr v-for="account in accounts" :key="account.id" class="border-t [&>td]:py-2">
                             <td :class="account.code.length === 1 ? 'text-black' : 'text-stone-500'" class="text-left">
                                 {{ account.code }}
+                            </td>
+                            <td>
+                                {{ account.c2 }}
                             </td>
                             <td :class="account.code.length === 1 ? 'text-black' : 'text-stone-500'" class="text-left">
                                 {{ account.name }}
