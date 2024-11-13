@@ -27,4 +27,7 @@ class Journal extends Model
             'is_deductible' => 'boolean',
         ];
     }
+    public function journalentries(){
+        return $this->hasMany(JournalEntry::class);
+    }
 }

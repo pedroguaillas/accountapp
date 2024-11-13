@@ -59,7 +59,32 @@ const save = () => {
                     errorForm[key] = error.response.data.errors[key][0]
                 });
             })
+    }else
+    {
+        axios
+            .put(route('company.update',company.id), company)
+            .then(() => {
+                toggle();
+                resetErrorForm();
+
+                router.reload({ only: ['companies'] });
+            }).catch(error => {
+                resetErrorForm();
+
+                Object.keys(error.response.data.errors).forEach(key => {
+                    errorForm[key] = error.response.data.errors[key][0]
+                });
+            })
     }
+}
+
+
+const update =(companyEdit)=>{
+    resetErrorForm();
+    Object.keys(companyEdit).forEach(key => {
+                    company[key] = companyEdit[key]
+                });
+    toggle();
 }
 
 </script>
@@ -98,8 +123,9 @@ const save = () => {
                             <td>{{ company.company }}</td>
                             <td>
                                 <div class="relative inline-flex [&>a>i]:text-white [&>button>i]:text-white">
-                                    <button class="rounded px-2 py-1 bg-red-500 text-white">
-                                        <i class="fa fa-trash"></i> Eliminar
+                              
+                                    <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(company)">
+                                        <i class="fa fa-trash"></i> Modificar
                                     </button>
                                 </div>
                             </td>

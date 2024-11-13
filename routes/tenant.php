@@ -6,6 +6,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
+use App\Http\Controllers\JournalController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -45,18 +46,37 @@ Route::middleware([
             return redirect()->away(env('APP_URL') . '/logout');
         })->name('logout');
 
-        // Centro de costos
+       //companias
         Route::get('rucs', [CompanyController::class, 'index'])->name('rucs.index');
         Route::post('rucs', [CompanyController::class, 'store'])->name('company.store');
+        Route::put('rucs/{company}', [CompanyController::class, 'update'])->name('company.update');
+           
+    
+    
+        // Centro de costos
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
-        Route::post('costcenters', [CostCenterController::class, 'store'])->name('costcenter.store');
+        Route::post('costcenters', [CostCenterController::class, 'store'])->name('costCenter.store');
+        Route::put('costcenters/{costCenter}', [CostCenterController::class,'update'])->name('costCenter.update');
+        Route::delete('costcenters/{costCenter}', [CostCenterController::class, 'delete'])->name('costCenter.delete');
+
+        
+
+        //establecimientos
         Route::get('establecimientos', [BranchController::class,'index'])->name('branch.index');
         Route::post('stores', [BranchController::class,'store'])->name('branch.store');
         Route::put('stores/{branch}', [BranchController::class,'update'])->name('branch.update');
-
+        Route::delete('stores/{branch}', [BranchController::class, 'delete'])->name('branch.delete');
 
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
+
+        // Journals
+        Route::get('asientos', [JournalController::class,'index'])->name('journal.index');
+        Route::get('journal/create', [JournalController::class,'create'])->name('journal.create');
+        Route::post('journals', [JournalController::class,'store'])->name('journal.store');
+        Route::put('journals/{journal}', [JournalController::class,'update'])->name('journal.update');
+        Route::delete('journals/{journal}', [JournalController::class, 'delete'])->name('journal.delete');
+
     });
 });

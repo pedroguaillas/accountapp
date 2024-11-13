@@ -7,7 +7,7 @@ import FormModal from './FormModal.vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 
-//Props
+// Props
 defineProps({
     branches: { type: Array, default: () => [] },
 })
@@ -15,20 +15,18 @@ defineProps({
 // Refs
 const modal = ref(false);
 
-//El inicializador de objetos
-const initialBranch = {number: '',name: '', city: '', address: '',is_matriz: false,enviroment_type: '' }
+// Inicializador de objetos
+const initialBranch = { number: '', name: '', city: '', address: '', is_matriz: false, enviroment_type: '' };
 
 // Reactives
 const branch = reactive({ ...initialBranch });
 const errorForm = reactive({ ...initialBranch });
 
 const newBranch = () => {
-    // Reinicio el formularios con valores vacios
     if (branch.id !== undefined) {
-        delete branch.id
+        delete branch.id;
     }
     Object.assign(branch, initialBranch);
-    // Muestro el modal
     toggle();
 }
 
@@ -40,53 +38,53 @@ const toggle = () => {
     modal.value = !modal.value;
 }
 
-
 const save = () => {
     if (branch.id === undefined) {
-         const data = { ...branch, is_matriz:branch.is_matriz==='' ? false : true }
-        axios
-            .post(route('branch.store'), branch)
+        axios.post(route('branch.store'), branch)
             .then(() => {
                 toggle();
                 resetErrorForm();
-
                 router.reload({ only: ['branches'] });
             }).catch(error => {
                 resetErrorForm();
-
                 Object.keys(error.response.data.errors).forEach(key => {
-                    errorForm[key] = error.response.data.errors[key][0]
+                    errorForm[key] = error.response.data.errors[key][0];
                 });
-            })
-    }else
-    {
-        const data = { ...branch, is_matriz:branch.is_matriz==='' ? false : true }
-        axios
-            .put(route('branch.update',branch.id), branch)
+            });
+    } else {
+        axios.put(route('branch.update', branch.id), branch)
             .then(() => {
                 toggle();
                 resetErrorForm();
-
                 router.reload({ only: ['branches'] });
             }).catch(error => {
                 resetErrorForm();
-
                 Object.keys(error.response.data.errors).forEach(key => {
-                    errorForm[key] = error.response.data.errors[key][0]
+                    errorForm[key] = error.response.data.errors[key][0];
                 });
-            })
+            });
     }
 }
 
-const update =(branchEdit)=>{
+const update = (branchEdit) => {
     resetErrorForm();
     Object.keys(branchEdit).forEach(key => {
-                    branch[key] = branchEdit[key]
-                });
+        branch[key] = branchEdit[key];
+    });
     toggle();
 }
 
-
+const removeBranch = (branchId) => {
+    if (confirm("¿Estás seguro de que deseas eliminar esta sucursal?")) {
+        axios.delete(route('branch.delete', branchId))
+            .then(() => {
+                router.reload({ only: ['branches'] });
+            })
+            .catch(error => {
+                console.error("Error al eliminar la sucursal", error);
+            });
+    }
+}
 
 </script>
 
@@ -105,7 +103,7 @@ const update =(branchEdit)=>{
                 </button>
             </div>
 
-            <!-- Resposive -->
+            <!-- Responsive -->
             <div class="w-full overflow-x-auto">
                 <!-- Tabla -->
                 <table class="mt-4 text-xs sm:text-sm table-auto w-full text-center text-gray-700">
@@ -128,19 +126,17 @@ const update =(branchEdit)=>{
                             <td>{{ branch.name }}</td>
                             <td>{{ branch.city }}</td>
                             <td>{{ branch.address }}</td>
-                            <td>{{ branch.is_matriz?'Matriz':'Sucursal'}}</td>
-                            <td>{{ branch.enviroment_type===1?'Prueba':'Produccion' }}</td>
+                            <td>{{ branch.is_matriz ? 'Matriz' : 'Sucursal' }}</td>
+                            <td>{{ branch.enviroment_type === 1 ? 'Prueba' : 'Producción' }}</td>
                             <td>
-                                <div class="relative inline-flex [&>a>i]:text-white [&>button>i]:text-white">
-                                    <button class="rounded px-2 py-1 bg-red-500 text-white">
+                                <div class="relative inline-flex">
+                                    <button class="rounded px-2 py-1 bg-red-500 text-white" @click="removeBranch(branch.id)">
                                         <i class="fa fa-trash"></i> Eliminar
                                     </button>
                                     <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(branch)">
-                                        <i class="fa fa-trash"></i> Modificar
+                                        <i class="fa fa-edit"></i> Modificar
                                     </button>
                                 </div>
-
-                                
                             </td>
                         </tr>
                     </tbody>
@@ -150,5 +146,5 @@ const update =(branchEdit)=>{
 
     </AdminLayout>
 
-    <FormModal :show="modal" :branch="branch" :error="errorForm"  @close="toggle" @save="save" />
+    <FormModal :show="modal" :branch="branch" :error="errorForm" @close="toggle" @save="save" />
 </template>
