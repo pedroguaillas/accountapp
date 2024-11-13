@@ -43,7 +43,7 @@ const save = () => {
     if (costCenter.id === undefined) {
         // const data = { ...club, category_id: props.category.id, group_id: club.group_id > 0 ? club.group_id : null, extra_points: club.extra_points === '' ? 0 : club.extra_points }
         axios
-            .post(route('costcenter.store'), costCenter)
+            .post(route('costCenter.store'), costCenter)
             .then(() => {
                 toggle();
                 resetErrorForm();

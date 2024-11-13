@@ -3,48 +3,34 @@
 // Imports
 import { ref, reactive } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import FormModal from './FormModalJournal.vue';
-import { router } from '@inertiajs/vue3';
+import { router,Link } from '@inertiajs/vue3';
 import axios from 'axios';
 
 // Props
 defineProps({
-    branches: { type: Array, default: () => [] },
+    journals: { type: Array, default: () => [] },
 })
 
 // Refs
-const modal = ref(false);
 
 // Inicializador de objetos
-const initialBranch = { number: '', name: '', city: '', address: '', is_matriz: false, enviroment_type: '' };
+const initialJournal = { date: '',description: '' };
 
 // Reactives
-const branch = reactive({ ...initialBranch });
-const errorForm = reactive({ ...initialBranch });
+const journal = reactive({ ...initialJournal });
+const errorForm = reactive({ ...initialJournal });
 
-const newBranch = () => {
-    if (branch.id !== undefined) {
-        delete branch.id;
-    }
-    Object.assign(branch, initialBranch);
-    toggle();
-}
 
 const resetErrorForm = () => {
-    Object.assign(errorForm, initialBranch);
-}
-
-const toggle = () => {
-    modal.value = !modal.value;
+    Object.assign(errorForm, initialJournal);
 }
 
 const save = () => {
-    if (branch.id === undefined) {
-        axios.post(route('branch.store'), branch)
+    if (journal.id === undefined) {
+        axios.post(route('journal.store'), journal)
             .then(() => {
-                toggle();
                 resetErrorForm();
-                router.reload({ only: ['branches'] });
+                router.reload({ only: ['journals'] });
             }).catch(error => {
                 resetErrorForm();
                 Object.keys(error.response.data.errors).forEach(key => {
@@ -52,11 +38,10 @@ const save = () => {
                 });
             });
     } else {
-        axios.put(route('branch.update', branch.id), branch)
+        axios.put(route('journal.update', journal.id), journal)
             .then(() => {
-                toggle();
                 resetErrorForm();
-                router.reload({ only: ['branches'] });
+                router.reload({ only: ['journals'] });
             }).catch(error => {
                 resetErrorForm();
                 Object.keys(error.response.data.errors).forEach(key => {
@@ -66,41 +51,42 @@ const save = () => {
     }
 }
 
-const update = (branchEdit) => {
+const update = (journalEdit) => {
     resetErrorForm();
-    Object.keys(branchEdit).forEach(key => {
-        branch[key] = branchEdit[key];
+    Object.keys(journalEdit).forEach(key => {
+        journal[key] = journalEdit[key];
     });
-    toggle();
 }
 
-const removeBranch = (branchId) => {
-    if (confirm("¿Estás seguro de que deseas eliminar esta sucursal?")) {
-        axios.delete(route('branch.delete', branchId))
+const removeJournal = (journalId) => {
+    if (confirm("¿Estás seguro de que deseas eliminar el asiento?")) {
+        axios.delete(route('journal.delete', journalId))
             .then(() => {
-                router.reload({ only: ['branches'] });
+                router.reload({ only: ['journals'] });
             })
             .catch(error => {
-                console.error("Error al eliminar la sucursal", error);
+                console.error("Error al eliminar el asiento", error);
             });
     }
 }
 
+
+
 </script>
 
 <template>
-    <AdminLayout title="Sucursales / Establecimientos">
+    <AdminLayout title="Asientos Contables">
 
         <!-- Card -->
         <div class="p-4 bg-white rounded drop-shadow-md">
 
             <!-- Card Header -->
             <div class="flex justify-between items-center">
-                <h2 class="text-sm sm:text-lg font-bold">Sucursales / Establecimientos</h2>
-                <button @click="newBranch"
+                <h2 class="text-sm sm:text-lg font-bold">Asientos Contables</h2>
+                <Link :href="route('journal.create')"
                     class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
                     +
-                </button>
+            </Link>
             </div>
 
             <!-- Responsive -->
@@ -110,30 +96,23 @@ const removeBranch = (branchId) => {
                     <thead>
                         <tr class="[&>th]:py-2">
                             <th class="w-1">N°</th>
-                            <th>N° Establecimiento</th>
-                            <th>Nombre</th>
-                            <th>Ciudad</th>
-                            <th>Dirección</th>
-                            <th>Matriz o Sucursal</th>
-                            <th>Ambiente</th>
+                            <th>Fecha</th>
+                            <th>Descripcion</th>
+                       
                             <th class="w-1"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="branch, i in branches" :key="branch.id" class="border-t [&>td]:py-2">
+                        <tr v-for="journal, i in journals" :key="journal.id" class="border-t [&>td]:py-2">
                             <td>{{ i + 1 }}</td>
-                            <td>{{ branch.number }}</td>
-                            <td>{{ branch.name }}</td>
-                            <td>{{ branch.city }}</td>
-                            <td>{{ branch.address }}</td>
-                            <td>{{ branch.is_matriz ? 'Matriz' : 'Sucursal' }}</td>
-                            <td>{{ branch.enviroment_type === 1 ? 'Prueba' : 'Producción' }}</td>
-                            <td>
+                            <td>{{journal.date }}</td>
+                            <td>{{journal.description }}</td>
+                         <td>
                                 <div class="relative inline-flex">
-                                    <button class="rounded px-2 py-1 bg-red-500 text-white" @click="removeBranch(branch.id)">
+                                    <button class="rounded px-2 py-1 bg-red-500 text-white" @click="removeJournal(journal.id)">
                                         <i class="fa fa-trash"></i> Eliminar
                                     </button>
-                                    <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(branch)">
+                                    <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(journal)">
                                         <i class="fa fa-edit"></i> Modificar
                                     </button>
                                 </div>
@@ -145,6 +124,4 @@ const removeBranch = (branchId) => {
         </div>
 
     </AdminLayout>
-
-    <FormModal :show="modal" :branch="branch" :error="errorForm" @close="toggle" @save="save" />
 </template>

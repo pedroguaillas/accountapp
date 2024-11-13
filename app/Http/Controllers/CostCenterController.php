@@ -35,6 +35,6 @@ class CostCenterController extends Controller
         //
         //else
         //return(response)
-        $costCenter>delete();
+        $costCenter->delete();
     }
 }
