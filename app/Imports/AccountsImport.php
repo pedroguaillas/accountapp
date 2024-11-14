@@ -60,7 +60,8 @@ class AccountsImport implements ToCollection
             // }
 
             // Paso 2: Recuperar todas las cuentas y ordenarlas por `code` para construir la jerarquía
-            $allAccounts = Account::where('company_id', $company->id)
+            $allAccounts = Account::select('id', 'code')
+                ->where('company_id', $company->id)
                 ->orderBy('code', 'asc') // Ordenar por código jerárquico
                 ->get();
 
