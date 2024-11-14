@@ -45,4 +45,9 @@ class Company extends Model
     {
         return $this->hasMany(Account::class);
     }
+
+    public function journals()
+    {
+        return $this->hasMany(Journal::class);
+    }
 }

@@ -12,7 +12,6 @@ class JournalEntry extends Model
     protected $fillable = [
         'journal_id', // ID del asiento
         'account_id', // ID de la cuenta
-        'cost_center_id', // ID centro de costos
         'debit', // Monto del debe
         'have', // Monto del haber
     ];

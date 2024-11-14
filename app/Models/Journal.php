@@ -18,6 +18,7 @@ class Journal extends Model
         'document_id', // ID Referencia externa (ej. ID factura)
         'table', // tabla (ej. invoices)
         'user_id', // usuario que creo el asiento
+        'cost_center_id',
     ];
 
     protected function casts(): array

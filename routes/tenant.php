@@ -73,7 +73,7 @@ Route::middleware([
 
         // Journals
         Route::get('asientos', [JournalController::class,'index'])->name('journal.index');
-        Route::get('journal/create', [JournalController::class,'create'])->name('journal.create');
+        Route::get('asiento/crear', [JournalController::class,'create'])->name('journal.create');
         Route::post('journals', [JournalController::class,'store'])->name('journal.store');
         Route::put('journals/{journal}', [JournalController::class,'update'])->name('journal.update');
         Route::delete('journals/{journal}', [JournalController::class, 'delete'])->name('journal.delete');
