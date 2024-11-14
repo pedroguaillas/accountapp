@@ -1,26 +1,26 @@
 <script setup>
-// Imports
+//imports
 import DialogModal from "@/Components/DialogModal.vue";
 
 // Props
 defineProps({
-  accounts: { type: Array, default: () => [] },
+  costCenters: { type: Array, default: () => [] },
   show: { type: Boolean, default: false },
 });
 
-// Método para seleccionar cuenta
-const handleSelectAccount = (account) => {
-  emit("selectAccount", { ...account });
-  emit("close");
+// Método para seleccionar centro de costo
+const handleSelectCostCenter = (costCenter) => {
+  emit("selectCostCenter", costCenter); // Emitir el centro de costo seleccionado
+  emit("close"); // Cerrar el modal
 };
 
 // Emits
-const emit = defineEmits(["close", "selectAccount"]);
+const emit = defineEmits(["close", "selectCostCenter"]);
 </script>
 
 <template>
-  <DialogModal :show="show" maxWidth="lg" @close="close">
-    <template #title> Seleccionar Cuenta </template>
+  <DialogModal :show="show" maxWidth="lg" @close="emit('close')">
+    <template #title> Seleccionar Centro de Costo </template>
     <template #content>
       <div class="mt-4 max-h-[300px] overflow-y-auto">
         <table
@@ -29,20 +29,20 @@ const emit = defineEmits(["close", "selectAccount"]);
           <thead>
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
-              <th>Cuenta</th>
+              <th>Centro de Costo</th>
               <th>Descripción</th>
             </tr>
           </thead>
           <tbody>
             <tr
-              v-for="(account, i) in accounts"
-              :key="account.id"
+              v-for="(costCenter, i) in costCenters"
+              :key="costCenter.id"
               class="border-t [&>td]:py-2 cursor-pointer"
-              @click="handleSelectAccount(account)"
+              @click="handleSelectCostCenter(costCenter)"
             >
               <td>{{ i + 1 }}</td>
-              <td>{{ account.code }}</td>
-              <td>{{ account.name }}</td>
+              <td>{{ costCenter.code }}</td>
+              <td>{{ costCenter.name }}</td>
             </tr>
           </tbody>
         </table>

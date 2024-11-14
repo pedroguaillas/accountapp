@@ -137,9 +137,12 @@ return new class extends Migration {
             $table->string('document_id')->nullable(); // Ej. ID compra
             $table->string('table')->nullable(); // shops
             $table->bigInteger("user_id");
-
+            $table->bigInteger("company_id");
+            $table->bigInteger('cost_center_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign("company_id")->references("id")->on("companies");
+            $table->foreign('cost_center_id')->references('id')->on('cost_centers');
         });
 
         // Item de asiento contables
@@ -147,7 +150,7 @@ return new class extends Migration {
             $table->id();
             $table->bigInteger('journal_id');
             $table->bigInteger('account_id');
-            $table->bigInteger('cost_center_id');
+      
             $table->decimal('debit', 14, 2)->default(0);
             $table->decimal('have', 14, 2)->default(0);
 
@@ -156,7 +159,7 @@ return new class extends Migration {
 
             $table->foreign('journal_id')->references('id')->on('journals');
             $table->foreign('account_id')->references('id')->on('accounts');
-            $table->foreign('cost_center_id')->references('id')->on('cost_centers');
+    
         });
     }
 
