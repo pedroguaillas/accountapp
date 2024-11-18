@@ -42,29 +42,34 @@ Route::middleware([
         })->name('tenant.dashboard');
 
         Route::post('/logout', function () {
-            // Redirigir al dominio principal para procesar el logout
-            return redirect()->away(env('APP_URL') . '/logout');
+            // Revocar todos los tokens del usuario
+            // $request->user()->currentAccessToken()->delete();
+
+            // Limpiar sesión y revocar tokens
+            Auth::guard('web')->logout();
+
+            // $request->session()->invalidate();
+            // $request->session()->regenerateToken();
+
+            // Redirigir al dominio principal
+            return Inertia::location(env('APP_URL'));
         })->name('logout');
 
-       //companias
+        //companias
         Route::get('rucs', [CompanyController::class, 'index'])->name('rucs.index');
         Route::post('rucs', [CompanyController::class, 'store'])->name('company.store');
         Route::put('rucs/{company}', [CompanyController::class, 'update'])->name('company.update');
-           
-    
-    
+
         // Centro de costos
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
         Route::post('costcenters', [CostCenterController::class, 'store'])->name('costCenter.store');
-        Route::put('costcenters/{costCenter}', [CostCenterController::class,'update'])->name('costCenter.update');
+        Route::put('costcenters/{costCenter}', [CostCenterController::class, 'update'])->name('costCenter.update');
         Route::delete('costcenters/{costCenter}', [CostCenterController::class, 'delete'])->name('costCenter.delete');
 
-        
-
         //establecimientos
-        Route::get('establecimientos', [BranchController::class,'index'])->name('branch.index');
-        Route::post('stores', [BranchController::class,'store'])->name('branch.store');
-        Route::put('stores/{branch}', [BranchController::class,'update'])->name('branch.update');
+        Route::get('establecimientos', [BranchController::class, 'index'])->name('branch.index');
+        Route::post('stores', [BranchController::class, 'store'])->name('branch.store');
+        Route::put('stores/{branch}', [BranchController::class, 'update'])->name('branch.update');
         Route::delete('stores/{branch}', [BranchController::class, 'delete'])->name('branch.delete');
 
         // Contabilidad
@@ -72,10 +77,10 @@ Route::middleware([
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
 
         // Journals
-        Route::get('asientos', [JournalController::class,'index'])->name('journal.index');
-        Route::get('asiento/crear', [JournalController::class,'create'])->name('journal.create');
-        Route::post('journals', [JournalController::class,'store'])->name('journal.store');
-        Route::put('journals/{journal}', [JournalController::class,'update'])->name('journal.update');
+        Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
+        Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
+        Route::post('journals', [JournalController::class, 'store'])->name('journal.store');
+        Route::put('journals/{journal}', [JournalController::class, 'update'])->name('journal.update');
         Route::delete('journals/{journal}', [JournalController::class, 'delete'])->name('journal.delete');
 
     });

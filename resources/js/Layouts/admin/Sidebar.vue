@@ -58,18 +58,6 @@ const user = computed(() => page.props.auth.user)
                     <ul id="dropdown-example"
                         class="hidden py-2 space-y-2 [&>li>a]:flex [&>li>a]:items-center [&>li>a]:w-full">
                         <li>
-                            <Link href="#"
-                                class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
-                            Activos
-                            fijos</Link>
-                        </li>
-                        <li>
-                            <Link href="#"
-                                class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
-                            Amortizaciones
-                            y depreciaciones</Link>
-                        </li>
-                        <li>
                             <Link :href="route('accounts')"
                                 class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
                             Plan
@@ -86,6 +74,18 @@ const user = computed(() => page.props.auth.user)
                                 class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
                             Centro
                             de costos</Link>
+                        </li>
+                        <li>
+                            <Link href="#"
+                                class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
+                            Activos
+                            fijos</Link>
+                        </li>
+                        <li>
+                            <Link href="#"
+                                class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
+                            Amortizaciones
+                            y depreciaciones</Link>
                         </li>
                     </ul>
                 </li>

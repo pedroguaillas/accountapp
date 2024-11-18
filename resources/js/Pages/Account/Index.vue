@@ -3,11 +3,23 @@
 // Imports
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import ImportExcel from './ImportExcel.vue';
+import { computed } from 'vue';
 
 //Props
 defineProps({
     accounts: { type: Array, default: () => [] },
 })
+
+// Función para calcular la clase de estilo
+const styleAccount = (code) => {
+    if (code.length === 1) {
+        return 'text-black font-bold';
+    } else if (code.length < 4) {
+        return 'text-stone-600 font-semibold italic indent-2';
+    } else {
+        return 'text-stone-400 italic indent-4';
+    }
+};
 
 </script>
 
@@ -30,19 +42,15 @@ defineProps({
                     <thead>
                         <tr class="[&>th]:py-2">
                             <th class="w-12 text-left">Cuenta</th>
-                            <th class="w-12 text-left">c. padre</th>
-                            <th>Descripción</th>
+                            <th class="text-left">Descripción</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="account in accounts" :key="account.id" class="border-t [&>td]:py-2">
-                            <td :class="account.code.length === 1 ? 'text-black' : 'text-stone-500'" class="text-left">
+                            <td :class="styleAccount(account.code)" class="text-left">
                                 {{ account.code }}
                             </td>
-                            <td>
-                                {{ account.c2 }}
-                            </td>
-                            <td :class="account.code.length === 1 ? 'text-black' : 'text-stone-500'" class="text-left">
+                            <td :class="styleAccount(account.code)" class="text-left">
                                 {{ account.name }}
                             </td>
                         </tr>
