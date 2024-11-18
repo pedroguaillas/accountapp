@@ -10,7 +10,7 @@ import InputError from "@/Components/InputError.vue";
 import axios from "axios";
 
 // Props
-defineProps({
+const props = defineProps({
   accounts: { type: Array, default: () => [] },
   costCenters: { type: Array, default: () => [] },
 });
@@ -23,6 +23,7 @@ const initialJournal = {
   description: "",
   journalEntries: [],
   cost_center_id: "",
+  is_deductible: false,
 };
 
 // Reactives
@@ -35,9 +36,11 @@ const journalEntry = reactive({
   have: "",
 });
 const errorForm = reactive({ ...initialJournal, date: "" });
+const errorMessage = reactive({ totalMismatch: "" }); // Mensaje de error para totales
 
 const resetErrorForm = () => {
   Object.assign(errorForm, initialJournal);
+  errorMessage.totalMismatch = ""; // Limpiar mensaje de error
 };
 
 const eliminarCuenta = (index) => {
@@ -45,6 +48,17 @@ const eliminarCuenta = (index) => {
 };
 
 const save = () => {
+  if (props.costCenters.length > 0 && journal.cost_center_id === "") {
+    errorForm.cost_center_id = "Seleccione un centro de costo.";
+    return; // Salir sin guardar
+  }
+  // Verificar si los totales de "debe" y "haber" coinciden
+  if (totalDebe.value !== totalHaver.value) {
+    errorMessage.totalMismatch =
+      "El total del Debe y el Haber no coinciden. Por favor verifica los valores.";
+    return; // Salir sin guardar
+  }
+
   journal.post(route("journal.store"), {
     onError: (errors) => {
       Object.keys(errors).forEach((key) => {
@@ -64,17 +78,19 @@ const handleAddJournalEntry = (entry) => {
 
 // Calcular totales de 'debe' y 'haber'
 const totalDebe = computed(() => {
-  return journal.journalEntries.reduce(
+  const total = journal.journalEntries.reduce(
     (sum, entry) => sum + Number(entry.debit),
     0
   );
+  return total.toFixed(2); // Devuelve el valor con dos decimales
 });
 
 const totalHaver = computed(() => {
-  return journal.journalEntries.reduce(
+  const total = journal.journalEntries.reduce(
     (sum, entry) => sum + Number(entry.have),
     0
   );
+  return total.toFixed(2);
 });
 
 // Método para recibir el centro de costo seleccionado desde SearchCostCenter
@@ -109,14 +125,20 @@ const handleCostCenterSelect = (costCenter) => {
         />
         <InputError :message="errorForm.description" class="mt-2" />
 
+        <label class="mt-6 block">
+          <input type="checkbox" v-model="journal.is_deductible" class="mr-2" />
+          ¿Es deducible?
+        </label>
+        <br />
+
         <select
-          v-if="costCenters.length>0 && costCenters.length <= 5"
+          v-if="costCenters.length > 0 && costCenters.length <= 5"
           v-model="journal.cost_center_id"
           class="mt-2 block w-full rounded"
         >
           <option value="">Seleccione</option>
           <option
-            v-for="(costCenter) in costCenters"
+            v-for="costCenter in costCenters"
             :key="costCenter.id"
             :value="costCenter.id"
           >
@@ -124,7 +146,7 @@ const handleCostCenterSelect = (costCenter) => {
           </option>
         </select>
 
-        <div v-else-if="costCenters.length>5">
+        <div v-else-if="costCenters.length > 5">
           <h3 class="mt-4">Centros de Costo</h3>
           <SearchCostCenter
             :costCenters="costCenters"
@@ -132,15 +154,15 @@ const handleCostCenterSelect = (costCenter) => {
           />
         </div>
 
+        <InputError :message="errorForm.cost_center_id" class="mt-2" />
         <!-- Cuentas -->
-        <h3 class="mt-4">Cuentas</h3>
+        <h3 class="mt-1">Cuentas</h3>
         <SearchAccount
           :accounts="accounts"
           :journal="journal"
           @addJournalEntry="handleAddJournalEntry"
         />
       </div>
-
       <!-- Tabla -->
       <table
         class="mt-4 text-xs sm:text-sm table-auto w-full text-center text-gray-700"
@@ -183,6 +205,11 @@ const handleCostCenterSelect = (costCenter) => {
           </tr>
         </tfoot>
       </table>
+
+      <!-- Mensaje de error para totales -->
+      <p v-if="errorMessage.totalMismatch" class="text-red-500 mt-4">
+        {{ errorMessage.totalMismatch }}
+      </p>
 
       <div class="mt-4 text-right">
         <button @click="save" class="px-4 py-2 bg-blue-500 text-white rounded">
