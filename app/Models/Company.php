@@ -50,4 +50,9 @@ class Company extends Model
     {
         return $this->hasMany(Journal::class);
     }
+
+    public function fixedassets()
+    {
+        return $this->hasMany(FixedAsset::class);
+    }
 }

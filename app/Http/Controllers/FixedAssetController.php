@@ -13,12 +13,12 @@ class FixedAssetController extends Controller
     public function index()
     {
         $company = Company::first();
-        $fixedAssets = FixedAsset::where('company_id', $company->id)->get();
-
+        $fixedAssetss = FixedAsset::where('company_id', $company->id)->get();
+      //  dd($fixedAssetss);
         return Inertia::render('FixedAsset/Index', [
-            'fixedAssets' => $fixedAssets,
-
+            'fixedAssetss' => $fixedAssetss,
         ]);
+
     }
 
 
@@ -33,48 +33,31 @@ class FixedAssetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'number' => 'required|min:1|max:999',
-            'name' => 'nullable|min:3|max:300',
-            'city' => 'required',
-            'address' => 'required',
-            //'is_matriz' => '',
-            'enviroment_type' => 'required',
-
+            'pay_method_id' => 'required|exists:pay_methods,id',
+            'is_depretation_a' => 'boolean',
+            'is_legal' => 'boolean',
+            'vaucher' => 'nullable|string|max:17',
+            'date_acquisition' => 'required|date',
+            'detail' => 'nullable|string|max:300',
+            'code' => 'required|string|max:20',
+            'type' => 'required|string|max:50',
+            'address' => 'required|string|max:255',
+            'period' => 'nullable|integer|min:0',
+            'value' => 'required|numeric|min:0',
+            'residual_value' => 'nullable|numeric|min:0',
+            'date_end' => 'nullable|date',
         ]);
 
-        $company = Company::first();
+        // Crear el activo fijo en la base de datos
+        $company = Company::first(); // Asegúrate de tener la empresa disponible
+        $company->fixedassets()->create($request->all());
 
-        $company->branches()->create($request->all());
+        //return response()->json(['message' => 'Activo fijo creado con éxito.'], 201);
+
+        return to_route('fixedassets.index');
 
     }
 
 
-    public function update(Request $request, Branch $branch)
-    {
-        $request->validate([
-            'number' => 'required|min:1|max:999',
-            'name' => 'nullable|min:3|max:300',
-            'city' => 'required',
-            'address' => 'required',
-            //'is_matriz' => '',
-            'enviroment_type' => 'required',
-        ]);
-        if ($request->is_matriz) {
-            $company = Company::first();
 
-            $company->branches()->update(['is_matriz' => false]);
-        }
-
-        $branch->update($request->all());
-    }
-
-    public function delete(Request $request, Branch $branch)
-    {
-        //no tenga relacion el establecimiento con otras
-        //if ()
-        //
-        //else
-        //return(response)
-        $branch->delete();
-    }
 }
