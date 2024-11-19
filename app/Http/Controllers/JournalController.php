@@ -61,6 +61,7 @@ class JournalController extends Controller
             ];
         })->values(); // Eliminar las claves generadas por groupBy
 
+     
         // Retornar a la vista con los datos procesados
         return Inertia::render('Journal/Index', [
             'journals' => $journals,

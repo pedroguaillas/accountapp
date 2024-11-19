@@ -218,5 +218,10 @@ return new class extends Migration {
         Schema::dropIfExists('accounts');
         Schema::dropIfExists('journals');
         Schema::dropIfExists('journal_entries');
+        Schema::dropIfExists('pay_methods');
+        Schema::dropIfExists('fixed_assets');
+
+
+
     }
 };

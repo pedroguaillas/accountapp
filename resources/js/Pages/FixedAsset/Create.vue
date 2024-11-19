@@ -36,26 +36,48 @@ const errorForm = reactive({ ...initialFixedAsset, date: "", date_end: "" });
 
 const resetErrorForm = () => {
   Object.assign(errorForm, initialFixedAsset);
-  errorMessage.totalMismatch = ""; // Limpiar mensaje de error
+  console.log("Formulario de errores reiniciado.");
 };
 
+// Método de guardar con mensajes
 const save = () => {
-  if (props.costCenters.length > 0 && journal.cost_center_id === "") {
-    errorForm.cost_center_id = "Seleccione un centro de costo.";
-    return; // Salir sin guardar
-  }
-  // Verificar si los totales de "debe" y "haber" coinciden
-  if (totalDebe.value !== totalHaver.value) {
-    errorMessage.totalMismatch =
-      "El total del Debe y el Haber no coinciden. Por favor verifica los valores.";
-    return; // Salir sin guardar
+  console.log("Método 'save' iniciado.");
+
+  // Validar datos requeridos en el frontend
+  if (!fixedAsset.pay_method_id) {
+    console.error("Método de pago no seleccionado.");
+    errorForm.pay_method_id = "Seleccione un método de pago.";
+    return;
   }
 
-  journal.post(route("journal.store"), {
+  if (!fixedAsset.address) {
+    console.error("La dirección es obligatoria.");
+    errorForm.address = "La dirección es obligatoria.";
+    return;
+  }
+
+  if (!fixedAsset.date_acquisition) {
+    console.error("La fecha de adquisición es obligatoria.");
+    errorForm.date_acquisition = "La fecha de adquisición es obligatoria.";
+    return;
+  }
+
+  console.log("Validaciones frontend completadas, enviando al servidor...");
+
+  // Enviar datos al backend
+  fixedAsset.post(route("fixedassets.store"), {
     onError: (errors) => {
+      console.error("Errores recibidos del servidor:", errors);
+      // Mostrar errores de validación desde el backend
       Object.keys(errors).forEach((key) => {
         errorForm[key] = errors[key];
       });
+    },
+    onSuccess: () => {
+      console.log("Activo fijo guardado exitosamente.");
+      // Reiniciar el formulario tras éxito
+      fixedAsset.reset();
+      resetErrorForm();
     },
   });
 };
@@ -98,11 +120,11 @@ const save = () => {
 
         <!-- Fecha de adqusicion -->
         <TextInput
-          v-model="fixedAsset.date"
+          v-model="fixedAsset.date_acquisition"
           type="date"
           class="mt-2 block w-full"
         />
-        <InputError :message="errorForm.date" class="mt-2" />
+        <InputError :message="errorForm.date_acquisition" class="mt-2" />
 
         <TextInput
           v-model="fixedAsset.detail"
