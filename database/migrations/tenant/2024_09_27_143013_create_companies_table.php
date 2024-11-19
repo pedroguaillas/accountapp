@@ -26,6 +26,16 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
+        Schema::create('pay_methods', function (Blueprint $table) {
+            $table->id();
+            $table->integer('code'); //
+            $table->string('name'); // 
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->char('ruc', 13)->unique(); //Constraint
@@ -150,7 +160,7 @@ return new class extends Migration {
             $table->id();
             $table->bigInteger('journal_id');
             $table->bigInteger('account_id');
-      
+
             $table->decimal('debit', 14, 2)->default(0);
             $table->decimal('have', 14, 2)->default(0);
 
@@ -159,8 +169,39 @@ return new class extends Migration {
 
             $table->foreign('journal_id')->references('id')->on('journals');
             $table->foreign('account_id')->references('id')->on('accounts');
-    
+
         });
+
+
+
+        // activos fijos
+        Schema::create('fixed_assets', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('pay_method_id');
+            $table->bigInteger('company_id');
+
+            $table->boolean('is_depretation_a')->default(false);
+            $table->boolean('is_legal')->default(false);
+            $table->string('vaucher')->nullable();
+            $table->date('date_acquisition');
+            $table->string('detail');
+            $table->string('code');
+            $table->string('type');
+            $table->string('address');
+            $table->integer('period');
+            $table->decimal('value', 14, 2)->default(0);
+            $table->decimal('residual_value', 14, 2)->default(0);
+            $table->date('date_end');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('pay_method_id')->references('id')->on('pay_methods');
+            $table->foreign('company_id')->references('id')->on('companies');
+
+        });
+
+
     }
 
     /**
