@@ -6,6 +6,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
+use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\JournalController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -80,8 +81,14 @@ Route::middleware([
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
         Route::post('journals', [JournalController::class, 'store'])->name('journal.store');
-        Route::put('journals/{journal}', [JournalController::class, 'update'])->name('journal.update');
-        Route::delete('journals/{journal}', [JournalController::class, 'delete'])->name('journal.delete');
+
+        // fixed assets  //poner las rutas con nombre en plural 
+        Route::get('activos-fijos', [FixedAssetController::class, 'index'])->name('fixedassets.index');
+        Route::get('activos-fijos/crear', [FixedAssetController::class, 'create'])->name('fixedassets.create');
+        Route::post('fixedassets', [FixedAssetController::class, 'store'])->name('fixeassets.store');
+        Route::put('fixedassets/{fixedasset}', [FixedAssetController::class, 'update'])->name('fixeassets.update');
+
+
 
     });
 });

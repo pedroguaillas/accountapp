@@ -1,12 +1,11 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import AccountSelectModal from "./AccountSelectModal.vue";
 
 // Props
 defineProps({
   accounts: { type: Array, default: () => [] },
   journal: { type: Object, default: () => ({}) },
-  //journalEntry: { type: Object, default: () => ({}) },
 });
 
 // Refs
@@ -25,21 +24,34 @@ const toggleModal = () => {
 // Método para recibir la cuenta seleccionada
 const handleAccountSelect = (account) => {
   accountId.value = account.id;
-  // Establecemos el valor de la descripción en el input de búsqueda
   search.value = account.name;
-  // Establecemos el código de la cuenta en el input de código
   code.value = account.code;
-  // emit('selectAccount', { accountId: account.id });
 };
 
+// Método para agregar una cuenta al diario
 const agregarCuenta = () => {
-  if (debit !== "" || have !== "") {
+  // console.log(typeof debit);
+  // console.log(typeof debit.value);
+  // console.log(typeof have.value);
+  if (accountId.value === 0) {
+    alert("No se ha seleccionado la cuenta.");
+    return; // Salir sin guardar
+  }
+  if (typeof debit.value === "number" || typeof have.value === "number") {
+    if (typeof debit.value === "number" && debit.value > 0) {
+      have.value = 0;
+    } else if (typeof have.value === "number" && have.value > 0) {
+      debit.value = 0;
+    } else {
+      return;
+    }
+
     const journalEntry = {
       account_id: accountId.value,
       code: code.value,
       name: search.value,
-      debit: debit.value,
-      have: have.value,
+      debit: parseFloat(debit.value),
+      have: parseFloat(have.value),
     };
 
     // Emitimos el objeto journalEntry al componente principal
@@ -50,10 +62,26 @@ const agregarCuenta = () => {
     search.value = "";
     debit.value = "";
     have.value = "";
+  }else
+  {
+    alert("Ingresar almenos un valor para el DEBE o el HABER");
   }
 };
 
-const emit = defineEmits(["selectAccount"]);
+const emit = defineEmits(["selectAccount", "addJournalEntry"]);
+
+// Watchers para ajustar automáticamente el valor de "debit" o "have"
+// watch(debit, (newValue) => {
+//   if (newValue > 0) {
+//     have.value = 0; // Si hay un valor en "debit", "have" se pone en 0
+//   }
+// });
+
+// watch(have, (newValue) => {
+//   if (newValue > 0) {
+//     debit.value = 0; // Si hay un valor en "have", "debit" se pone en 0
+//   }
+// });
 </script>
 
 <template>
@@ -78,19 +106,19 @@ const emit = defineEmits(["selectAccount"]);
       @
     </button>
 
+    <!-- Campo para "Debe" -->
     <input
       type="number"
-      v-model="debit"
+      v-model.number="debit"
       placeholder="Debe"
       class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-      min="0"
     />
+    <!-- Campo para "Haber" -->
     <input
       type="number"
-      v-model="have"
+      v-model.number="have"
       placeholder="Haber"
       class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-      min="0"
     />
     <button
       type="button"
