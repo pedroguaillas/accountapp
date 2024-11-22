@@ -73,7 +73,11 @@ class JournalController extends Controller
     public function create()
     {
         $company = Company::first();
-        $accounts = Account::select('id', 'code', 'name')->where('company_id', $company->id)->get();
+        $accounts = Account::select('id', 'code', 'name', 'is_detail')
+        ->where('company_id', $company->id)
+        ->where('is_detail', true) // Solo incluir cuentas donde is_detail es true
+        ->get();
+    
         $costCenters = CostCenter::select('id', 'code', 'name')->where('company_id', $company->id)->get();
 
 

@@ -1,32 +1,35 @@
 <script setup>
 // Imports
-import { reactive } from "vue";
+import { reactive, computed } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import { router, useForm } from "@inertiajs/vue3";
+import { useForm } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import { watch } from "vue";
 
 // Props
 const props = defineProps({
   payMethods: { type: Array, default: () => [] },
+  activeTypes: { type: Array, default: () => [] },
 });
 
 const date = new Date().toISOString().split("T")[0];
 
 // Inicializador de objetos
 const initialFixedAsset = {
-  pay_method_id: 0,
+  pay_method_id: "",
   is_depretation_a: false,
   is_legal: false,
   vaucher: "",
-  date_acquisition: "",
+  date_acquisition: date,
   detail: "",
   code: "",
-  type: "",
+  type_id: "",
   address: "",
-  period: 0,
-  value: 0,
-  residual_value: 0,
+  period: "",
+  value: "",
+  residual_value: "",
   date_end: "",
 };
 
@@ -36,51 +39,98 @@ const errorForm = reactive({ ...initialFixedAsset, date: "", date_end: "" });
 
 const resetErrorForm = () => {
   Object.assign(errorForm, initialFixedAsset);
-  console.log("Formulario de errores reiniciado.");
 };
 
 // Método de guardar con mensajes
 const save = () => {
-  console.log("Método 'save' iniciado.");
-
   // Validar datos requeridos en el frontend
   if (!fixedAsset.pay_method_id) {
-    console.error("Método de pago no seleccionado.");
     errorForm.pay_method_id = "Seleccione un método de pago.";
     return;
   }
 
+  if (!fixedAsset.type_id) {
+    errorForm.type_id = "Seleccione un tipo de activo.";
+    return;
+  }
+
   if (!fixedAsset.address) {
-    console.error("La dirección es obligatoria.");
     errorForm.address = "La dirección es obligatoria.";
     return;
   }
 
   if (!fixedAsset.date_acquisition) {
-    console.error("La fecha de adquisición es obligatoria.");
     errorForm.date_acquisition = "La fecha de adquisición es obligatoria.";
     return;
   }
 
-  console.log("Validaciones frontend completadas, enviando al servidor...");
-
   // Enviar datos al backend
   fixedAsset.post(route("fixedassets.store"), {
     onError: (errors) => {
-      console.error("Errores recibidos del servidor:", errors);
       // Mostrar errores de validación desde el backend
       Object.keys(errors).forEach((key) => {
         errorForm[key] = errors[key];
       });
     },
     onSuccess: () => {
-      console.log("Activo fijo guardado exitosamente.");
       // Reiniciar el formulario tras éxito
       fixedAsset.reset();
       resetErrorForm();
     },
   });
 };
+
+const calculofecha = computed(() => {
+  // Si no hay fecha de adquisición o periodo, no calculamos la fecha final
+  if (!fixedAsset.date_acquisition || fixedAsset.period === "") {
+    return "";
+  }
+
+  // Convertir la fecha de adquisición a un objeto Date
+  const acquisitionDate = new Date(fixedAsset.date_acquisition);
+
+  // Asegurarse de que el periodo sea un número entero
+  const periodYears = parseInt(fixedAsset.period, 10);
+
+  // Si el periodo es 0, la fecha final será la misma que la fecha de adquisición
+  if (periodYears === 0) {
+    fixedAsset.date_end = acquisitionDate.toISOString().split("T")[0];
+    return fixedAsset.date_end;
+  }
+
+  // Si el periodo es mayor a 0, calculamos la fecha final sumando los años al año de adquisición
+  const endDate = new Date(
+    acquisitionDate.getFullYear() + periodYears,
+    acquisitionDate.getMonth(),
+    acquisitionDate.getDate()
+  );
+
+  // Asignamos la fecha de finalización calculada
+  fixedAsset.date_end = endDate.toISOString().split("T")[0];
+
+  return fixedAsset.date_end;
+});
+
+watch(
+  () => fixedAsset.type_id,
+  (newTypeId) => {
+    // Encuentra el tipo activo seleccionado
+    const selectedType = props.activeTypes.find(
+      (type) => type.id === newTypeId
+    );
+
+    // Si se encuentra, asigna el tiempo de depreciación al período
+    if (selectedType) {
+      fixedAsset.period =
+        selectedType.depresiation_time !== undefined
+          ? selectedType.depresiation_time
+          : ""; // Asigna el valor, incluso si es 0
+    } else {
+      // Si no hay tipo seleccionado, limpia el período
+      fixedAsset.period = "";
+    }
+  }
+);
 </script>
 
 <template>
@@ -93,129 +143,183 @@ const save = () => {
       </div>
 
       <!-- Formulario -->
-      <div>
-        <label class="mt-6 block">
-          <input
-            type="checkbox"
-            v-model="fixedAsset.is_depretation_a"
-            class="mr-2"
-          />
-          ¿Posee depreciacion acelerada?
-        </label>
-        <br />
 
-        <label class="mt-6 block">
-          <input type="checkbox" v-model="fixedAsset.is_legal" class="mr-2" />
-          ¿Tiene sustento legal de compra?
-        </label>
-        <br />
-        <TextInput
-          v-model="fixedAsset.vaucher"
-          type="text"
-          placeholder="001-001-000000009"
-          class="mt-2 block w-full"
-          max="17"
-        />
-        <InputError :message="errorForm.vaucher" class="mt-2" />
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Primera columna -->
+        <div class="grid grid-cols-1 gap-4">
+          <!--  primera columna dentro de la columna primera-->
+          <div class="col-span-6 sm:col-span-4">
+            <label class="mt-6 block">
+              <input
+                type="checkbox"
+                v-model="fixedAsset.is_depretation_a"
+                class="mr-2"
+              />
+              ¿Posee depreciación acelerada?
+            </label>
+          </div>
 
-        <!-- Fecha de adqusicion -->
-        <TextInput
-          v-model="fixedAsset.date_acquisition"
-          type="date"
-          class="mt-2 block w-full"
-        />
-        <InputError :message="errorForm.date_acquisition" class="mt-2" />
+          <!--  segunda columna dentro de la columna primera-->
+          <div class="col-span-6 sm:col-span-4">
+            <label class="mt-6 block">
+              <input
+                type="checkbox"
+                v-model="fixedAsset.is_legal"
+                class="mr-2"
+              />
+              ¿Tiene sustento legal de compra?
+            </label>
+          </div>
 
-        <TextInput
-          v-model="fixedAsset.detail"
-          type="text"
-          placeholder="Descripcion"
-          class="mt-2 block w-full"
-          max="17"
-        />
-        <InputError :message="errorForm.detail" class="mt-2" />
-
-        <TextInput
-          v-model="fixedAsset.code"
-          type="text"
-          placeholder="CMC23"
-          class="mt-2 block w-full"
-        />
-        <InputError :message="errorForm.code" class="mt-2" />
-
-        <TextInput
-          v-model="fixedAsset.type"
-          type="text"
-          placeholder="Vehiculos"
-          class="mt-2 block w-full"
-        />
-        <InputError :message="errorForm.type" class="mt-2" />
-
-        <TextInput
-          v-model="fixedAsset.address"
-          type="text"
-          placeholder="Lugar donde se encuentra el AF"
-          class="mt-2 block w-full"
-        />
-        <InputError :message="errorForm.address" class="mt-2" />
-
-        <TextInput
-          v-model="fixedAsset.period"
-          type="number"
-          placeholder="5"
-          class="mt-2 block w-full"
-        />
-        <InputError :message="errorForm.detail" class="mt-2" />
-
-        <TextInput
-          v-model="fixedAsset.value"
-          type="number"
-          placeholder="0,00"
-          class="mt-2 block w-full"
-          min="0"
-        />
-        <InputError :message="errorForm.value" class="mt-2" />
-
-        <TextInput
-          v-model="fixedAsset.residual_value"
-          type="number"
-          placeholder="0,00"
-          class="mt-2 block w-full"
-          min="0"
-        />
-        <InputError :message="errorForm.residual_value" class="mt-2" />
-
-        <!-- Fecha de finalizacion de depreciacion-->
-        <TextInput
-          v-model="fixedAsset.date_end"
-          type="date"
-          class="mt-2 block w-full"
-        />
-        <InputError :message="errorForm.date_end" class="mt-2" />
-
-        <select
-          v-model="fixedAsset.pay_method_id"
-          class="mt-2 block w-full rounded"
-        >
-          <option value="">Seleccione</option>
-          <option
-            v-for="payMethod in payMethods"
-            :key="payMethod.id"
-            :value="payMethod.id"
+          <!--  tercera columna dentro de la columna primera-->
+          <div
+            :hidden="fixedAsset.is_legal !== true"
+            class="col-span-6 sm:col-span-4"
           >
-            {{ payMethod.name }}
-          </option>
-        </select>
-        <InputError :message="errorForm.pay_method_id" class="mt-2" />
+            <InputLabel for="is_legal" value="Numero de documento" />
+            <TextInput
+              v-model="fixedAsset.vaucher"
+              type="text"
+              class="mt-2 block w-full"
+              max="17"
+            />
+            <InputError :message="errorForm.vaucher" class="mt-2" />
+          </div>
 
-        <div class="mt-4 text-right">
-          <button
-            @click="save"
-            class="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Guardar
-          </button>
+          <!--  cuarto columna dentro de la columna primera-->
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="date_acquisition" value="Fecha de adquisicion" />
+            <TextInput
+              v-model="fixedAsset.date_acquisition"
+              type="date"
+              class="mt-2 block w-full"
+            />
+          </div>
+
+          <!--  quinta columna dentro de la columna primera-->
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="detail" value="Detalle" />
+            <TextInput
+              v-model="fixedAsset.detail"
+              type="text"
+              class="mt-1 block w-full"
+              max="17"
+            />
+            <InputError :message="errorForm.detail" class="mt-2" />
+          </div>
+
+          <!--  sexta columna dentro de la columna primera-->
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="code" value="Codigo" />
+            <TextInput
+              v-model="fixedAsset.code"
+              type="text"
+              class="mt-1 block w-full"
+            />
+            <InputError :message="errorForm.code" class="mt-2" />
+          </div>
+
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="active_type" value="Tipo de activo fijo" />
+            <select
+              v-model="fixedAsset.type_id"
+              class="mt-2 block w-full rounded"
+            >
+              <option value="" selected>Seleccione</option>
+              <option
+                v-for="activeType in activeTypes"
+                :key="activeType.id"
+                :value="activeType.id"
+              >
+                {{ activeType.name }}
+              </option>
+            </select>
+            <InputError :message="errorForm.activeType" class="mt-2" />
+          </div>
         </div>
+
+        <!-- Segunda columna  de la principal-->
+
+        <div class="grid grid-cols-1 gap-4">
+          <!-- primera columna de la segunda columna -->
+
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="adress" value="Direccion del activo Fijo" />
+            <TextInput
+              v-model="fixedAsset.address"
+              type="text"
+              class="mt-2 block w-full"
+            />
+            <InputError :message="errorForm.address" class="mt-2" />
+          </div>
+
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="period" value="Periodo de depresiacion" />
+            <TextInput
+              v-model="fixedAsset.period"
+              type="number"
+              class="mt-2 block w-full"
+            />
+            <InputError :message="errorForm.period" class="mt-2" />
+          </div>
+
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="value" value="Valor del activo fijo" />
+            <TextInput
+              v-model="fixedAsset.value"
+              type="number"
+              class="mt-2 block w-full"
+              min="0"
+            />
+            <InputError :message="errorForm.value" class="mt-2" />
+          </div>
+
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="residual_value" value="Valor residual" />
+            <TextInput
+              v-model="fixedAsset.residual_value"
+              type="number"
+              class="mt-2 block w-full"
+              min="0"
+              :max="fixedAsset.value"
+            />
+            <InputError :message="errorForm.residual_value" class="mt-2" />
+          </div>
+
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="date_end" value="Fecha final de depreciación" />
+            <TextInput
+              :value="calculofecha"
+              v-model="fixedAsset.date_end"
+              type="date"
+              class="mt-2 block w-full"
+              disabled
+            />
+          </div>
+
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="pay_method_id" value="Metodo de pago" />
+            <select
+              v-model="fixedAsset.pay_method_id"
+              class="mt-2 block w-full rounded"
+            >
+              <option value="" selected>Seleccione</option>
+              <option
+                v-for="payMethod in payMethods"
+                :key="payMethod.id"
+                :value="payMethod.id"
+              >
+                {{ payMethod.name }}
+              </option>
+            </select>
+            <InputError :message="errorForm.pay_method_id" class="mt-2" />
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 text-right">
+        <button @click="save" class="px-4 py-2 bg-blue-500 text-white rounded">
+          Guardar
+        </button>
       </div>
     </div>
   </AdminLayout>

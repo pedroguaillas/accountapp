@@ -7,6 +7,13 @@ import { Link } from "@inertiajs/vue3";
 defineProps({
   fixedAssetss: { type: Array, default: () => [] },
 });
+
+// Función para formatear la fecha sin horas
+const formatDate = (date) => {
+  if (!date) return "";
+  const formattedDate = new Date(date).toLocaleDateString("es-EC"); // 'es-EC' para formato en español de Ecuador
+  return formattedDate;
+};
 </script>
 
 <template>
@@ -47,17 +54,13 @@ defineProps({
               class="border-t [&>td]:py-2"
             >
               <td>{{ i + 1 }}</td>
-              <td>{{ fixe.code || "No disponible" }}</td>
+              <td>{{ fixe.code ?? "" }}</td>
               <td>
-                {{ fixe.date_acquisition || "Fecha no disponible" }}
+                {{ formatDate(fixe.date_acquisition) ?? "" }}
               </td>
-              <td>{{ fixe.detail || "Detalle no disponible" }}</td>
+              <td>{{ fixe.detail ?? "" }}</td>
               <td>
-                {{
-                  fixe.value !== null
-                    ? fixe.value.toFixed(2)
-                    : "0.00"
-                }}
+                {{ fixe.value }}
               </td>
               <td>
                 <div class="relative inline-flex">

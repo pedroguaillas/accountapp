@@ -17,7 +17,7 @@ class FixedAsset extends Model
         'date_acquisition',//fecha de adquisicion
         'detail',//detalle de activo fijo
         'code',//codigo de activo fijo
-        'type',//tipo de activo fijo
+        'type_id',//tipo de activo fijo
         'address', // direccion o localizacion del activo fijo
         'period',//tiempo de depreciacion en anios
         'value', //valor  del af
@@ -29,13 +29,18 @@ class FixedAsset extends Model
         'is_legal' => 'boolean',
         'date_acquisition' => 'date',
         'period' => 'integer',
-        'value' => 'decimal',
-        'residual_value' => 'decimal',
+      //  'value' => 'decimal',
+        //'residual_value' => 'decimal',
         'date_end' => 'date',
     ];
     public function paymethod()
     {
         return $this->belongsTo(PayMethod::class);
+    }
+
+    public function activetype()
+    {
+        return $this->belongsTo(ActiveTypes::class);
     }
 }
 

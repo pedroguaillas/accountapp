@@ -35,6 +35,15 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
+        Schema::create('active_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name'); //
+            $table->integer('depresiation_time'); // 
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
 
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
@@ -128,6 +137,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('type'); // activo, pasivo, patrimonio, ingreso, gasto y costos
             $table->boolean("is_active")->default(true);
+            $table->boolean("is_detail")->default(false);
 
             $table->timestamps();
             $table->softDeletes();
@@ -179,6 +189,7 @@ return new class extends Migration {
             $table->id();
             $table->bigInteger('pay_method_id');
             $table->bigInteger('company_id');
+            $table->bigInteger('type_id');
 
             $table->boolean('is_depretation_a')->default(false);
             $table->boolean('is_legal')->default(false);
@@ -186,7 +197,7 @@ return new class extends Migration {
             $table->date('date_acquisition');
             $table->string('detail');
             $table->string('code');
-            $table->string('type');
+
             $table->string('address');
             $table->integer('period');
             $table->decimal('value', 14, 2)->default(0);
@@ -198,6 +209,7 @@ return new class extends Migration {
 
             $table->foreign('pay_method_id')->references('id')->on('pay_methods');
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->foreign('type_id')->references('id')->on('active_types');
 
         });
 
@@ -220,8 +232,7 @@ return new class extends Migration {
         Schema::dropIfExists('journal_entries');
         Schema::dropIfExists('pay_methods');
         Schema::dropIfExists('fixed_assets');
-
-
+        Schema::dropIfExists(' active_types');
 
     }
 };
