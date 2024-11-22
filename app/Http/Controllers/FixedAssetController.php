@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\FixedAsset;
 use App\Models\PayMethod;
+use App\Models\ActiveTypes;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,8 +14,13 @@ class FixedAssetController extends Controller
     public function index()
     {
         $company = Company::first();
+        $company = Company::first();
+      //  dd(FixedAsset::where('company_id', $company->id)->toSql(), $company->id);
+
         $fixedAssetss = FixedAsset::where('company_id', $company->id)->get();
-      //  dd($fixedAssetss);
+
+
+       // dd($fixedAssetss->toArray());
         return Inertia::render('FixedAsset/Index', [
             'fixedAssetss' => $fixedAssetss,
         ]);
@@ -25,9 +31,11 @@ class FixedAssetController extends Controller
     public function create()
     {
         $payMethods = PayMethod::all();
+        $activeTypes=ActiveTypes::all();
 
         return Inertia::render('FixedAsset/Create', [
             'payMethods' => $payMethods,
+            'activeTypes'=> $activeTypes,
         ]);
     }
     public function store(Request $request)
@@ -40,7 +48,6 @@ class FixedAssetController extends Controller
             'date_acquisition' => 'required|date',
             'detail' => 'nullable|string|max:300',
             'code' => 'required|string|max:20',
-            'type' => 'required|string|max:50',
             'address' => 'required|string|max:255',
             'period' => 'nullable|integer|min:0',
             'value' => 'required|numeric|min:0',

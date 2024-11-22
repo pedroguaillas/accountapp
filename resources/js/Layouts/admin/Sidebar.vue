@@ -76,7 +76,7 @@ const user = computed(() => page.props.auth.user)
                             de costos</Link>
                         </li>
                         <li>
-                            <Link href="#"
+                            <Link :href="route('fixedassets.index')"
                                 class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
                             Activos
                             fijos</Link>

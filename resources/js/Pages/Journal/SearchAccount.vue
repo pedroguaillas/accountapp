@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch } from "vue";
 import AccountSelectModal from "./AccountSelectModal.vue";
+import InputLabel from "@/Components/InputLabel.vue";
 
 // Props
 defineProps({
@@ -62,71 +63,70 @@ const agregarCuenta = () => {
     search.value = "";
     debit.value = "";
     have.value = "";
-  }else
-  {
+  } else {
     alert("Ingresar almenos un valor para el DEBE o el HABER");
   }
 };
 
 const emit = defineEmits(["selectAccount", "addJournalEntry"]);
-
-// Watchers para ajustar automáticamente el valor de "debit" o "have"
-// watch(debit, (newValue) => {
-//   if (newValue > 0) {
-//     have.value = 0; // Si hay un valor en "debit", "have" se pone en 0
-//   }
-// });
-
-// watch(have, (newValue) => {
-//   if (newValue > 0) {
-//     debit.value = 0; // Si hay un valor en "have", "debit" se pone en 0
-//   }
-// });
 </script>
 
 <template>
-  <div class="flex mt-2">
+  <div class="mt-2 grid grid-cols-6 ">
     <!-- Campo para el código -->
-    <div
-      class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-    >
-      {{ code }}
+    <div>
+      <InputLabel for="code" value="Codigo" />
+      <div
+        class="block w-full h-10 border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
+      >
+        {{ code }}
+      </div>
     </div>
     <!-- Campo para la descripción -->
-    <input
-      v-model="search"
-      type="text"
-      class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-      placeholder="Buscar..."
-    />
-    <button
-      @click="toggleModal"
-      class="bg-slate-500 text-white px-4 py-2 hover:bg-slate-600 focus:outline-none"
-    >
-      @
-    </button>
-
+    <div>
+      <InputLabel for="search" value="Buscar" />
+      <input
+        v-model="search"
+        type="text"
+        class="block w-full border border-gray-300 px-4 py-2 focus:outline-none"
+      />
+    </div>
+    <div class=" ">
+      <button
+        @click="toggleModal"
+        class="bg-slate-500 text-white px-4 py-2 hover:bg-slate-600 focus:outline-none"
+      >
+        @
+      </button>
+    </div>
     <!-- Campo para "Debe" -->
-    <input
-      type="number"
-      v-model.number="debit"
-      placeholder="Debe"
-      class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-    />
+    <div>
+      <InputLabel for="debit" value="Debe" />
+      <input
+        type="number"
+        v-model.number="debit"
+        class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
+      />
+    </div>
     <!-- Campo para "Haber" -->
-    <input
-      type="number"
-      v-model.number="have"
-      placeholder="Haber"
-      class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-    />
-    <button
-      type="button"
-      @click="agregarCuenta"
-      class="bg-blue-500 text-white rounded-r px-4 py-2 hover:bg-blue-600 focus:outline-none"
-    >
-      Agregar
-    </button>
+
+    <div>
+      <InputLabel for="have" value="Haber" />
+      <input
+        type="number"
+        v-model.number="have"
+        class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
+      />
+    </div>
+    <div>
+      <button
+        type="button"
+        @click="agregarCuenta"
+        class="bg-blue-500 text-white rounded-r px-4 py-2 hover:bg-blue-600 focus:outline-none"
+      >
+        Agregar
+      </button>
+    </div>
   </div>
 
   <!-- Modal de Selección de Cuenta -->
