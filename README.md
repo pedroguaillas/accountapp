@@ -39,3 +39,11 @@ Instalar de pendencias de node
 Levantar el servidor node
 `./vendor/bin/sail npm run dev`
 
+Migrar prinicipal
+`./vendor/bin/sail artisan migrate:fresh --seed`
+
+Migrar tenant
+`./vendor/bin/sail artisan tenants:migrate`
+
+Ejecutar Seeder Tenant
+`./vendor/bin/sail artisan tenants:seed --class=TenantSeeder`

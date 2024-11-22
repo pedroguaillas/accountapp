@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\ContributorType;
 use App\Models\EconomicActivity;
 use App\Models\PayMethod;
-use App\Models\ActiveTypes;
+use App\Models\ActiveType;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -33,12 +33,12 @@ class TenantSeeder extends Seeder
         PayMethod::create(['name' => 'OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO', 'code' => 20]);
         PayMethod::create(['name' => 'ENDOSO DE TÍTULOS', 'code' => 21]);
 
-        ActiveTypes::create(['name' => 'Terrenos', 'depresiation_time' => 0]);
-        ActiveTypes::create(['name' => 'Edificios', 'depresiation_time' => 20]);
-        ActiveTypes::create(['name' => 'Maquinaria, equipo e instalaciones', 'depresiation_time' => 10]);
-        ActiveTypes::create(['name' => 'Muebles enseres y equipos de oficina ', 'depresiation_time' => 10]);
-        ActiveTypes::create(['name' => 'Vehículos', 'depresiation_time' => 5]);
-        ActiveTypes::create(['name' => 'Equipo de computo, tecnológico y otros', 'depresiation_time' => 3]);
+        ActiveType::create(['name' => 'Terrenos', 'depresiation_time' => 0]);
+        ActiveType::create(['name' => 'Edificios', 'depresiation_time' => 20]);
+        ActiveType::create(['name' => 'Maquinaria, equipo e instalaciones', 'depresiation_time' => 10]);
+        ActiveType::create(['name' => 'Muebles enseres y equipos de oficina ', 'depresiation_time' => 10]);
+        ActiveType::create(['name' => 'Vehículos', 'depresiation_time' => 5]);
+        ActiveType::create(['name' => 'Equipo de computo, tecnológico y otros', 'depresiation_time' => 3]);
 
     }
 

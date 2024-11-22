@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\FixedAsset;
 use App\Models\PayMethod;
-use App\Models\ActiveTypes;
+use App\Models\ActiveType;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,30 +14,24 @@ class FixedAssetController extends Controller
     public function index()
     {
         $company = Company::first();
-        $company = Company::first();
-      //  dd(FixedAsset::where('company_id', $company->id)->toSql(), $company->id);
-
         $fixedAssetss = FixedAsset::where('company_id', $company->id)->get();
 
-
-       // dd($fixedAssetss->toArray());
         return Inertia::render('FixedAsset/Index', [
             'fixedAssetss' => $fixedAssetss,
         ]);
-
     }
-
 
     public function create()
     {
         $payMethods = PayMethod::all();
-        $activeTypes=ActiveTypes::all();
+        $activeTypes = ActiveType::all();
 
         return Inertia::render('FixedAsset/Create', [
             'payMethods' => $payMethods,
-            'activeTypes'=> $activeTypes,
+            'activeTypes' => $activeTypes,
         ]);
     }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -59,12 +53,6 @@ class FixedAssetController extends Controller
         $company = Company::first(); // Asegúrate de tener la empresa disponible
         $company->fixedassets()->create($request->all());
 
-        //return response()->json(['message' => 'Activo fijo creado con éxito.'], 201);
-
         return to_route('fixedassets.index');
-
     }
-
-
-
 }

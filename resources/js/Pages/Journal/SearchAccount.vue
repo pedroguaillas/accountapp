@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import AccountSelectModal from "./AccountSelectModal.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 
@@ -31,9 +31,6 @@ const handleAccountSelect = (account) => {
 
 // Método para agregar una cuenta al diario
 const agregarCuenta = () => {
-  // console.log(typeof debit);
-  // console.log(typeof debit.value);
-  // console.log(typeof have.value);
   if (accountId.value === 0) {
     alert("No se ha seleccionado la cuenta.");
     return; // Salir sin guardar
@@ -72,68 +69,50 @@ const emit = defineEmits(["selectAccount", "addJournalEntry"]);
 </script>
 
 <template>
-  <div class="mt-2 grid grid-cols-6 ">
+  <div class="mt-2 grid grid-cols-7">
+
     <!-- Campo para el código -->
     <div>
-      <InputLabel for="code" value="Codigo" />
-      <div
-        class="block w-full h-10 border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-      >
+      <InputLabel for="code" value="Código" />
+      <div class="block w-full h-10 border border-gray-300 rounded-l px-4 py-2 focus:outline-none">
         {{ code }}
       </div>
     </div>
+
     <!-- Campo para la descripción -->
-    <div>
+    <div class="col-span-3">
       <InputLabel for="search" value="Buscar" />
-      <input
-        v-model="search"
-        type="text"
-        class="block w-full border border-gray-300 px-4 py-2 focus:outline-none"
-      />
+      <div class="flex">
+        <input v-model="search" type="text" class="block w-full border border-gray-300 px-4 py-2 focus:outline-none" />
+        <button @click="toggleModal" class="bg-slate-500 text-white px-4 py-2 hover:bg-slate-600 focus:outline-none">
+          @
+        </button>
+      </div>
     </div>
-    <div class=" ">
-      <button
-        @click="toggleModal"
-        class="bg-slate-500 text-white px-4 py-2 hover:bg-slate-600 focus:outline-none"
-      >
-        @
-      </button>
-    </div>
+
     <!-- Campo para "Debe" -->
     <div>
       <InputLabel for="debit" value="Debe" />
-      <input
-        type="number"
-        v-model.number="debit"
-        class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-      />
+      <input type="number" v-model.number="debit"
+        class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none" />
     </div>
-    <!-- Campo para "Haber" -->
 
+    <!-- Campo para "Haber" -->
     <div>
       <InputLabel for="have" value="Haber" />
-      <input
-        type="number"
-        v-model.number="have"
-        class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none"
-      />
+      <input type="number" v-model.number="have"
+        class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none" />
     </div>
-    <div>
-      <button
-        type="button"
-        @click="agregarCuenta"
-        class="bg-blue-500 text-white rounded-r px-4 py-2 hover:bg-blue-600 focus:outline-none"
-      >
+
+    <div class="content-end">
+      <button type="button" @click="agregarCuenta"
+        class="bg-blue-500 w-full text-white rounded-r px-4 py-2 hover:bg-blue-600 focus:outline-none">
         Agregar
       </button>
     </div>
+
   </div>
 
   <!-- Modal de Selección de Cuenta -->
-  <AccountSelectModal
-    :show="modal"
-    :accounts="accounts"
-    @close="toggleModal"
-    @selectAccount="handleAccountSelect"
-  />
+  <AccountSelectModal :show="modal" :accounts="accounts" @close="toggleModal" @selectAccount="handleAccountSelect" />
 </template>

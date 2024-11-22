@@ -16,7 +16,7 @@ class JournalController extends Controller
     {
         $company = Company::first();
         // Subconsulta para journals
-        $journal = DB::table("journals")->select('id', 'date', 'description')
+        $journal = DB::table("journals")->selectRaw("id,to_char(date,'DD-MM-YYYY') AS date,description")
             ->where(
                 'company_id',
                 $company->id
@@ -57,41 +57,41 @@ class JournalController extends Controller
                         'debit' => $entry->debit,
                         'have' => $entry->have,
                     ];
-                })->values(), // Asegurarse de que las claves sean numéricas
+                }),
+                'total' => $entries->reduce(function ($sum, $entry) {
+                    return $sum + $entry->debit; // Acumular los valores de debit
+                }, 0),
             ];
         })->values(); // Eliminar las claves generadas por groupBy
 
-     
         // Retornar a la vista con los datos procesados
         return Inertia::render('Journal/Index', [
             'journals' => $journals,
         ]);
     }
 
-
-
     public function create()
     {
         $company = Company::first();
         $accounts = Account::select('id', 'code', 'name', 'is_detail')
-        ->where('company_id', $company->id)
-        ->where('is_detail', true) // Solo incluir cuentas donde is_detail es true
-        ->get();
-    
-        $costCenters = CostCenter::select('id', 'code', 'name')->where('company_id', $company->id)->get();
+            ->where('company_id', $company->id)
+            ->where('is_detail', true) // Solo incluir cuentas donde is_detail es true
+            ->get();
 
+        $costCenters = CostCenter::select('id', 'code', 'name')
+            ->where('company_id', $company->id)->get();
 
         return Inertia::render('Journal/Create', [
             'accounts' => $accounts,
             'costCenters' => $costCenters,
-
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'description' => 'required|min:1|max:999',
+            'description' => 'required|min:1|max:300',
+            'date' => 'required',
             'journalEntries.*.account_id' => 'required|min:1', // validar que exista esa cuenta 
             'journalEntries.*.debit' => 'required|min:0',
             'journalEntries.*.have' => 'required|min:0',
@@ -114,7 +114,6 @@ class JournalController extends Controller
         foreach ($requestJournalEntries as $journalEntry) {
             $journalEntries[] = [
                 'account_id' => $journalEntry['account_id'],
-
                 'debit' => $journalEntry['debit'],
                 'have' => $journalEntry['have'],
             ];
@@ -122,14 +121,11 @@ class JournalController extends Controller
 
         $journal->journalentries()->createMany($journalEntries);
 
-        // return Inertia::render('journal.index');
-
         return to_route('journal.index');
-
     }
+
     public function delete(Request $request, Journal $journal)
     {
-
         $journal->delete();
     }
 }
