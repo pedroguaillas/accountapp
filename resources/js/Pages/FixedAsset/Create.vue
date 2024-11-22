@@ -6,7 +6,9 @@ import { useForm } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import DynamicSelect from "@/Components/DynamicSelect.vue";
 import { watch } from "vue";
+import Checkbox from "@/Components/Checkbox.vue";
 
 // Props
 const props = defineProps({
@@ -35,7 +37,7 @@ const initialFixedAsset = {
 
 // Reactives
 const fixedAsset = useForm({ ...initialFixedAsset });
-const errorForm = reactive({ ...initialFixedAsset, date: "", date_end: "" });
+const errorForm = reactive({});
 
 const resetErrorForm = () => {
   Object.assign(errorForm, initialFixedAsset);
@@ -131,6 +133,16 @@ watch(
     }
   }
 );
+
+const activeTypeOptions = props.activeTypes.map((activeType) => ({
+  value: activeType.id,
+  label: activeType.name,
+}));
+
+const payMethodOptions = props.payMethods.map((payMethod) => ({
+  value: payMethod.id,
+  label: payMethod.name,
+}));
 </script>
 
 <template>
@@ -148,28 +160,22 @@ watch(
         <!-- Primera columna -->
         <div class="grid grid-cols-1 gap-4">
           <!--  primera columna dentro de la columna primera-->
+
           <div class="col-span-6 sm:col-span-4">
-            <label class="mt-6 block">
-              <input
-                type="checkbox"
-                v-model="fixedAsset.is_depretation_a"
-                class="mr-2"
-              />
-              ¿Posee depreciación acelerada?
-            </label>
+            <Checkbox
+              v-model:checked="fixedAsset.is_depretation_a"
+              label="¿Posee depreciación acelerada?"
+            />
+          </div>
+          <!--  segunda columna dentro de la columna primera-->
+
+          <div class="col-span-6 sm:col-span-4">
+          <Checkbox
+            v-model:checked="fixedAsset.is_legal"
+            label="¿Tiene sustento legal de compra?"
+          />
           </div>
 
-          <!--  segunda columna dentro de la columna primera-->
-          <div class="col-span-6 sm:col-span-4">
-            <label class="mt-6 block">
-              <input
-                type="checkbox"
-                v-model="fixedAsset.is_legal"
-                class="mr-2"
-              />
-              ¿Tiene sustento legal de compra?
-            </label>
-          </div>
 
           <!--  tercera columna dentro de la columna primera-->
           <div
@@ -180,7 +186,7 @@ watch(
             <TextInput
               v-model="fixedAsset.vaucher"
               type="text"
-              class="mt-2 block w-full"
+              class="mt-1 block w-full"
               max="17"
             />
             <InputError :message="errorForm.vaucher" class="mt-2" />
@@ -192,8 +198,9 @@ watch(
             <TextInput
               v-model="fixedAsset.date_acquisition"
               type="date"
-              class="mt-2 block w-full"
+              class="mt-1 block w-full"
             />
+            <InputError :message="errorForm.date_acquisition" class="mt-2" />
           </div>
 
           <!--  quinta columna dentro de la columna primera-->
@@ -221,19 +228,13 @@ watch(
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="active_type" value="Tipo de activo fijo" />
-            <select
+
+            <DynamicSelect
+              class="mt-1 block w-full"
               v-model="fixedAsset.type_id"
-              class="mt-2 block w-full rounded"
-            >
-              <option value="" selected>Seleccione</option>
-              <option
-                v-for="activeType in activeTypes"
-                :key="activeType.id"
-                :value="activeType.id"
-              >
-                {{ activeType.name }}
-              </option>
-            </select>
+              :options="activeTypeOptions"
+              autofocus
+            />
             <InputError :message="errorForm.activeType" class="mt-2" />
           </div>
         </div>
@@ -248,7 +249,7 @@ watch(
             <TextInput
               v-model="fixedAsset.address"
               type="text"
-              class="mt-2 block w-full"
+              class="mt-1 block w-full"
             />
             <InputError :message="errorForm.address" class="mt-2" />
           </div>
@@ -258,7 +259,7 @@ watch(
             <TextInput
               v-model="fixedAsset.period"
               type="number"
-              class="mt-2 block w-full"
+              class="mt-1 block w-full"
             />
             <InputError :message="errorForm.period" class="mt-2" />
           </div>
@@ -268,7 +269,7 @@ watch(
             <TextInput
               v-model="fixedAsset.value"
               type="number"
-              class="mt-2 block w-full"
+              class="mt-1 block w-full"
               min="0"
             />
             <InputError :message="errorForm.value" class="mt-2" />
@@ -279,7 +280,7 @@ watch(
             <TextInput
               v-model="fixedAsset.residual_value"
               type="number"
-              class="mt-2 block w-full"
+              class="mt-1 block w-full"
               min="0"
               :max="fixedAsset.value"
             />
@@ -292,26 +293,21 @@ watch(
               :value="calculofecha"
               v-model="fixedAsset.date_end"
               type="date"
-              class="mt-2 block w-full"
+              class="mt-1 block w-full"
               disabled
             />
+            <InputError :message="errorForm.date_end" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="pay_method_id" value="Metodo de pago" />
-            <select
+            <DynamicSelect
+              class="mt-1 block w-full"
               v-model="fixedAsset.pay_method_id"
-              class="mt-2 block w-full rounded"
-            >
-              <option value="" selected>Seleccione</option>
-              <option
-                v-for="payMethod in payMethods"
-                :key="payMethod.id"
-                :value="payMethod.id"
-              >
-                {{ payMethod.name }}
-              </option>
-            </select>
+              :options="payMethodOptions"
+              autofocus
+            />
+
             <InputError :message="errorForm.pay_method_id" class="mt-2" />
           </div>
         </div>

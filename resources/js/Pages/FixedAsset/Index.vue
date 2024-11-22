@@ -2,6 +2,7 @@
 // Importaciones
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Link } from "@inertiajs/vue3";
+import Table from "@/Components/Table.vue";
 
 // Props
 defineProps({
@@ -34,8 +35,7 @@ const formatDate = (date) => {
 
       <!-- Tabla de Activos Fijos -->
       <div class="w-full overflow-x-auto">
-        <table
-          class="mt-4 text-xs sm:text-sm table-auto w-full text-center text-gray-700"
+        <Table
         >
           <thead>
             <tr class="[&>th]:py-2">
@@ -71,7 +71,7 @@ const formatDate = (date) => {
               </td>
             </tr>
           </tbody>
-        </table>
+        </Table>
       </div>
     </div>
   </AdminLayout>
