@@ -5,6 +5,7 @@ import ModalCostCenter from "./ModalCostCenter.vue";
 import { router } from "@inertiajs/vue3";
 import { ref, reactive } from "vue";
 import axios from "axios";
+import Table from "@/Components/Table.vue";
 
 //Props
 defineProps({
@@ -113,9 +114,7 @@ const removeCostCenter = (costCenterId) => {
       <!-- Resposive -->
       <div class="w-full overflow-x-auto">
         <!-- Tabla -->
-        <table
-          class="mt-4 text-xs sm:text-sm table-auto w-full text-center text-gray-700"
-        >
+        <Table>
           <thead>
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
@@ -156,7 +155,7 @@ const removeCostCenter = (costCenterId) => {
               </td>
             </tr>
           </tbody>
-        </table>
+        </Table>
       </div>
     </div>
   </AdminLayout>

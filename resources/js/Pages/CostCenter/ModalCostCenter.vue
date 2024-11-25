@@ -5,12 +5,15 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import { useFocusNextField } from "@/composables/useFocusNextField";
 // Props
 defineProps({
   costCenter: { type: Object, default: () => ({}) },
   error: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
 });
+
+const { focusNextField } = useFocusNextField();
 
 // Emits
 defineEmits(["close", "save"]);
@@ -35,7 +38,7 @@ const typeOptions = [
     </template>
     <template #content>
       <div class="mt-4">
-        <form class="w-2xl grid grid-cols-1 gap-3">
+        <form class="w-2xl grid grid-cols-1 gap-3" @keydown.enter.prevent="focusNextField">
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="code" value="Codigo" />
             <TextInput

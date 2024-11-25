@@ -3,7 +3,7 @@
 // Imports
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import ImportExcel from './ImportExcel.vue';
-import { computed } from 'vue';
+import Table from "@/Components/Table.vue";
 
 //Props
 defineProps({
@@ -38,7 +38,7 @@ const styleAccount = (code) => {
             <!-- Resposive -->
             <div class="w-full overflow-x-auto">
                 <!-- Tabla -->
-                <table class="mt-4 text-xs sm:text-sm table-auto w-full text-center text-gray-700">
+                <Table>
                     <thead>
                         <tr class="[&>th]:py-2">
                             <th class="w-12 text-left">Cuenta</th>
@@ -55,7 +55,7 @@ const styleAccount = (code) => {
                             </td>
                         </tr>
                     </tbody>
-                </table>
+                </Table>
             </div>
         </div>
 

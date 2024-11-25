@@ -86,8 +86,9 @@ Route::middleware([
         Route::get('activos-fijos', [FixedAssetController::class, 'index'])->name('fixedassets.index');
         Route::get('activos-fijos/crear', [FixedAssetController::class, 'create'])->name('fixedassets.create');
         Route::post('fixedassets', [FixedAssetController::class, 'store'])->name('fixedassets.store');
-        Route::put('fixedassets/{fixedasset}', [FixedAssetController::class, 'update'])->name('fixedassets.update');
-
+        Route::get('activos-fijos/editar/{fixedAsset_id}', [FixedAssetController::class, 'edit'])->name('fixedassets.edit');
+        Route::put('fixedassets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('fixedassets.update');
+       
 
 
     });
