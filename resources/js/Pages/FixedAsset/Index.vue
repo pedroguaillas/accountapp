@@ -32,11 +32,11 @@ defineProps({
           <thead>
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
-              <th>Código</th>
-              <th>Fecha</th>
-              <th>Detalle</th>
-              <th>Valor</th>
-              <th class="w-1">Acciones</th>
+              <th>CODIGO</th>
+              <th>FECHA</th>
+              <th>DETALLE</th>
+              <th>VALOR</th>
+              <th class="w-1">ACCIONES</th>
             </tr>
           </thead>
           <tbody>

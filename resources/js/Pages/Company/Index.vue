@@ -116,7 +116,7 @@ const update = (companyEdit) => {
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
               <th>RUC</th>
-              <th>Razon social</th>
+              <th>RAZON SOCIAL</th>
               <th class="w-1"></th>
             </tr>
           </thead>
