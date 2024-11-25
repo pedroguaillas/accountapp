@@ -5,6 +5,7 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import { useFocusNextField } from "@/composables/useFocusNextField";
 
 // Props
 const props = defineProps({
@@ -14,6 +15,8 @@ const props = defineProps({
   economyActivities: { type: Array, default: () => [] },
   contributorTypes: { type: Array, default: () => [] },
 });
+
+const { focusNextField } = useFocusNextField();
 
 // Emits
 defineEmits(["close", "save"]);
@@ -40,7 +43,7 @@ const contributorTypeOptions = props.contributorTypes.map(
     </template>
     <template #content>
       <div class="mt-4">
-        <form class="w-2xl grid grid-cols-1 gap-3">
+        <form class="w-2xl grid grid-cols-1 gap-3"  @keydown.enter.prevent="focusNextField">
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="ruc" value="RUC" />
 
@@ -48,9 +51,9 @@ const contributorTypeOptions = props.contributorTypes.map(
               v-model="company.ruc"
               type="text"
               class="mt-1 block w-full"
-              placeholder="RUC"
               minlength="13"
               maxlength="13"
+              required
             />
             <InputError :message="error.ruc" class="mt-2" />
           </div>
@@ -61,9 +64,9 @@ const contributorTypeOptions = props.contributorTypes.map(
               v-model="company.company"
               type="text"
               class="mt-1 block w-full"
-              placeholder="Razon social"
               minlength="3"
               maxlength="300"
+              required
             />
             <InputError :message="error.company" class="mt-2" />
           </div>

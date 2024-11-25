@@ -6,7 +6,7 @@ import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
 import Checkbox from "@/Components/Checkbox.vue";
-
+import { useFocusNextField } from "@/composables/useFocusNextField";
 import { ref } from "vue";
 
 // Props
@@ -15,6 +15,8 @@ defineProps({
   error: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
 });
+
+const { focusNextField } = useFocusNextField();
 
 const enviromentTypeOptions = [
   { value: "1", label: "Prueba" },
@@ -33,7 +35,7 @@ defineEmits(["close", "save"]);
     </template>
     <template #content>
       <div class="mt-4">
-        <form class="w-2xl grid grid-cols-1 gap-3">
+        <form class="w-2xl grid grid-cols-1 gap-3"  @keydown.enter.prevent="focusNextField">
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="number" value="Numero de establecimiento" />
             <TextInput

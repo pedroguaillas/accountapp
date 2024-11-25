@@ -112,37 +112,52 @@ const calculofecha = computed(() => {
 
   return fixedAsset.date_end;
 });
+const activeTypeOptions = Array.isArray(props.activeTypes)
+  ? props.activeTypes.map((activeType) => ({
+      value: activeType.id,
+      label: activeType.name,
+    }))
+  : [];
+
+const payMethodOptions = Array.isArray(props.payMethods)
+  ? props.payMethods.map((payMethod) => ({
+      value: payMethod.id,
+      label: payMethod.name,
+    }))
+  : [];
 
 watch(
-  () => fixedAsset.type_id,
+  () => fixedAsset.type_id, // Observa cambios en el ID
   (newTypeId) => {
-    // Encuentra el tipo activo seleccionado
+    if (!Array.isArray(props.activeTypes)) {
+      console.error(
+        "props.activeTypes no es un array válido:",
+        props.activeTypes
+      );
+      return;
+    }
+    console.log("props.activeTypes:", props.activeTypes);
+    console.log("ID buscado (newTypeId):", newTypeId);
+
     const selectedType = props.activeTypes.find(
-      (type) => type.id === newTypeId
+      (type) => String(type.id) === String(newTypeId) // Comparación flexible
     );
 
-    // Si se encuentra, asigna el tiempo de depreciación al período
     if (selectedType) {
-      fixedAsset.period =
-        selectedType.depresiation_time !== undefined
-          ? selectedType.depresiation_time
-          : ""; // Asigna el valor, incluso si es 0
+      console.log("Tipo seleccionado encontrado:", selectedType);
+      fixedAsset.period = selectedType.depresiation_time ?? "";
     } else {
-      // Si no hay tipo seleccionado, limpia el período
-      fixedAsset.period = "";
+      console.warn(`No se encontró ningún tipo activo con el ID: ${newTypeId}`);
+      console.log(
+        "IDs disponibles en props.activeTypes:",
+        props.activeTypes.map((type) => type.id)
+      );
+      fixedAsset.period = ""; // Limpia si no se encuentra
     }
+
+    console.log("Periodo actualizado del activo fijo:", fixedAsset.period);
   }
 );
-
-const activeTypeOptions = props.activeTypes.map((activeType) => ({
-  value: activeType.id,
-  label: activeType.name,
-}));
-
-const payMethodOptions = props.payMethods.map((payMethod) => ({
-  value: payMethod.id,
-  label: payMethod.name,
-}));
 </script>
 
 <template>
@@ -170,12 +185,11 @@ const payMethodOptions = props.payMethods.map((payMethod) => ({
           <!--  segunda columna dentro de la columna primera-->
 
           <div class="col-span-6 sm:col-span-4">
-          <Checkbox
-            v-model:checked="fixedAsset.is_legal"
-            label="¿Tiene sustento legal de compra?"
-          />
+            <Checkbox
+              v-model:checked="fixedAsset.is_legal"
+              label="¿Tiene sustento legal de compra?"
+            />
           </div>
-
 
           <!--  tercera columna dentro de la columna primera-->
           <div

@@ -8,13 +8,6 @@ import Table from "@/Components/Table.vue";
 defineProps({
   fixedAssetss: { type: Array, default: () => [] },
 });
-
-// Función para formatear la fecha sin horas
-const formatDate = (date) => {
-  if (!date) return "";
-  const formattedDate = new Date(date).toLocaleDateString("es-EC"); // 'es-EC' para formato en español de Ecuador
-  return formattedDate;
-};
 </script>
 
 <template>
@@ -35,8 +28,7 @@ const formatDate = (date) => {
 
       <!-- Tabla de Activos Fijos -->
       <div class="w-full overflow-x-auto">
-        <Table
-        >
+        <Table>
           <thead>
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
@@ -56,7 +48,7 @@ const formatDate = (date) => {
               <td>{{ i + 1 }}</td>
               <td>{{ fixe.code ?? "" }}</td>
               <td>
-                {{ formatDate(fixe.date_acquisition) ?? "" }}
+                {{ fixe.date_acquisition ?? "" }}
               </td>
               <td>{{ fixe.detail ?? "" }}</td>
               <td>
@@ -64,9 +56,12 @@ const formatDate = (date) => {
               </td>
               <td>
                 <div class="relative inline-flex">
-                  <button class="rounded px-2 py-1 bg-blue-500 text-white">
-                    <i class="fa fa-edit"></i> Modificar
-                  </button>
+                  <Link
+                    :href="route('fixedassets.edit', fixe.id)"
+                    class="rounded px-2 py-1 bg-blue-500 text-white"
+                  >
+                    <i class="fa fa-edit"> </i> Modificar
+                  </Link>
                 </div>
               </td>
             </tr>

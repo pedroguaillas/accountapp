@@ -29,8 +29,8 @@ class FixedAsset extends Model
         'is_legal' => 'boolean',
         'date_acquisition' => 'date',
         'period' => 'integer',
-      //  'value' => 'decimal',
-        //'residual_value' => 'decimal',
+        'value' => 'float',
+        'residual_value' => 'float',
         'date_end' => 'date',
     ];
     public function paymethod()
