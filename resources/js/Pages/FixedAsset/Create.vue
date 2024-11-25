@@ -196,11 +196,12 @@ watch(
             :hidden="fixedAsset.is_legal !== true"
             class="col-span-6 sm:col-span-4"
           >
-            <InputLabel for="is_legal" value="Numero de documento" />
+            <InputLabel for="is_legal" value="Número de documento" />
             <TextInput
               v-model="fixedAsset.vaucher"
               type="text"
               class="mt-1 block w-full"
+               placeholder="001-001-098765432"
               max="17"
             />
             <InputError :message="errorForm.vaucher" class="mt-2" />
@@ -208,7 +209,7 @@ watch(
 
           <!--  cuarto columna dentro de la columna primera-->
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="date_acquisition" value="Fecha de adquisicion" />
+            <InputLabel for="date_acquisition" value="Fecha de adquisición" />
             <TextInput
               v-model="fixedAsset.date_acquisition"
               type="date"
@@ -231,7 +232,7 @@ watch(
 
           <!--  sexta columna dentro de la columna primera-->
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="code" value="Codigo" />
+            <InputLabel for="code" value="Código" />
             <TextInput
               v-model="fixedAsset.code"
               type="text"
@@ -259,7 +260,7 @@ watch(
           <!-- primera columna de la segunda columna -->
 
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="adress" value="Direccion del activo Fijo" />
+            <InputLabel for="adress" value="Dirección del activo fijo" />
             <TextInput
               v-model="fixedAsset.address"
               type="text"
@@ -269,7 +270,7 @@ watch(
           </div>
 
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="period" value="Periodo de depresiacion" />
+            <InputLabel for="period" value="Periodo de depreciación" />
             <TextInput
               v-model="fixedAsset.period"
               type="number"
@@ -314,7 +315,7 @@ watch(
           </div>
 
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="pay_method_id" value="Metodo de pago" />
+            <InputLabel for="pay_method_id" value="Método de pago" />
             <DynamicSelect
               class="mt-1 block w-full"
               v-model="fixedAsset.pay_method_id"

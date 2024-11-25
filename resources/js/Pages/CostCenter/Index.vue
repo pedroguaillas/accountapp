@@ -118,9 +118,9 @@ const removeCostCenter = (costCenterId) => {
           <thead>
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
-              <th>Código</th>
-              <th>Nombre</th>
-              <th>Tipo</th>
+              <th>CODIGO</th>
+              <th>NOMBRE</th>
+              <th>TIPO</th>
               <th class="w-1"></th>
             </tr>
           </thead>

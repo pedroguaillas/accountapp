@@ -40,7 +40,7 @@ const typeOptions = [
       <div class="mt-4">
         <form class="w-2xl grid grid-cols-1 gap-3" @keydown.enter.prevent="focusNextField">
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="code" value="Codigo" />
+            <InputLabel for="code" value="Código" />
             <TextInput
               v-model="costCenter.code"
               type="text"

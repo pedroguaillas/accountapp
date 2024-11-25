@@ -41,8 +41,8 @@ const styleAccount = (code) => {
                 <Table>
                     <thead>
                         <tr class="[&>th]:py-2">
-                            <th class="w-12 text-left">Cuenta</th>
-                            <th class="text-left">Descripción</th>
+                            <th class="w-12 text-left">CUENTA</th>
+                            <th class="text-left">DESCRIPCION</th>
                         </tr>
                     </thead>
                     <tbody>

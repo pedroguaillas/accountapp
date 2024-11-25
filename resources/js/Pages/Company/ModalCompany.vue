@@ -59,7 +59,7 @@ const contributorTypeOptions = props.contributorTypes.map(
           </div>
 
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="company" value="Compania" />
+            <InputLabel for="company" value="Companía" />
             <TextInput
               v-model="company.company"
               type="text"
