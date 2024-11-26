@@ -5,18 +5,18 @@ import Table from "@/Components/Table.vue";
 
 // Props
 defineProps({
-  fixedAssetss: { type: Array, default: () => [] },
+  depreciations: { type: Array, default: () => [] },
 });
 </script>
 
 <template>
-  <!-- Tarjeta de Activos Fijos -->
+  <!-- Tarjeta de Depreciación -->
   <div class="p-4 bg-white rounded drop-shadow-md">
     <div class="flex justify-between items-center">
-      <h2 class="text-sm sm:text-lg font-bold">Activos fijos</h2>
+      <h2 class="text-sm sm:text-lg font-bold">Depreciación</h2>
       <div class="flex justify-end mb-3">
         <Link
-          :href="route('fixedassets.create')"
+         
           class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
         >
           +
@@ -24,22 +24,22 @@ defineProps({
       </div>
     </div>
 
-    <!-- Tabla de Activos Fijos -->
+    <!-- Tabla de Depreciación -->
     <div class="w-full overflow-x-auto">
       <Table>
         <thead>
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
-            <th>CODIGO</th>
+            <th>ACTIVO</th>
             <th>FECHA</th>
-            <th>DETALLE</th>
             <th>VALOR</th>
+            <th>DEPRECIACIÓN</th>
             <th class="w-1">ACCIONES</th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(fixe, i) in fixedAssetss"
+            v-for="(fixe, i) in  depreciations"
             :key="fixe.id"
             class="border-t [&>td]:py-2"
           >

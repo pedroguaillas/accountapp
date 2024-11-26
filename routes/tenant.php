@@ -8,6 +8,9 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\DepreciationController;
+use App\Http\Controllers\AssetManagementController;
+
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -90,6 +93,10 @@ Route::middleware([
         Route::put('fixedassets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('fixedassets.update');
        
 
+        Route::get('/depreciacion', [DepreciationController::class, 'index'])->name('depreciations.index');
+
+        Route::get('/activos-depreciacion', [AssetManagementController::class, 'index'])->name('assets.depreciation');
+        
 
     });
 });
