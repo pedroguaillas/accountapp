@@ -77,7 +77,7 @@ const user = computed(() => page.props.auth.user)
                             de costos</Link>
                         </li>
                         <li>
-                            <Link :href="route('fixedassets.index')"
+                            <Link :href="route('assetsdepreciation.index')"
                                 class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
                             Activos
                             fijos</Link>
@@ -85,8 +85,7 @@ const user = computed(() => page.props.auth.user)
                         <li>
                             <Link href="#"
                                 class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
-                            Amortizaciones
-                            y depreciaciones</Link>
+                            Activos intangibles</Link>
                         </li>
                     </ul>
                 </li>
