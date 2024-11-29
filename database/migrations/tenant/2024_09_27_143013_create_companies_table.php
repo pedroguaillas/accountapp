@@ -214,6 +214,31 @@ return new class extends Migration {
         });
 
 
+        Schema::create('intangible_assets', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('pay_method_id');
+            $table->bigInteger('company_id');
+
+
+            $table->String('type');
+            $table->boolean('is_legal')->default(false);
+            $table->string('vaucher')->nullable();
+            $table->date('date_acquisition');
+            $table->string('detail');
+            $table->string('code');
+            $table->integer('period');
+            $table->decimal('value', 14, 2)->default(0);
+            $table->date('date_end');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('pay_method_id')->references('id')->on('pay_methods');
+            $table->foreign('company_id')->references('id')->on('companies');
+
+        });
+
+
     }
 
     /**
@@ -232,7 +257,8 @@ return new class extends Migration {
         Schema::dropIfExists('journal_entries');
         Schema::dropIfExists('pay_methods');
         Schema::dropIfExists('fixed_assets');
-        Schema::dropIfExists(' active_types');
+        Schema::dropIfExists('active_types');
+        Schema::dropIfExists('intangible_assets');
 
     }
 };

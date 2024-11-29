@@ -37,6 +37,8 @@ function prevPage(tab) {
     window.location.href = proms.depreciations.prev_page_url;
   }
 }
+
+
 </script>
 
 <template>

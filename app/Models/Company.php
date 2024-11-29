@@ -55,4 +55,9 @@ class Company extends Model
     {
         return $this->hasMany(FixedAsset::class);
     }
+
+    public function intangibleassets()
+    {
+        return $this->hasMany(IntangibleAsset::class);
+    }
 }

@@ -3,31 +3,33 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import ModalCostCenter from "./ModalCostCenter.vue";
 import { router } from "@inertiajs/vue3";
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import axios from "axios";
 import Table from "@/Components/Table.vue";
 
-//Props
-defineProps({
-  costCenters: { type: Array, default: () => [] },
+// Props
+const props = defineProps({
+  costCenters: { type: Object, default: () => ({ data: [] }) }, // Default empty array to avoid undefined errors
+  filters: { type: String, default: "" },
 });
 
 // Refs
 const modal = ref(false);
+const search = ref(props.filters);
 
+// Initial cost center object
 const initialCostCenter = { name: "", code: "", type: "", state: "" };
 
 // Reactives
 const costCenter = reactive({ ...initialCostCenter });
 const errorForm = reactive({ ...initialCostCenter });
 
+// Functions
 const newCostCenter = () => {
-  // Reinicio el formularios con valores vacios
   if (costCenter.id !== undefined) {
     delete costCenter.id;
   }
   Object.assign(costCenter, initialCostCenter);
-  // Muestro el modal
   toggle();
 };
 
@@ -40,45 +42,39 @@ const toggle = () => {
 };
 
 const save = () => {
-  if (costCenter.id === undefined) {
-    // const data = { ...club, category_id: props.category.id, group_id: club.group_id > 0 ? club.group_id : null, extra_points: club.extra_points === '' ? 0 : club.extra_points }
-    axios
-      .post(route("costCenter.store"), costCenter)
-      .then(() => {
-        toggle();
-        resetErrorForm();
-
-        router.reload({ only: ["costCenters"] });
-      })
-      .catch((error) => {
-        resetErrorForm();
-
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
-        });
-      });
-  } else {
-    axios
-      .put(route("costCenter.update", costCenter.id), costCenter)
-      .then(() => {
-        toggle();
-        resetErrorForm();
-        router.reload({ only: ["costCenters"] });
-      })
-      .catch((error) => {
-        resetErrorForm();
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
-        });
-      });
+  // Validating input fields before sending the request
+  if (!costCenter.name || !costCenter.code || !costCenter.type) {
+    alert("Por favor, complete todos los campos");
+    return;
   }
+
+  const routeMethod = costCenter.id ? "put" : "post";
+  const routeName = costCenter.id
+    ? route("costCenter.update", costCenter.id)
+    : route("costCenter.store");
+
+  axios[routeMethod](routeName, costCenter)
+    .then(() => {
+      toggle();
+      resetErrorForm();
+      router.reload({ only: ["costCenters"] });
+    })
+    .catch((error) => {
+      resetErrorForm();
+      if (error.response) {
+        Object.keys(error.response.data.errors).forEach((key) => {
+          errorForm[key] = error.response.data.errors[key][0];
+        });
+      } else {
+        console.error("Error desconocido", error);
+        alert("Hubo un error al procesar la solicitud");
+      }
+    });
 };
 
 const update = (costCenterEdit) => {
   resetErrorForm();
-  Object.keys(costCenterEdit).forEach((key) => {
-    costCenter[key] = costCenterEdit[key];
-  });
+  Object.assign(costCenter, costCenterEdit);
   toggle();
 };
 
@@ -94,6 +90,38 @@ const removeCostCenter = (costCenterId) => {
       });
   }
 };
+
+const loading = ref(false);
+
+// Watch for search changes
+watch(
+  search,
+  async (newQuery) => {
+    // Solo activar la búsqueda si la longitud es al menos 1
+    const url = route("costcenter.index"); // Obtener la URL con la función route
+
+    loading.value = true; // Activar el estado de carga
+
+    try {
+      // Realizar la solicitud GET utilizando router.get
+      const response = await router.get(
+        url,
+        {
+          search: newQuery, // Pasar los parámetros de búsqueda
+        },
+        { preserveState: true } //otros parametros
+      );
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // Finalizar el estado de carga
+      loading.value = false;
+    }
+  },
+  { immediate: false } // Ejecutar inmediatamente al montar el componente
+);
+
+// Watch for search changes
 </script>
 
 <template>
@@ -110,6 +138,9 @@ const removeCostCenter = (costCenterId) => {
           +
         </button>
       </div>
+      <!-- Buscar -->
+      Buscar
+      <input v-model="search" type="search" name="search" />
 
       <!-- Resposive -->
       <div class="w-full overflow-x-auto">
@@ -126,7 +157,7 @@ const removeCostCenter = (costCenterId) => {
           </thead>
           <tbody>
             <tr
-              v-for="(costCenter, i) in costCenters"
+              v-for="(costCenter, i) in props.costCenters.data"
               :key="costCenter.id"
               class="border-t [&>td]:py-2"
             >
@@ -160,6 +191,7 @@ const removeCostCenter = (costCenterId) => {
     </div>
   </AdminLayout>
 
+  <!-- Modal Component for CostCenter -->
   <ModalCostCenter
     :show="modal"
     :costCenter="costCenter"

@@ -7,6 +7,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\FixedAssetController;
+use App\Http\Controllers\IntangibleAssetController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\AssetManagementController;
@@ -89,14 +90,25 @@ Route::middleware([
         Route::get('activos-fijos', [FixedAssetController::class, 'index'])->name('fixedassets.index');
         Route::get('activos-fijos/crear', [FixedAssetController::class, 'create'])->name('fixedassets.create');
         Route::post('fixedassets', [FixedAssetController::class, 'store'])->name('fixedassets.store');
-        Route::get('activos-fijos/editar/{fixedAsset_id}', [FixedAssetController::class, 'edit'])->name('fixedassets.edit');
+        Route::get('activos-fijos/editar/{fixedAssetId}', [FixedAssetController::class, 'edit'])->name('fixedassets.edit');
         Route::put('fixedassets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('fixedassets.update');
-       
+
 
         Route::get('/depreciacion', [DepreciationController::class, 'index'])->name('depreciations.index');
 
-        Route::get('/activos-depreciacion', [AssetManagementController::class, 'index'])->name('assets.depreciation');
-        
+        Route::get('/activos-depreciacion', [AssetManagementController::class, 'index'])->name('assetsdepreciation.index');
+
+
+        // intngible assets  //poner las rutas con nombre en plural 
+        Route::get('activos-intangibles', [IntangibleAssetController::class, 'index'])->name('intangibleassets.index');
+        Route::get('activos-intangibles/crear', [IntangibleAssetController::class, 'create'])->name('intangibleassets.create');
+       Route::post('intangibleassets', [IntangibleAssetController::class, 'store'])->name('intangibleassets.store');
+        Route::get('activos-intangible/editar/{intangibleAssetId}', [IntangibleAssetController::class, 'edit'])->name('intangibleassets.edit');
+        Route::put('intangibleassets/{intangibleasset}', [IntangibleAssetController::class, 'update'])->name('intangibleassets.update');
+
+
+        //resumir rutas
+       // Route::resource('intangibleassets', IntangibleAssetController::class)->only(['store','update']);
 
     });
 });
