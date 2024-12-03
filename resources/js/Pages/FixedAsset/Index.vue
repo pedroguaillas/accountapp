@@ -1,13 +1,40 @@
 <script setup>
 // Importaciones
-import { Link } from "@inertiajs/vue3";
+import { Link, router } from "@inertiajs/vue3";
+import { ref } from "vue";
 import Table from "@/Components/Table.vue";
-
+import axios from "axios";
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 // Props
 defineProps({
   fixedAssetss: { type: Array, default: () => [] },
 });
+
+const modal = ref(false);
+const deleteid = ref(0);
+
+const toggle = () => {
+  modal.value = !modal.value;
+};
+
+const removeFixedAsset = (fixedAssetId) => {
+  toggle();
+  deleteid.value = fixedAssetId;
+};
+
+const deletefixed = () => {
+  axios
+    .delete(route("fixedassets.delete", deleteid.value))
+    .then(() => {
+      router.visit(route("assetsdepreciation.index")); // Redirige a la ruta deseada
+    })
+    .catch((error) => {
+      console.error("Error al eliminar el activo fijo", error);
+    });
+};
 </script>
+
 
 <template>
   <!-- Tarjeta de Activos Fijos -->
@@ -61,10 +88,26 @@ defineProps({
                   <i class="fa fa-edit"> </i> Modificar
                 </Link>
               </div>
+              <button
+                class="rounded px-2 py-1 bg-red-500 text-white"
+                @click="removeFixedAsset(fixe.id)"
+              >
+                <i class="fa fa-trash"></i> Eliminar
+              </button>
             </td>
           </tr>
         </tbody>
       </Table>
     </div>
   </div>
+
+  <ConfirmationModal :show="modal">
+    <template #title> ELIMINAR ACTIVOS FIJOS </template>
+    <template #content> Esta seguro de eliminar el activo fijo? </template>
+    <template #footer>
+      <PrimaryButton type="button" @click="deletefixed">Aceptar</PrimaryButton>
+    </template>
+  </ConfirmationModal>
 </template>
+
+

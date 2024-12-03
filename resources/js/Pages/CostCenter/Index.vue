@@ -6,6 +6,8 @@ import { router } from "@inertiajs/vue3";
 import { ref, reactive, watch } from "vue";
 import axios from "axios";
 import Table from "@/Components/Table.vue";
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 // Props
 const props = defineProps({
@@ -39,6 +41,13 @@ const resetErrorForm = () => {
 
 const toggle = () => {
   modal.value = !modal.value;
+};
+
+const modal1 = ref(false);
+const deleteid = ref(0);
+
+const toggle1 = () => {
+  modal1.value = !modal1.value;
 };
 
 const save = () => {
@@ -79,17 +88,24 @@ const update = (costCenterEdit) => {
 };
 
 const removeCostCenter = (costCenterId) => {
-  if (confirm("¿Estás seguro de que deseas eliminar este centro de costos?")) {
-    axios
-      .delete(route("costCenter.delete", costCenterId))
-      .then(() => {
-        router.reload({ only: ["costCenters"] });
-      })
-      .catch((error) => {
-        console.error("Error al eliminar el centro de costos", error);
-      });
-  }
+  toggle1();
+  deleteid.value = costCenterId;
 };
+
+
+
+const deletecostcenter = () => {
+  axios
+    .delete(route("costCenter.delete", deleteid.value ))  // Eliminar centro de costos
+    .then(() => {
+      // Después de eliminar el centro de costos, redirigir a la ruta deseada
+      router.visit(route("costcenter.index"));
+    })
+    .catch((error) => {
+      console.error("Error al eliminar el centro de costos", error);
+    });
+};
+
 
 const loading = ref(false);
 
@@ -199,4 +215,11 @@ watch(
     @close="toggle"
     @save="save"
   />
+  <ConfirmationModal :show="modal1">
+    <template #title> ELIMINAR CENTRO DE COSTOS </template>
+    <template #content> Esta seguro de eliminar el centro de costo? </template>
+    <template #footer>
+      <PrimaryButton type="button" @click="deletecostcenter">Aceptar</PrimaryButton>
+    </template>
+  </ConfirmationModal>
 </template>

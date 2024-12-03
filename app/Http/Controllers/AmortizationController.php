@@ -3,32 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
-use App\Models\IntangibleAsset;
+use App\Models\FixedAsset;
 use App\Models\PayMethod;
+use App\Models\ActiveType;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 
-class IntangibleAssetController extends Controller
+class AmortizationController extends Controller
 {
     public function index()
     {
-        $company = Company::first();
-        $intangibleAssetss = IntangibleAsset::where('company_id', $company->id)
-            ->selectRaw("id, code,to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition,detail,value")
-            ->where('company_id', $company->id)
-            ->get();
 
-        //dd($intangibleAssetss);
-        return Inertia::render('IntangibleAsset/Index', [
-            'intangibleAssetss' => $intangibleAssetss,
+        //$depreciations = Depreciation::with('fixed_asset')->get(); // Obtén las depreciaciones
+        return Inertia::render('IntangibleAsset/Amortizacion', [
+            'amortizations' => FixedAsset::all(),
         ]);
     }
 
     public function create()
     {
         $payMethods = PayMethod::all();
-  
 
         return Inertia::render('IntangibleAsset/Create', [
             'payMethods' => $payMethods,
@@ -44,20 +39,20 @@ class IntangibleAssetController extends Controller
             'date_acquisition' => 'required|date',
             'detail' => 'nullable|string|max:300',
             'code' => 'required|string|max:20',
-            'period' => 'nullable|integer',
+            'period' => 'nullable|integer|min:0',
             'value' => 'required|numeric|min:0',
             'date_end' => 'nullable|date',
         ]);
 
-        // Crear el activo inatngible en la base de datos
+        // Crear el activo fijo en la base de datos
         $company = Company::first(); // Asegúrate de tener la empresa disponible
-        $company->intangibleassets()->create($request->all());
+        $company->fixedassets()->create($request->all());
 
-        return to_route('intangibleamortization.index');
+        return to_route('intangibleassets.index');
     }
-    public function edit(int $intangibleAsset_id)
+    public function edit(int $fixedAsset_id)
     {
-        $intangibleAsset = DB::table("intangible_assets")
+        $fixedAsset = DB::table("fixed_assets")
             ->selectRaw("
             id, 
             pay_method_id, 
@@ -71,52 +66,43 @@ class IntangibleAssetController extends Controller
             CAST(value AS FLOAT) as value, 
             to_char(date_end, 'YYYY-MM-DD') as date_end
         ")
-            ->where('id', $intangibleAsset_id)
+            ->where('id', $fixedAsset_id)
             ->first();
 
-        //dd($intangibleAsset);
+        //dd($fixedAsset);
 
         $payMethods = PayMethod::all();
+        $activeTypes = ActiveType::all();
 
-        return Inertia::render('IntangibleAsset/Edit', [
-            'intangibleAsset' => $intangibleAsset,
+
+        return Inertia::render('FixedAsset/Edit', [
+            'fixedAsset' => $fixedAsset,
             'payMethods' => $payMethods,
+            'activeTypes' => $activeTypes,
         ]);
 
     }
 
-    public function update(Request $request, IntangibleAsset $intangibleasset)
+    public function update(Request $request, FixedAsset $fixedAsset)
     {
         // Validación de los campos del formulario
         $request->validate([
             'pay_method_id' => 'required|exists:pay_methods,id',
-            //'is_legal' => 'boolean',
             'vaucher' => 'nullable|string|max:17',
             'date_acquisition' => 'required|date',
             'detail' => 'required|string|max:300',
             'code' => 'required|string|max:20',
-            'period' => 'required|integer',
+            'period' => 'required|integer|min:0',
             'value' => 'required|numeric|min:0',
             'date_end' => 'required|date',
         ]);
     
         // Actualización del activo fijo con los datos validados
-        $intangibleasset->update($request->all());
+        $fixedAsset->update($request->all());
     
         // Redirigir a la vista de listado de activos fijos
-        return redirect()->route('intangibleamortization.index')->with('success', 'Activo intangible actualizado exitosamente.');
-}
+        return to_route('fixedassets.index')->with('success', 'Activo fijo actualizado exitosamente.');
+    }
     
-
-public function destroy(int $intangibleassetId)
-{
-    $intangibleasset = IntangibleAsset::findOrFail($intangibleassetId);
-    $intangibleasset->delete(); // Esto usará SoftDeletes
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Activo fijo eliminado correctamente.',
-    ]);
-}
 
 }

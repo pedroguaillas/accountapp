@@ -5,7 +5,7 @@ import Table from "@/Components/Table.vue";
 
 // Props
 defineProps({
-  depreciations: { type: Array, default: () => [] },
+  amortizations: { type: Array, default: () => [] },
 });
 </script>
 
@@ -13,7 +13,7 @@ defineProps({
   <!-- Tarjeta de Depreciación -->
   <div class="p-4 bg-white rounded drop-shadow-md">
     <div class="flex justify-between items-center">
-      <h2 class="text-sm sm:text-lg font-bold">Depreciación</h2>
+      <h2 class="text-sm sm:text-lg font-bold">Amortizacion</h2>
       <div class="flex justify-end mb-3">
         <Link
          

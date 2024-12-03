@@ -6,6 +6,8 @@ import FormModal from "./FormModal.vue";
 import { router } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 // Props
 defineProps({
@@ -14,6 +16,13 @@ defineProps({
 
 // Refs
 const modal = ref(false);
+const modal1 = ref(false);
+const deleteid = ref(0);
+
+const toggle1 = () => {
+  modal1.value = !modal1.value;
+};
+
 
 // Inicializador de objetos
 const initialBranch = {
@@ -85,18 +94,27 @@ const update = (branchEdit) => {
   toggle();
 };
 
+
 const removeBranch = (branchId) => {
-  if (confirm("¿Estás seguro de que deseas eliminar esta sucursal?")) {
-    axios
-      .delete(route("branch.delete", branchId))
-      .then(() => {
-        router.reload({ only: ["branches"] });
-      })
-      .catch((error) => {
-        console.error("Error al eliminar la sucursal", error);
-      });
-  }
+  toggle1();
+  deleteid.value = branchId;
 };
+
+
+
+const deletebranch = () => {
+  axios
+    .delete(route("branch.delete", deleteid.value ))  // Eliminar centro de costos
+    .then(() => {
+      // Después de eliminar el centro de costos, redirigir a la ruta deseada
+      router.visit(route("branch.index"));
+    })
+    .catch((error) => {
+      console.error("Error al eliminar a sucursal", error);
+    });
+};
+
+
 </script>
 
 <template>
@@ -172,4 +190,12 @@ const removeBranch = (branchId) => {
     @close="toggle"
     @save="save"
   />
+
+  <ConfirmationModal :show="modal1">
+    <template #title> ELIMINAR ESTABLECIMIENTOS </template>
+    <template #content> Esta seguro de eliminar el establecimiento? </template>
+    <template #footer>
+      <PrimaryButton type="button" @click="deletebranch">Aceptar</PrimaryButton>
+    </template>
+  </ConfirmationModal>
 </template>
