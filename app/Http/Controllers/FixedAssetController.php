@@ -15,15 +15,15 @@ class FixedAssetController extends Controller
     public function index()
     {
         $company = Company::first();
-        $fixedAssetss = DB::table("fixed_assets")
-            ->selectRaw("id, code,to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition,detail,value")
-            ->where('company_id', $company->id)
+        $fixedAssetss = FixedAsset::where('company_id', $company->id)
+            ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
             ->get();
 
         return Inertia::render('FixedAsset/Index', [
             'fixedAssetss' => $fixedAssetss,
         ]);
     }
+
 
     public function create()
     {
@@ -100,7 +100,7 @@ class FixedAssetController extends Controller
         // Validación de los campos del formulario
         $request->validate([
             'pay_method_id' => 'required|exists:pay_methods,id',
-           // 'is_depretation_a' => 'boolean',
+            // 'is_depretation_a' => 'boolean',
             //'is_legal' => 'boolean',
             'vaucher' => 'nullable|string|max:17',
             'date_acquisition' => 'required|date',
@@ -112,13 +112,24 @@ class FixedAssetController extends Controller
             'residual_value' => 'nullable|numeric|min:0',
             'date_end' => 'required|date',
         ]);
-    
+
         // Actualización del activo fijo con los datos validados
         $fixedAsset->update($request->all());
-    
+
         // Redirigir a la vista de listado de activos fijos
         return to_route('assetsdepreciation.index')->with('success', 'Activo fijo actualizado exitosamente.');
     }
-    
+
+    public function destroy(int $fixedAssetId)
+    {
+        $fixedAsset = FixedAsset::findOrFail($fixedAssetId);
+        $fixedAsset->delete(); // Esto usará SoftDeletes
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Activo fijo eliminado correctamente.',
+        ]);
+    }
+
 
 }

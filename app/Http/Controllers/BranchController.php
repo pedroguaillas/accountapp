@@ -58,13 +58,14 @@ class BranchController extends Controller
         $branch->update($request->all());
     }
 
-    public function delete(Request $request,Branch $branch)
+    public function destroy(int $branchId)
     {
-        //no tenga relacion el establecimiento con otras
-        //if ()
-        //
-        //else
-        //return(response)
-        $branch->delete();
+        $branch= Branch::findOrFail($branchId);
+        $branch->delete(); // Esto usará SoftDeletes
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Establecimiento eliminado correctamente.',
+        ]);
     }
 }

@@ -10,8 +10,9 @@ use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\DepreciationController;
+use App\Http\Controllers\AmortizationController;
 use App\Http\Controllers\AssetManagementController;
-
+use App\Http\Controllers\IntangibleManagementController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -69,13 +70,13 @@ Route::middleware([
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
         Route::post('costcenters', [CostCenterController::class, 'store'])->name('costCenter.store');
         Route::put('costcenters/{costCenter}', [CostCenterController::class, 'update'])->name('costCenter.update');
-        Route::delete('costcenters/{costCenter}', [CostCenterController::class, 'delete'])->name('costCenter.delete');
+        Route::delete('costcenters/{costCenterId}', [CostCenterController::class, 'destroy'])->name('costCenter.delete');
 
         //establecimientos
         Route::get('establecimientos', [BranchController::class, 'index'])->name('branch.index');
         Route::post('stores', [BranchController::class, 'store'])->name('branch.store');
         Route::put('stores/{branch}', [BranchController::class, 'update'])->name('branch.update');
-        Route::delete('stores/{branch}', [BranchController::class, 'delete'])->name('branch.delete');
+        Route::delete('stores/{branchId}', [BranchController::class, 'destroy'])->name('branch.delete');
 
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
@@ -92,7 +93,7 @@ Route::middleware([
         Route::post('fixedassets', [FixedAssetController::class, 'store'])->name('fixedassets.store');
         Route::get('activos-fijos/editar/{fixedAssetId}', [FixedAssetController::class, 'edit'])->name('fixedassets.edit');
         Route::put('fixedassets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('fixedassets.update');
-
+        Route::delete('fixedassets/{fixedAssetId}', [FixedAssetController::class, 'destroy'])->name('fixedassets.delete');
 
         Route::get('/depreciacion', [DepreciationController::class, 'index'])->name('depreciations.index');
 
@@ -105,6 +106,12 @@ Route::middleware([
        Route::post('intangibleassets', [IntangibleAssetController::class, 'store'])->name('intangibleassets.store');
         Route::get('activos-intangible/editar/{intangibleAssetId}', [IntangibleAssetController::class, 'edit'])->name('intangibleassets.edit');
         Route::put('intangibleassets/{intangibleasset}', [IntangibleAssetController::class, 'update'])->name('intangibleassets.update');
+        Route::delete('intangibleassets/{intangibleasset}', [IntangibleAssetController::class, 'destroy'])->name('intangibleassets.delete');
+
+        Route::get('/amortizacion', [AmortizationController::class, 'index'])->name('amortizations.index');
+
+
+        Route::get('/activos-amortizacion', [IntangibleManagementController::class, 'index'])->name('intangibleamortization.index');
 
 
         //resumir rutas

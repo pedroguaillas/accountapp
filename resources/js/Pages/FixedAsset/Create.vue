@@ -158,6 +158,51 @@ watch(
     console.log("Periodo actualizado del activo fijo:", fixedAsset.period);
   }
 );
+
+const periodInMonths = computed(() => {
+  // Si el periodo en años no es válido, devolvemos 0
+  const periodYears = parseInt(fixedAsset.period, 10) || 0;
+  return periodYears * 12; // Convertimos años a meses
+});
+
+// Función para ajustar el periodo de años según los meses
+const setPeriodFromMonths = (months) => {
+  // Si los meses no son válidos, ponemos el periodo en blanco
+  if (!months || isNaN(months) || months < 0) {
+    fixedAsset.period = "";
+    return;
+  }
+  fixedAsset.period = Math.floor(months / 12); // Convertimos meses a años
+};
+
+// Watch para actualizar los meses cuando cambia el periodo en años
+watch(
+  () => fixedAsset.period,
+  (newPeriod) => {
+    if (newPeriod >= 0) {
+      fixedAsset.periodMonths = newPeriod * 12; // Convertimos años a meses
+    }
+  }
+);
+
+// Watch para actualizar los años cuando cambia el periodo en meses
+watch(
+  () => fixedAsset.periodMonths,
+  (newMonths) => {
+    if (newMonths >= 0) {
+      fixedAsset.period = Math.floor(newMonths / 12); // Convertimos meses a años
+    }
+  }
+);
+
+watch(
+  () => fixedAsset.period, // Observa cambios en el periodo de depreciación
+  (newPeriod) => {
+    if (parseInt(newPeriod, 10) === 0) {
+      fixedAsset.residual_value = 0; // Si el periodo es 0, asignar 0 al valor residual
+    }
+  }
+);
 </script>
 
 <template>
@@ -201,7 +246,7 @@ watch(
               v-model="fixedAsset.vaucher"
               type="text"
               class="mt-1 block w-full"
-               placeholder="001-001-098765432"
+              placeholder="001-001-098765432"
               max="17"
             />
             <InputError :message="errorForm.vaucher" class="mt-2" />
@@ -269,16 +314,32 @@ watch(
             <InputError :message="errorForm.address" class="mt-2" />
           </div>
 
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="period" value="Periodo de depreciación" />
-            <TextInput
-              v-model="fixedAsset.period"
-              type="number"
-              class="mt-1 block w-full"
-            />
-            <InputError :message="errorForm.period" class="mt-2" />
-          </div>
+          <!-- Campo Periodo de Depreciación -->
+          <div>
+            <!-- Campo Periodo de Depreciación (Años) -->
+            <div class="col-span-6 sm:col-span-4">
+              <InputLabel for="period" value="Periodo de depreciación (años)" />
+              <TextInput
+                v-model="fixedAsset.period"
+                type="number"
+                class="mt-1 block w-full"
+                :disabled="!fixedAsset.is_depretation_a"
+              />
 
+              <!-- Campo Periodo de Depreciación (Meses) -->
+              <InputLabel
+                for="period-months"
+                value="Periodo de depreciación (meses)"
+              />
+              <TextInput
+                v-model="fixedAsset.periodMonths"
+                type="number"
+                class="mt-1 block w-full"
+                :disabled="!fixedAsset.is_depretation_a"
+              />
+              <InputError :message="errorForm.period" class="mt-2" />
+            </div>
+          </div>
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="value" value="Valor del activo fijo" />
             <TextInput
@@ -298,6 +359,7 @@ watch(
               class="mt-1 block w-full"
               min="0"
               :max="fixedAsset.value"
+              :disabled="parseInt(fixedAsset.period, 10) === 0"
             />
             <InputError :message="errorForm.residual_value" class="mt-2" />
           </div>

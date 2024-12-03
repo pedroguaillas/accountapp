@@ -47,13 +47,17 @@ class CostCenterController extends Controller
         $costCenter->update($request->all());
     }
 
-    public function delete(Request $request, CostCenter $costCenter)
+
+
+    public function destroy(int $costCenterId)
     {
-        //no tenga relacion el centro de costo con otras
-        //if ()
-        //
-        //else
-        //return(response)
-        $costCenter->delete();
+        $costCenter= CostCenter::findOrFail($costCenterId);
+        $costCenter->delete(); // Esto usará SoftDeletes
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Centro de costo eliminado correctamente.',
+        ]);
     }
+
 }

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FixedAsset extends Model
 {
-    use HasFactory;
+    use HasFactory,  SoftDeletes;
     protected $fillable = [
         'pay_method_id',  //id de metodos de pago
         'company_id',//id de la compania
@@ -40,7 +41,7 @@ class FixedAsset extends Model
 
     public function activetype()
     {
-        return $this->belongsTo(ActiveTypes::class);
+        return $this->belongsTo(ActiveType::class);
     }
 }
 

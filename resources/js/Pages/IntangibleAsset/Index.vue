@@ -1,12 +1,43 @@
 <script setup>
 // Importaciones
-import { Link } from "@inertiajs/vue3";
+import { Link ,router} from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
+import axios from "axios";
+import { ref } from "vue";
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+
+// Props
 
 // Props
 defineProps({
   intangibleAssetss: { type: Array, default: () => [] },
 });
+
+
+
+const modal = ref(false);
+const deleteid = ref(0);
+
+const toggle = () => {
+  modal.value = !modal.value;
+};
+
+const removeIntangibleAsset = (intangibleId) => {
+  toggle();
+  deleteid.value = intangibleId;
+};
+
+const deleteintangible = () => {
+  axios
+    .delete(route("intangibleassets.delete", deleteid.value))
+    .then(() => {
+      router.visit(route("intangibleamortization.index")); // Redirige a la ruta deseada
+    })
+    .catch((error) => {
+      console.error("Error al eliminar el activo intangible", error);
+    });
+};
 </script>
 
 <template>
@@ -60,6 +91,13 @@ defineProps({
                 >
                   <i class="fa fa-edit"> </i> Modificar
                 </Link>
+
+                <button
+                class="rounded px-2 py-1 bg-red-500 text-white"
+                @click="removeIntangibleAsset(inta.id)"
+              >
+                <i class="fa fa-trash"></i> Eliminar
+              </button>
               </div>
             </td>
           </tr>
@@ -67,4 +105,11 @@ defineProps({
       </Table>
     </div>
   </div>
+  <ConfirmationModal :show="modal">
+    <template #title> ELIMINAR ACTIVOS FIJOS </template>
+    <template #content> Esta seguro de eliminar el activo fijo? </template>
+    <template #footer>
+      <PrimaryButton type="button" @click="deleteintangible">Aceptar</PrimaryButton>
+    </template>
+  </ConfirmationModal>
 </template>

@@ -6,6 +6,7 @@ use App\Models\Journal;
 use App\Models\Company;
 use App\Models\Account;
 use App\Models\CostCenter;
+use App\Models\JournalEntry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -126,6 +127,7 @@ class JournalController extends Controller
 
     public function delete(Request $request, Journal $journal)
     {
+        JournalEntry::where('journal_id', $journal->id)->delete();
         $journal->delete();
     }
 }

@@ -259,6 +259,11 @@ return new class extends Migration {
         Schema::dropIfExists('fixed_assets');
         Schema::dropIfExists('active_types');
         Schema::dropIfExists('intangible_assets');
+        Schema::table('fixed_assets', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
 
     }
+
+
 };
