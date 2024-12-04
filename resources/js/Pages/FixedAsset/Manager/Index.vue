@@ -13,6 +13,7 @@ const proms = defineProps({
 // Controlador de pestañas activas
 const activeTab = ref("fixedAssets"); // Pestaña por defecto
 
+
 // Paginación para activos fijos
 const fixedAssetsPage = ref(proms.fixedAssetss.current_page);
 const totalFixedAssetsPages = ref(proms.fixedAssetss.last_page);

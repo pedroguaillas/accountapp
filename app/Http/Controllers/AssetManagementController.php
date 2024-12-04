@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FixedAsset;
 use App\Models\Company;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -15,9 +14,6 @@ class AssetManagementController extends Controller
         // Obtener la compañía actual
         $company = Company::first();
 
-        // Capturar los filtros de búsqueda enviados desde el frontend
-        // dd( $request->search);
-
         // Consulta para activos fijos con filtros opcionales
         $fixedAssetssQuery = DB::table('fixed_assets')
             ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
@@ -29,15 +25,13 @@ class AssetManagementController extends Controller
             $fixedAssetssQuery->where('code', 'LIKE', '%' . $request->search . '%');
         }
 
-
         // Aplicar paginación a activos fijos
         $fixedAssetss = $fixedAssetssQuery->paginate(10);
-
 
         $depreciations = $fixedAssetssQuery->paginate(10);
 
         // Retornar la vista con los datos y filtros actuales
-        return Inertia::render('FixedAsset/Index2', [
+        return Inertia::render('FixedAsset/Manager/Index', [
             'fixedAssetss' => $fixedAssetss,
             'depreciations' => $depreciations,
             'filters' => [
