@@ -1,11 +1,13 @@
 <script setup>
 // Imports
-import { ref, reactive } from "vue";
+import { ref, reactive,watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import ModalCompany from "./ModalCompany.vue";
 import { router } from "@inertiajs/vue3";
 import axios from "axios";
 import Table from "@/Components/Table.vue";
+import TextInput from "@/Components/TextInput.vue";
+
 
 //Props
 defineProps({
@@ -16,6 +18,8 @@ defineProps({
 
 // Refs
 const modal = ref(false);
+const search = ref(""); // Término de búsqueda
+const loading = ref(false); // Estado de carga
 
 //El inicializador de objetos
 const initialCompany = {
@@ -91,6 +95,40 @@ const update = (companyEdit) => {
   });
   toggle();
 };
+
+
+
+watch(
+  search,
+  async (newQuery) => {
+    const url = route("rucs.index"); // Ruta del índice de sucursales
+    loading.value = true; // Activa el indicador de carga
+
+    try {
+      if (newQuery.length === 0) {
+        // Si el término de búsqueda está vacío, recarga todos los datos
+        await router.get(
+          url,
+          {}, // Sin parámetros de búsqueda
+          { preserveState: true }
+        );
+      } else if (newQuery.length >= 1) {
+        // Realizar búsqueda con el término
+        await router.get(
+          url,
+          { search: newQuery }, // Pasar los parámetros de búsqueda
+          { preserveState: true }
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // Finalizar el estado de carga
+      loading.value = false;
+    }
+  },
+  { immediate: false }
+);
 </script>
 
 <template>
@@ -100,6 +138,17 @@ const update = (companyEdit) => {
       <!-- Card Header -->
       <div class="flex justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold">Negocios / RUCs</h2>
+        <div class="w-full flex justify-end">
+          <TextInput
+            v-model="search"
+            type="text"
+            class="mt-1 block w-[50%] mr-2 h-8"
+            minlength="3"
+            maxlength="300"
+            required
+            placeholder="BUSCAR"
+          />
+        </div>
         <button
           @click="newCompany"
           class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"

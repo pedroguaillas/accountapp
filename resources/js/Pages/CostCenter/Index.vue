@@ -8,6 +8,7 @@ import axios from "axios";
 import Table from "@/Components/Table.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
 
 // Props
 const props = defineProps({
@@ -92,11 +93,9 @@ const removeCostCenter = (costCenterId) => {
   deleteid.value = costCenterId;
 };
 
-
-
 const deletecostcenter = () => {
   axios
-    .delete(route("costCenter.delete", deleteid.value ))  // Eliminar centro de costos
+    .delete(route("costCenter.delete", deleteid.value)) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
       router.visit(route("costcenter.index"));
@@ -106,27 +105,30 @@ const deletecostcenter = () => {
     });
 };
 
-
 const loading = ref(false);
 
-// Watch for search changes
 watch(
   search,
   async (newQuery) => {
-    // Solo activar la búsqueda si la longitud es al menos 1
     const url = route("costcenter.index"); // Obtener la URL con la función route
-
     loading.value = true; // Activar el estado de carga
 
     try {
-      // Realizar la solicitud GET utilizando router.get
-      const response = await router.get(
-        url,
-        {
-          search: newQuery, // Pasar los parámetros de búsqueda
-        },
-        { preserveState: true } //otros parametros
-      );
+      if (newQuery.length === 0) {
+        // Si el término de búsqueda está vacío, recargar todos los registros
+        await router.get(
+          url,
+          {}, // Sin parámetros de búsqueda
+          { preserveState: true }
+        );
+      } else if (newQuery.length >= 1) {
+        // Si hay término de búsqueda, realizar la solicitud con el parámetro
+        await router.get(
+          url,
+          { search: newQuery }, // Pasar los parámetros de búsqueda
+          { preserveState: true }
+        );
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -145,18 +147,25 @@ watch(
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
-      <div class="flex justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold">Centro de costos</h2>
+      <div class="flex flex-col sm:flex-row justify-between items-center">
+        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
+          Centro de costos
+        </h2>
+        <div class="w-full flex sm:justify-end">
+          <TextInput
+            v-model="search"
+            type="text"
+            class="block sm:mr-2 h-8 w-full"
+            placeholder="Buscar"
+          />
+        </div>
         <button
           @click="newCostCenter"
-          class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
         >
           +
         </button>
       </div>
-      <!-- Buscar -->
-      Buscar
-      <input v-model="search" type="search" name="search" />
 
       <!-- Resposive -->
       <div class="w-full overflow-x-auto">
@@ -219,7 +228,9 @@ watch(
     <template #title> ELIMINAR CENTRO DE COSTOS </template>
     <template #content> Esta seguro de eliminar el centro de costo? </template>
     <template #footer>
-      <PrimaryButton type="button" @click="deletecostcenter">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deletecostcenter"
+        >Aceptar</PrimaryButton
+      >
     </template>
   </ConfirmationModal>
 </template>
