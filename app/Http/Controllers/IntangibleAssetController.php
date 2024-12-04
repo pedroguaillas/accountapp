@@ -11,20 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class IntangibleAssetController extends Controller
 {
-    public function index()
-    {
-        $company = Company::first();
-        $intangibleAssetss = IntangibleAsset::where('company_id', $company->id)
-            ->selectRaw("id, code,to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition,detail,value")
-            ->where('company_id', $company->id)
-            ->get();
-
-        //dd($intangibleAssetss);
-        return Inertia::render('IntangibleAsset/Index', [
-            'intangibleAssetss' => $intangibleAssetss,
-        ]);
-    }
-
+   
     public function create()
     {
         $payMethods = PayMethod::all();

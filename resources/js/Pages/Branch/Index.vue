@@ -1,6 +1,6 @@
 <script setup>
 // Imports
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import { router } from "@inertiajs/vue3";
@@ -8,21 +8,24 @@ import Table from "@/Components/Table.vue";
 import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
 
 // Props
-defineProps({
-  branches: { type: Array, default: () => [] },
+const props = defineProps({
+  branches: { type: Object, default: () => ({}) },
+  filters: { type: String, default: "" },
 });
 
 // Refs
 const modal = ref(false);
 const modal1 = ref(false);
 const deleteid = ref(0);
+const search = ref(""); // Término de búsqueda
+const loading = ref(false); // Estado de carga
 
 const toggle1 = () => {
   modal1.value = !modal1.value;
 };
-
 
 // Inicializador de objetos
 const initialBranch = {
@@ -55,35 +58,34 @@ const toggle = () => {
 };
 
 const save = () => {
-  if (branch.id === undefined) {
-    axios
-      .post(route("branch.store"), branch)
-      .then(() => {
-        toggle();
-        resetErrorForm();
-        router.reload({ only: ["branches"] });
-      })
-      .catch((error) => {
-        resetErrorForm();
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
-        });
-      });
-  } else {
-    axios
-      .put(route("branch.update", branch.id), branch)
-      .then(() => {
-        toggle();
-        resetErrorForm();
-        router.reload({ only: ["branches"] });
-      })
-      .catch((error) => {
-        resetErrorForm();
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
-        });
-      });
+  // Validar campos obligatorios antes de enviar la solicitud
+  if (!branch.number || !branch.name || !branch.city || !branch.address) {
+    alert("Por favor, complete todos los campos obligatorios");
+    return;
   }
+
+  const routeMethod = branch.id ? "put" : "post"; // Determinar el método HTTP
+  const routeName = branch.id
+    ? route("branch.update", branch.id) // Ruta para actualización
+    : route("branch.store"); // Ruta para creación
+
+  axios[routeMethod](routeName, branch)
+    .then(() => {
+      toggle(); // Cierra el modal
+      resetErrorForm(); // Reinicia los errores del formulario
+      router.reload({ only: ["branches"] }); // Recarga los datos de sucursales
+    })
+    .catch((error) => {
+      resetErrorForm();
+      if (error.response && error.response.data.errors) {
+        Object.keys(error.response.data.errors).forEach((key) => {
+          errorForm[key] = error.response.data.errors[key][0];
+        });
+      } else {
+        console.error("Error desconocido", error);
+        alert("Hubo un error al procesar la solicitud");
+      }
+    });
 };
 
 const update = (branchEdit) => {
@@ -94,17 +96,14 @@ const update = (branchEdit) => {
   toggle();
 };
 
-
 const removeBranch = (branchId) => {
   toggle1();
   deleteid.value = branchId;
 };
 
-
-
 const deletebranch = () => {
   axios
-    .delete(route("branch.delete", deleteid.value ))  // Eliminar centro de costos
+    .delete(route("branch.delete", deleteid.value)) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
       router.visit(route("branch.index"));
@@ -114,7 +113,29 @@ const deletebranch = () => {
     });
 };
 
+watch(
+  search,
+  async (newQuery) => {
+    if (newQuery.length < 1) return; // No buscar si el término está vacío
 
+    const url = route("branch.index"); // Ruta del índice de sucursales
+    loading.value = true; // Activa el indicador de carga
+
+    try {
+      // Enviar la consulta como parámetro
+      await router.get(
+        url,
+        { search: newQuery }, // Pasar el término de búsqueda
+        { preserveState: true } // Mantener el estado actual
+      );
+    } catch (error) {
+      console.error("Error en la búsqueda", error);
+    } finally {
+      loading.value = false; // Desactiva el indicador de carga
+    }
+  },
+  { immediate: false }
+);
 </script>
 
 <template>
@@ -126,6 +147,17 @@ const deletebranch = () => {
         <h2 class="text-sm sm:text-lg font-bold">
           Sucursales / Establecimientos
         </h2>
+        <div class="w-full flex justify-end">
+          <TextInput
+            v-model="search"
+            type="text"
+            class="mt-1 block w-[50%] mr-2 h-8"
+            minlength="3"
+            maxlength="300"
+            required
+            placeholder="BUSCAR"
+          />
+        </div>
         <button
           @click="newBranch"
           class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
@@ -133,6 +165,7 @@ const deletebranch = () => {
           +
         </button>
       </div>
+
       <Table>
         <thead>
           <tr class="[&>th]:py-2">
@@ -148,7 +181,7 @@ const deletebranch = () => {
         </thead>
         <tbody>
           <tr
-            v-for="(branch, i) in branches"
+            v-for="(branch, i) in props.branches.data"
             :key="branch.id"
             class="border-t [&>td]:py-2"
           >

@@ -5,20 +5,27 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Company;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+
 
 class BranchController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $branches = Branch::all();
-       
-
-        return Inertia::render('Branch/Index', [
+        // Obtener el término de búsqueda desde la solicitud
+        $search = $request->input('search', ''); // Usar un valor por defecto vacío si no hay búsqueda
+    
+        // Consultar las sucursales y aplicar filtro si hay término de búsqueda
+        $branches = Branch::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', '%' . $search . '%');
+            });
+        $branches = $branches->paginate(10);
+        // Retornar las sucursales a la vista
+        return inertia('Branch/Index', [
             'branches' => $branches,
-      
         ]);
     }
+    
 
     public function store(Request $request)
     {
