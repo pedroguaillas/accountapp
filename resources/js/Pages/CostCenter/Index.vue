@@ -8,6 +8,7 @@ import axios from "axios";
 import Table from "@/Components/Table.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
 
 // Props
 const props = defineProps({
@@ -109,24 +110,28 @@ const deletecostcenter = () => {
 
 const loading = ref(false);
 
-// Watch for search changes
 watch(
   search,
   async (newQuery) => {
-    // Solo activar la búsqueda si la longitud es al menos 1
     const url = route("costcenter.index"); // Obtener la URL con la función route
-
     loading.value = true; // Activar el estado de carga
 
     try {
-      // Realizar la solicitud GET utilizando router.get
-      const response = await router.get(
-        url,
-        {
-          search: newQuery, // Pasar los parámetros de búsqueda
-        },
-        { preserveState: true } //otros parametros
-      );
+      if (newQuery.length === 0) {
+        // Si el término de búsqueda está vacío, recargar todos los registros
+        await router.get(
+          url,
+          {}, // Sin parámetros de búsqueda
+          { preserveState: true }
+        );
+      } else if (newQuery.length >= 1) {
+        // Si hay término de búsqueda, realizar la solicitud con el parámetro
+        await router.get(
+          url,
+          { search: newQuery }, // Pasar los parámetros de búsqueda
+          { preserveState: true }
+        );
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -147,17 +152,25 @@ watch(
       <!-- Card Header -->
       <div class="flex justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold">Centro de costos</h2>
+        <div class="w-full flex justify-end">
+          <TextInput
+            v-model="search"
+            type="text"
+            class="mt-1 block w-[50%] mr-2 h-8"
+            minlength="3"
+            maxlength="300"
+            required
+            placeholder="BUSCAR"
+          />
+        </div>
         <button
           @click="newCostCenter"
           class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
         >
-          +
+           +
         </button>
       </div>
-      <!-- Buscar -->
-      Buscar
-      <input v-model="search" type="search" name="search" />
-
+    
       <!-- Resposive -->
       <div class="w-full overflow-x-auto">
         <!-- Tabla -->

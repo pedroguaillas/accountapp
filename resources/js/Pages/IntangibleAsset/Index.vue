@@ -17,8 +17,6 @@ defineProps({
 
 const modal = ref(false);
 const deleteid = ref(0);
-const search = ref(""); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 
 const toggle = () => {
   modal.value = !modal.value;
@@ -40,30 +38,6 @@ const deleteintangible = () => {
     });
 };
 
-
-watch(
-  search,
-  async (newQuery) => {
-    if (newQuery.length < 1) return; // No buscar si el término está vacío
-
-    const url = route("intangibleassets.index"); // Ruta del índice 
-    loading.value = true; // Activa el indicador de carga
-
-    try {
-      // Enviar la consulta como parámetro
-      await router.get(
-        url,
-        { search: newQuery }, // Pasar el término de búsqueda
-        { preserveState: true } // Mantener el estado actual
-      );
-    } catch (error) {
-      console.error("Error en la búsqueda", error);
-    } finally {
-      loading.value = false; // Desactiva el indicador de carga
-    }
-  },
-  { immediate: false }
-);
 </script>
 
 <template>
@@ -81,15 +55,7 @@ watch(
         </Link>
       </div>
     </div>
-    <div class="mb-4">
-      Buscar:
-      <input
-        v-model="search"
-        type="text"
-        class="border rounded p-1"
-        placeholder="Buscar por nombre, ciudad, etc."
-      />
-    </div>
+    
     <!-- Tabla de Activos Fijos -->
     <div class="w-full overflow-x-auto">
       <Table>

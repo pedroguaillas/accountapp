@@ -11,38 +11,32 @@ use Illuminate\Support\Facades\DB;
 class IntangibleManagementController extends Controller
 {
     public function index(Request $request)
-    {
-        // Obtener la compañía actual
-        $company = Company::first();
+{
+    $company = Company::first();
 
-        // Capturar los filtros de búsqueda enviados desde el frontend
-        // dd( $request->search);
+    // Filtro de búsqueda
+    $search = $request->search;
 
-        // Consulta para activos fijos con filtros opcionales
-        $intangibleAssetssQuery = DB::table('intangible_assets')
-            ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
-            ->where('company_id', $company->id)
-            ->whereNull('deleted_at'); // Excluir registros eliminados
+    // Consulta principal
+    $intangibleAssetssQuery = DB::table('intangible_assets')
+        ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
+        ->where('company_id', $company->id)
+        ->whereNull('deleted_at');
 
-        // Aplicar filtro por código si existe
-        if ($request->search) {
-            $intangibleAssetssQuery->where('code', 'LIKE', '%' . $request->search . '%');
-        }
-
-
-        // Aplicar paginación a activos fijos
-        $intangibleAssetss = $intangibleAssetssQuery->paginate(10);
-
-        $amortizations = $intangibleAssetssQuery->paginate(10);
-
-        // Retornar la vista con los datos y filtros actuales
-        return Inertia::render('IntangibleAsset/Index2', [
-            'intangibleAssetss' => $intangibleAssetss,
-            'amortizations' => $amortizations,
-            'filters' => [
-                'search' => $request->search, // Retornar el filtro de código
-            ],
-        ]);
+    if ($search) {
+        $intangibleAssetssQuery->where('code', 'LIKE', '%' . $search . '%');
     }
+
+    // Paginación
+    $intangibleAssetss = $intangibleAssetssQuery->paginate(10);
+    $amortizations = $intangibleAssetssQuery->paginate(10);
+
+    return Inertia::render('IntangibleAsset/Manager/Index', [
+        'intangibleAssetss' => $intangibleAssetss,
+        'amortizations' => $amortizations,
+        'filters' => ['search' => $search],
+    ]);
+}
+
 
 }

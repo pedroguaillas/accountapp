@@ -117,26 +117,35 @@ const deletebranch = () => {
 watch(
   search,
   async (newQuery) => {
-    if (newQuery.length < 1) return; // No buscar si el término está vacío
-
     const url = route("branch.index"); // Ruta del índice de sucursales
     loading.value = true; // Activa el indicador de carga
 
     try {
-      // Enviar la consulta como parámetro
-      await router.get(
-        url,
-        { search: newQuery }, // Pasar el término de búsqueda
-        { preserveState: true } // Mantener el estado actual
-      );
+      if (newQuery.length === 0) {
+        // Si el término de búsqueda está vacío, recarga todos los datos
+        await router.get(
+          url,
+          {}, // Sin parámetros de búsqueda
+          { preserveState: true }
+        );
+      } else if (newQuery.length >= 1) {
+        // Realizar búsqueda con el término
+        await router.get(
+          url,
+          { search: newQuery }, // Pasar los parámetros de búsqueda
+          { preserveState: true }
+        );
+      }
     } catch (error) {
-      console.error("Error en la búsqueda", error);
+      console.log(error);
     } finally {
-      loading.value = false; // Desactiva el indicador de carga
+      // Finalizar el estado de carga
+      loading.value = false;
     }
   },
   { immediate: false }
 );
+
 </script>
 
 <template>
