@@ -25,6 +25,21 @@ class AccountController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        Account::create($request->all());
+    }
+
+    public function update(Request $request, Account $account)
+    {
+        $account->update($request->all());
+    }
+
+    public function delete(Account $account)
+    {
+        $account->delete();
+    }
+
     public function import(Request $request)
     {
         $request->validate([

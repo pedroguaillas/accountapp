@@ -9,6 +9,7 @@ import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import { PlusIcon, TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
@@ -139,29 +140,18 @@ watch(
 </script>
 
 <template>
-  <AdminLayout title="Sucursales / Establecimientos">
+  <AdminLayout title="Sucursales / establecimientos">
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
-      <div class="flex justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold">
-          Sucursales / Establecimientos
+      <div class="flex flex-col sm:flex-row justify-between items-center">
+        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
+          Sucursales / establecimientos
         </h2>
-        <div class="w-full flex justify-end">
-          <TextInput
-            v-model="search"
-            type="text"
-            class="mt-1 block w-[50%] mr-2 h-8"
-            minlength="3"
-            maxlength="300"
-            required
-            placeholder="BUSCAR"
-          />
+        <div class="w-full flex sm:justify-end">
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
-        <button
-          @click="newBranch"
-          class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
-        >
+        <button @click="newBranch" class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -170,21 +160,17 @@ watch(
         <thead>
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
-            <th>N° ESTABLECIMIENTO</th>
+            <th>ESTAB</th>
             <th>NOMBRE</th>
             <th>CIUDAD</th>
             <th>DIRECCION</th>
-            <th>MATRIZ O SUCURSAL</th>
+            <th>MATRIZ</th>
             <th>AMBIENTE</th>
             <th class="w-1"></th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(branch, i) in props.branches.data"
-            :key="branch.id"
-            class="border-t [&>td]:py-2"
-          >
+          <tr v-for="(branch, i) in props.branches.data" :key="branch.id" class="border-t [&>td]:py-2">
             <td>{{ i + 1 }}</td>
             <td>{{ branch.number }}</td>
             <td>{{ branch.name }}</td>
@@ -195,18 +181,12 @@ watch(
               {{ branch.enviroment_type === 1 ? "Prueba" : "Producción" }}
             </td>
             <td>
-              <div class="relative inline-flex">
-                <button
-                  class="rounded px-2 py-1 bg-red-500 text-white"
-                  @click="removeBranch(branch.id)"
-                >
-                  <i class="fa fa-trash"></i> Eliminar
+              <div class="relative inline-flex gap-1">
+                <button class="rounded px-1 py-1 bg-red-500 text-white" @click="removeBranch(branch.id)">
+                  <TrashIcon class="size-6 text-white" />
                 </button>
-                <button
-                  class="rounded px-2 py-1 bg-blue-500 text-white"
-                  @click="update(branch)"
-                >
-                  <i class="fa fa-edit"></i> Modificar
+                <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(branch)">
+                  <PencilIcon class="size-4 text-white" />
                 </button>
               </div>
             </td>
@@ -216,13 +196,7 @@ watch(
     </div>
   </AdminLayout>
 
-  <FormModal
-    :show="modal"
-    :branch="branch"
-    :error="errorForm"
-    @close="toggle"
-    @save="save"
-  />
+  <FormModal :show="modal" :branch="branch" :error="errorForm" @close="toggle" @save="save" />
 
   <ConfirmationModal :show="modal1">
     <template #title> ELIMINAR ESTABLECIMIENTOS </template>

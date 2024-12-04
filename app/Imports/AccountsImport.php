@@ -11,6 +11,11 @@ class AccountsImport implements ToCollection
 {
     public function collection(Collection $rows)
     {
+        // validar formato de cuenta Ej. 1.1.1 bien, 1.10001.1 mal
+        // Verificar que no se repita las cuentas
+        // Verificar espacios en blanco
+        // Verificar que una cuenta no termine en punto
+
         $company = Company::first();
 
         if ($company) {
@@ -23,6 +28,7 @@ class AccountsImport implements ToCollection
                     'name' => str_replace('  ', ' ', trim($cols[1])),
                 ];
             }
+
             $company->accounts()->createMany($accounts);
 
             // Paso 2: Recuperar todas las cuentas y construir la jerarquía
@@ -44,22 +50,37 @@ class AccountsImport implements ToCollection
             }
 
             // Paso 3: Marcar cuentas sin hijos como `is_detail = true`
+            // foreach ($allAccounts as $account) {
+            //     $hasChildren = Account::where('parent_id', $account->id)->exists();
+            //     if (!$hasChildren) {
+            //         $account->is_detail = true;
+            //         $account->save();
+            //     }
+            // }
+
+            // Paso 3: Marcar cuentas sin hijos como `is_detail = true`
+            $accountsKeys = [];
             foreach ($allAccounts as $account) {
                 $hasChildren = Account::where('parent_id', $account->id)->exists();
                 if (!$hasChildren) {
-                    $account->is_detail = true;
-                    $account->save();
+                    $accountsKeys[] = $account->id;
                 }
             }
+            Account::whereIn('id', $accountsKeys)->update(['is_detail' => true]);
         }
     }
 
     private function typeAccount($account)
     {
-        if (str_starts_with($account, '1')) return 'activo';
-        if (str_starts_with($account, '2')) return 'pasivo';
-        if (str_starts_with($account, '3')) return 'patrimonio';
-        if (str_starts_with($account, '4')) return 'ingreso';
-        if (str_starts_with($account, '5')) return 'gasto';
+        if (str_starts_with($account, '1'))
+            return 'activo';
+        if (str_starts_with($account, '2'))
+            return 'pasivo';
+        if (str_starts_with($account, '3'))
+            return 'patrimonio';
+        if (str_starts_with($account, '4'))
+            return 'ingreso';
+        if (str_starts_with($account, '5'))
+            return 'gasto';
     }
 }
