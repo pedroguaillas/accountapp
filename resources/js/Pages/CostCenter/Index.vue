@@ -93,11 +93,9 @@ const removeCostCenter = (costCenterId) => {
   deleteid.value = costCenterId;
 };
 
-
-
 const deletecostcenter = () => {
   axios
-    .delete(route("costCenter.delete", deleteid.value ))  // Eliminar centro de costos
+    .delete(route("costCenter.delete", deleteid.value)) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
       router.visit(route("costcenter.index"));
@@ -106,7 +104,6 @@ const deletecostcenter = () => {
       console.error("Error al eliminar el centro de costos", error);
     });
 };
-
 
 const loading = ref(false);
 
@@ -150,27 +147,26 @@ watch(
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
-      <div class="flex justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold">Centro de costos</h2>
-        <div class="w-full flex justify-end">
+      <div class="flex flex-col sm:flex-row justify-between items-center">
+        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
+          Centro de costos
+        </h2>
+        <div class="w-full flex sm:justify-end">
           <TextInput
             v-model="search"
             type="text"
-            class="mt-1 block w-[50%] mr-2 h-8"
-            minlength="3"
-            maxlength="300"
-            required
-            placeholder="BUSCAR"
+            class="block sm:mr-2 h-8 w-full"
+            placeholder="Buscar"
           />
         </div>
         <button
           @click="newCostCenter"
-          class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
         >
-           +
+          +
         </button>
       </div>
-    
+
       <!-- Resposive -->
       <div class="w-full overflow-x-auto">
         <!-- Tabla -->
@@ -232,7 +228,9 @@ watch(
     <template #title> ELIMINAR CENTRO DE COSTOS </template>
     <template #content> Esta seguro de eliminar el centro de costo? </template>
     <template #footer>
-      <PrimaryButton type="button" @click="deletecostcenter">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deletecostcenter"
+        >Aceptar</PrimaryButton
+      >
     </template>
   </ConfirmationModal>
 </template>

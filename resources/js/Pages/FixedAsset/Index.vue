@@ -6,9 +6,11 @@ import Table from "@/Components/Table.vue";
 import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import AdminLayout from "@/Layouts/AdminLayout.vue";
 // Props
-defineProps({
-  fixedAssetss: { type: Array, default: () => [] },
+const props=defineProps({
+  fixedAssetss: { type: Object, default: () => ({}) },
+  filters: { type: Object, default: () => ({}) },
 });
 
 const modal = ref(false);
@@ -27,7 +29,7 @@ const deletefixed = () => {
   axios
     .delete(route("fixedassets.delete", deleteid.value))
     .then(() => {
-      router.visit(route("assetsdepreciation.index")); // Redirige a la ruta deseada
+      router.visit(route("fixedassets.index")); // Redirige a la ruta deseada
     })
     .catch((error) => {
       console.error("Error al eliminar el activo fijo", error);
@@ -37,6 +39,7 @@ const deletefixed = () => {
 
 
 <template>
+    <AdminLayout title="Activos fijos">
   <!-- Tarjeta de Activos Fijos -->
   <div class="p-4 bg-white rounded drop-shadow-md">
     <div class="flex justify-between items-center">
@@ -66,7 +69,7 @@ const deletefixed = () => {
         </thead>
         <tbody>
           <tr
-            v-for="(fixe, i) in fixedAssetss"
+            v-for="(fixe, i) in props.fixedAssetss.data"
             :key="fixe.id"
             class="border-t [&>td]:py-2"
           >
@@ -100,7 +103,7 @@ const deletefixed = () => {
       </Table>
     </div>
   </div>
-
+</AdminLayout>
   <ConfirmationModal :show="modal">
     <template #title> ELIMINAR ACTIVOS FIJOS </template>
     <template #content> Esta seguro de eliminar el activo fijo? </template>

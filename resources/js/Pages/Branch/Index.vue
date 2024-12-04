@@ -145,7 +145,6 @@ watch(
   },
   { immediate: false }
 );
-
 </script>
 
 <template>
@@ -158,9 +157,17 @@ watch(
           Sucursales / establecimientos
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
+          <TextInput
+            v-model="search"
+            type="search"
+            class="block sm:mr-2 h-8 w-full"
+            placeholder="Buscar ..."
+          />
         </div>
-        <button @click="newBranch" class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
+        <button
+          @click="newBranch"
+          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+        >
           +
         </button>
       </div>
@@ -179,7 +186,11 @@ watch(
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(branch, i) in props.branches.data" :key="branch.id" class="border-t [&>td]:py-2">
+          <tr
+            v-for="(branch, i) in props.branches.data"
+            :key="branch.id"
+            class="border-t [&>td]:py-2"
+          >
             <td>{{ i + 1 }}</td>
             <td>{{ branch.number }}</td>
             <td>{{ branch.name }}</td>
@@ -191,10 +202,16 @@ watch(
             </td>
             <td>
               <div class="relative inline-flex gap-1">
-                <button class="rounded px-1 py-1 bg-red-500 text-white" @click="removeBranch(branch.id)">
+                <button
+                  class="rounded px-1 py-1 bg-red-500 text-white"
+                  @click="removeBranch(branch.id)"
+                >
                   <TrashIcon class="size-6 text-white" />
                 </button>
-                <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(branch)">
+                <button
+                  class="rounded px-2 py-1 bg-blue-500 text-white"
+                  @click="update(branch)"
+                >
                   <PencilIcon class="size-4 text-white" />
                 </button>
               </div>
@@ -205,7 +222,13 @@ watch(
     </div>
   </AdminLayout>
 
-  <FormModal :show="modal" :branch="branch" :error="errorForm" @close="toggle" @save="save" />
+  <FormModal
+    :show="modal"
+    :branch="branch"
+    :error="errorForm"
+    @close="toggle"
+    @save="save"
+  />
 
   <ConfirmationModal :show="modal1">
     <template #title> ELIMINAR ESTABLECIMIENTOS </template>
