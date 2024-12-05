@@ -31,15 +31,17 @@ defineEmits(["close", "save"]);
       <div class="mt-4">
         <form class="w-2xl grid grid-cols-1 gap-3" @keydown.enter.prevent="focusNextField">
 
-          <div class="col-span-6 sm:col-span-4">
+          <div v-if="!account.id" class="col-span-6 sm:col-span-4">
             <InputLabel for="code" value="Cuenta" />
-            <TextInput v-model="account.code" type="text" class="mt-1 block w-full" minlength="3" maxlength="20" />
+            <TextInput v-model="account.code" type="text" class="mt-1 block w-full" minlength="3" maxlength="20"
+              required />
             <InputError :message="error.code" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="name" value="Descripción" />
-            <TextInput v-model="account.name" type="text" class="mt-1 block w-full" minlength="3" maxlength="300" />
+            <TextInput v-model="account.name" type="text" class="mt-1 block w-full" minlength="3" maxlength="300"
+              required />
             <InputError :message="error.name" class="mt-2" />
           </div>
 

@@ -15,7 +15,7 @@ class AccountController extends Controller
     {
         $company = Company::first();
 
-        $accounts = Account::select('accounts.code', 'accounts.name', 'a2.code AS c2')
+        $accounts = Account::select('accounts.id', 'accounts.code', 'accounts.name', 'a2.code AS c2')
             ->leftJoin('accounts AS a2', 'accounts.parent_id', 'a2.id')
             ->where('accounts.company_id', $company->id)
             ->orderBy('accounts.id')->get();

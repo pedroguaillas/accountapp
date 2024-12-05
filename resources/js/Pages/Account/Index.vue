@@ -5,8 +5,9 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 import ImportExcel from './ImportExcel.vue';
 import Table from "@/Components/Table.vue";
 import FormModal from "./FormModal.vue";
+import { useForm, router } from "@inertiajs/vue3";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 
 //Props
 defineProps({
@@ -15,16 +16,38 @@ defineProps({
 
 // Refs
 const modal = ref(false);
-const account = ref({});
-const errorForm = ref({});
+const account = useForm({});
+const errorForm = reactive({});
 
 const toggle = () => {
     modal.value = !modal.value;
 };
 
-const update = (account) => {
-    console.log(account)
+const edit = (accountEdit) => {
+    Object.keys(accountEdit).forEach((key) => {
+        account[key] = accountEdit[key];
+    });
     toggle()
+}
+
+const save = () => {
+    if (account.id) {
+        update()
+    }
+}
+
+const update = () => {
+    account.put(route('account.update', account.id), {
+        onSuccess: () => {
+            toogle()
+            router.reload(['accounts'])
+        },
+        onError: (errors) => {
+            Object.keys(errors).forEach((key) => {
+                errorForm[key] = errors[key];
+            });
+        },
+    })
 }
 
 const remove = (account) => {
@@ -76,11 +99,11 @@ const styleAccount = (code) => {
                                 {{ account.name }}
                             </td>
                             <td class="flex justify-end">
-                                <div class="relative inline-flex gap-1">
+                                <div v-if="account.code.length > 1" class="relative inline-flex gap-1">
                                     <button class="rounded px-1 py-1 bg-red-500 text-white" @click="remove(account)">
                                         <TrashIcon class="size-6 text-white" />
                                     </button>
-                                    <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(account)">
+                                    <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="edit(account)">
                                         <PencilIcon class="size-4 text-white" />
                                     </button>
                                 </div>

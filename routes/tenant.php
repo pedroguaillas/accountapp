@@ -81,6 +81,7 @@ Route::middleware([
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
+        Route::resource('account', AccountController::class)->only(['store', 'update', 'delete']);
 
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
