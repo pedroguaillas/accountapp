@@ -5,7 +5,7 @@ import Depreciation from "@/Pages/FixedAsset/Depreciation.vue"; // Vista de Depr
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { router } from '@inertiajs/vue3';
-
+import Paginate from "@/Components/Paginate.vue";
 // Props para recibir datos desde el servidor
 const proms = defineProps({
   fixedAssetss: { type: Object, default: () => ({}) },
