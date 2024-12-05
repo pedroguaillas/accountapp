@@ -9,7 +9,7 @@ import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
-import { PlusIcon, TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+
 
 // Props
 const props = defineProps({

@@ -11,11 +11,38 @@ use Illuminate\Support\Facades\DB;
 
 class IntangibleAssetController extends Controller
 {
-   
+
+
+    public function index(Request $request)
+    {
+        $company = Company::first();
+
+        // Filtro de búsqueda
+        $search = $request->search;
+
+        // Consulta principal
+        $intangibleAssetssQuery = DB::table('intangible_assets')
+            ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
+            ->where('company_id', $company->id)
+            ->whereNull('deleted_at');
+
+        if ($search) {
+            $intangibleAssetssQuery->where('code', 'LIKE', '%' . $search . '%');
+        }
+
+        // Paginación
+        $intangibleAssetss = $intangibleAssetssQuery->paginate(10);
+
+        return Inertia::render('IntangibleAsset/Index', [
+            'intangibleAssetss' => $intangibleAssetss,
+            'filters' => ['search' => $search],
+        ]);
+    }
+
     public function create()
     {
         $payMethods = PayMethod::all();
-  
+
 
         return Inertia::render('IntangibleAsset/Create', [
             'payMethods' => $payMethods,
@@ -40,7 +67,7 @@ class IntangibleAssetController extends Controller
         $company = Company::first(); // Asegúrate de tener la empresa disponible
         $company->intangibleassets()->create($request->all());
 
-        return to_route('intangibleamortization.index');
+        return to_route('intangibleassets.index');
     }
     public function edit(int $intangibleAsset_id)
     {
@@ -86,24 +113,24 @@ class IntangibleAssetController extends Controller
             'value' => 'required|numeric|min:0',
             'date_end' => 'required|date',
         ]);
-    
+
         // Actualización del activo fijo con los datos validados
         $intangibleasset->update($request->all());
-    
+
         // Redirigir a la vista de listado de activos fijos
-        return redirect()->route('intangibleamortization.index')->with('success', 'Activo intangible actualizado exitosamente.');
-}
-    
+        return redirect()->route('intangibleassets.index')->with('success', 'Activo intangible actualizado exitosamente.');
+    }
 
-public function destroy(int $intangibleassetId)
-{
-    $intangibleasset = IntangibleAsset::findOrFail($intangibleassetId);
-    $intangibleasset->delete(); // Esto usará SoftDeletes
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Activo fijo eliminado correctamente.',
-    ]);
-}
+    public function destroy(int $intangibleassetId)
+    {
+        $intangibleasset = IntangibleAsset::findOrFail($intangibleassetId);
+        $intangibleasset->delete(); // Esto usará SoftDeletes
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Activo fijo eliminado correctamente.',
+        ]);
+    }
 
 }
