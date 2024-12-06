@@ -10,6 +10,7 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import Table from "@/Components/Table.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
+import { TrashIcon } from "@heroicons/vue/24/outline";
 import Checkbox from "@/Components/Checkbox.vue";
 
 // Props
@@ -160,7 +161,7 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
               <td class="py-2 text-right w-24">{{ journalEntry.have.toFixed(2) }}</td>
               <td class="py-2">
                 <button @click="eliminarCuenta(index)" class="text-red-500 hover:text-red-700">
-                  Eliminar
+                  <TrashIcon class="size-6 text-red-500" />
                 </button>
               </td>
             </tr>

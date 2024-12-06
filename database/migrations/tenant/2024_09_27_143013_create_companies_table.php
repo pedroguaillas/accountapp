@@ -119,7 +119,6 @@ return new class extends Migration {
             $table->string('code');
             $table->string('name');
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->string('type');
             $table->boolean("is_active")->default(true);
 
             $table->timestamps();

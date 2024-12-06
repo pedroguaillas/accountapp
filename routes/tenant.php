@@ -35,6 +35,10 @@ Route::middleware([
         ]);
     });
 
+    // Route::get('/login', function () {
+    //     return Inertia::location(env('APP_URL'));
+    // })->name('tenant.login');
+
     Route::middleware([
         'auth:sanctum',
         config('jetstream.auth_session'),
@@ -104,7 +108,7 @@ Route::middleware([
         // intngible assets  //poner las rutas con nombre en plural 
         Route::get('activos-intangibles', [IntangibleAssetController::class, 'index'])->name('intangibleassets.index');
         Route::get('activos-intangibles/crear', [IntangibleAssetController::class, 'create'])->name('intangibleassets.create');
-       Route::post('intangibleassets', [IntangibleAssetController::class, 'store'])->name('intangibleassets.store');
+        Route::post('intangibleassets', [IntangibleAssetController::class, 'store'])->name('intangibleassets.store');
         Route::get('activos-intangible/editar/{intangibleAssetId}', [IntangibleAssetController::class, 'edit'])->name('intangibleassets.edit');
         Route::put('intangibleassets/{intangibleasset}', [IntangibleAssetController::class, 'update'])->name('intangibleassets.update');
         Route::delete('intangibleassets/{intangibleasset}', [IntangibleAssetController::class, 'destroy'])->name('intangibleassets.delete');
@@ -116,7 +120,7 @@ Route::middleware([
 
 
         //resumir rutas
-       // Route::resource('intangibleassets', IntangibleAssetController::class)->only(['store','update']);
+        // Route::resource('intangibleassets', IntangibleAssetController::class)->only(['store','update']);
 
     });
 });

@@ -16,13 +16,12 @@ class CostCenterController extends Controller
 
         $costCenters = CostCenter::select("*")
             ->where('company_id', $company->id);
-       
+
         if ($request->search) {
             $costCenters->where('code', 'LIKE', '%' . $request->search . '%');
         }
 
         $costCenters = $costCenters->paginate(10);
-        //dd($costCenters);
 
         return Inertia::render(
             'CostCenter/Index',
@@ -31,7 +30,6 @@ class CostCenterController extends Controller
                 "costCenters" => $costCenters,
             ]
         );
-
     }
 
     public function store(Request $request)
@@ -42,16 +40,12 @@ class CostCenterController extends Controller
 
     public function update(Request $request, CostCenter $costCenter)
     {
-        $company = Company::first();
-
         $costCenter->update($request->all());
     }
 
-
-
     public function destroy(int $costCenterId)
     {
-        $costCenter= CostCenter::findOrFail($costCenterId);
+        $costCenter = CostCenter::findOrFail($costCenterId);
         $costCenter->delete(); // Esto usará SoftDeletes
 
         return response()->json([

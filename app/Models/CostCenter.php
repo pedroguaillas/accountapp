@@ -14,7 +14,6 @@ class CostCenter extends Model
         "company_id", // ID Compania
         "code", // Codigo de centro de costos
         "name", // Nombre de centro de costos
-        "type", // (T-transaccional,G-global)
         "parent_id", // Si tiene un ID padre de Centro de Costos
         "is_active",
     ];

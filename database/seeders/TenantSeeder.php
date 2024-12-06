@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
 use App\Models\ContributorType;
 use App\Models\EconomicActivity;
 use App\Models\PayMethod;
 use App\Models\ActiveType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class TenantSeeder extends Seeder
@@ -40,7 +40,13 @@ class TenantSeeder extends Seeder
         ActiveType::create(['name' => 'Vehículos', 'depresiation_time' => 5]);
         ActiveType::create(['name' => 'Equipo de computo, tecnológico y otros', 'depresiation_time' => 3]);
 
-    }
+        Company::create([
+            'ruc' => '1100167694001',
+            'company' => 'EJEMPLO COMPANIA',
+            'economic_activity_id' => 1,
+            'contributor_type_id' => 1,
+        ]);
 
+    }
 
 }

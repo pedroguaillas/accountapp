@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import AccountSelectModal from "./AccountSelectModal.vue";
 import InputLabel from "@/Components/InputLabel.vue";
+import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 
 // Props
 defineProps({
@@ -84,8 +85,8 @@ const emit = defineEmits(["selectAccount", "addJournalEntry"]);
       <InputLabel for="search" value="Buscar" />
       <div class="flex">
         <input v-model="search" type="text" class="block w-full border border-gray-300 px-4 py-2 focus:outline-none" />
-        <button @click="toggleModal" class="bg-slate-500 text-white px-4 py-2 hover:bg-slate-600 focus:outline-none">
-          @
+        <button @click="toggleModal" class="bg-slate-500 text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
+          <MagnifyingGlassIcon class="size-6 text-white stroke-[3px]" />
         </button>
       </div>
     </div>

@@ -50,15 +50,6 @@ class AccountsImport implements ToCollection
             }
 
             // Paso 3: Marcar cuentas sin hijos como `is_detail = true`
-            // foreach ($allAccounts as $account) {
-            //     $hasChildren = Account::where('parent_id', $account->id)->exists();
-            //     if (!$hasChildren) {
-            //         $account->is_detail = true;
-            //         $account->save();
-            //     }
-            // }
-
-            // Paso 3: Marcar cuentas sin hijos como `is_detail = true`
             $accountsKeys = [];
             foreach ($allAccounts as $account) {
                 $hasChildren = Account::where('parent_id', $account->id)->exists();

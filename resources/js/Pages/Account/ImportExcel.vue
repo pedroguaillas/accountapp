@@ -1,6 +1,7 @@
 <script setup>
 
 // Imports
+import { ArrowUpTrayIcon } from '@heroicons/vue/24/outline'; // Icono Upload
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -12,7 +13,6 @@ const handleClick = () => {
 
 const handleFileChange = (event) => {
     const files = event.target.files;
-    // Si archivo seleccionado
     if (files.length > 0) submit(files[0])
 }
 
@@ -22,7 +22,7 @@ const submit = (file) => {
             console.log('Bien')
         },
         onError: (err) => {
-            console.log(err)
+            alert(err)
         }
     })
 }
@@ -30,8 +30,9 @@ const submit = (file) => {
 </script>
 
 <template>
-    <button @click="handleClick" class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
-        +
+    <button @click="handleClick"
+        class="px-2 bg-green-500 dark:bg-green-600 hover:bg-green-700 text-2xl text-white rounded">
+        <ArrowUpTrayIcon class="w-6 h-6 my-1 stroke-[2px]" />
     </button>
     <input ref="fileInput" @change="handleFileChange" type="file" hidden id="file" />
 

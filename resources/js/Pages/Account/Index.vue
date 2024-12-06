@@ -56,13 +56,15 @@ const remove = (account) => {
 
 // Función para calcular la clase de estilo
 const styleAccount = (code) => {
+    let result = ''
     if (code.length === 1) {
-        return 'text-black font-bold';
+        result = 'text-black';
     } else if (code.length < 4) {
-        return 'text-stone-600 font-semibold italic indent-2';
+        result = 'text-stone-600 indent-2';
     } else {
-        return 'text-stone-400 italic indent-4';
+        result = 'text-stone-400 indent-4';
     }
+    return result + ' text-left'
 };
 
 </script>
@@ -76,7 +78,7 @@ const styleAccount = (code) => {
             <!-- Card Header -->
             <div class="flex justify-between items-center">
                 <h2 class="text-sm sm:text-lg font-bold">Plan de cuentas</h2>
-                <ImportExcel v-if="accounts.lenght === 0" />
+                <ImportExcel v-if="accounts.length === 0" />
             </div>
 
             <!-- Resposive -->
@@ -91,11 +93,12 @@ const styleAccount = (code) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="account in accounts" :key="account.id" class="border-t">
-                            <td :class="styleAccount(account.code)" class="text-left">
+                        <tr v-for="account in accounts" :key="account.id" class="border-t"
+                            :class="account.is_detail ? 'italic' : 'font-bold'">
+                            <td :class="styleAccount(account.code)">
                                 {{ account.code }}
                             </td>
-                            <td :class="styleAccount(account.code)" class="text-left">
+                            <td :class="styleAccount(account.code)">
                                 {{ account.name }}
                             </td>
                             <td class="flex justify-end">
