@@ -9,7 +9,14 @@ class ActiveType extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'depresiation_time'];
+    protected $fillable = [
+        'name',                 // Categoria del activo fijo
+        'depreciation_time',    // Tiempo de depreciacion
+        'account_id',           // Vinculo con la cuenta
+    ];
 
-    protected $casts = ['depresiation_time' => 'integer'];
+    protected $casts = [
+        'depreciation_time' => 'integer',
+        'account_id' => 'integer',
+    ];
 }

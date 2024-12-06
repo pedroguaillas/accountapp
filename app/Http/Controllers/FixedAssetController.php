@@ -17,32 +17,32 @@ class FixedAssetController extends Controller
 
     public function index(Request $request)
     {
+        // Obtener la compañía actual
+        $company = Company::first();
 
-         // Obtener la compañía actual
-         $company = Company::first();
+        // Consulta para activos fijos con filtros opcionales
+        $fixedAssetssQuery = DB::table('fixed_assets')
+            ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
+            ->where('company_id', $company->id)
+            ->whereNull('deleted_at'); // Excluir registros eliminados
 
-         // Consulta para activos fijos con filtros opcionales
-         $fixedAssetssQuery = DB::table('fixed_assets')
-             ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
-             ->where('company_id', $company->id)
-             ->whereNull('deleted_at'); // Excluir registros eliminados
- 
-         // Aplicar filtro por código si existe
-         if ($request->search) {
-             $fixedAssetssQuery->where('code', 'LIKE', '%' . $request->search . '%');
-         }
- 
-         // Aplicar paginación a activos fijos
-         $fixedAssetss = $fixedAssetssQuery->paginate(10);
- 
-          // Retornar la vista con los datos y filtros actuales
-         return Inertia::render('FixedAsset/Index', [
-             'fixedAssetss' => $fixedAssetss,
-             'filters' => [
-                 'search' => $request->search, // Retornar el filtro de código
-             ],
-         ]);
+        // Aplicar filtro por código si existe
+        if ($request->search) {
+            $fixedAssetssQuery->where('code', 'LIKE', '%' . $request->search . '%');
+        }
+
+        // Aplicar paginación a activos fijos
+        $fixedAssetss = $fixedAssetssQuery->paginate(10);
+
+        // Retornar la vista con los datos y filtros actuales
+        return Inertia::render('FixedAsset/Index', [
+            'fixedAssetss' => $fixedAssetss,
+            'filters' => [
+                'search' => $request->search, // Retornar el filtro de código
+            ],
+        ]);
     }
+
     public function create()
     {
         $payMethods = PayMethod::all();
@@ -56,26 +56,25 @@ class FixedAssetController extends Controller
 
     public function store(FixedAssetStoreRequest $fixedAssetStoreRequest)
     {
-
-        // Crear el activo fijo en la base de datos
         $company = Company::first(); // Asegúrate de tener la empresa disponible
         $company->fixedassets()->create($fixedAssetStoreRequest->all());
 
         return to_route('fixedassets.index');
     }
+
     public function edit(int $fixedAsset_id)
     {
         $fixedAsset = DB::table("fixed_assets")
             ->selectRaw("
             id, 
-            pay_method_id, 
+            pay_method_id,
             is_depretation_a, 
             is_legal, 
             vaucher, 
             to_char(date_acquisition, 'YYYY-MM-DD') as date_acquisition, 
             detail, 
             code, 
-            type_id, 
+            active_type_id, 
             address, 
             period, 
             CAST(value AS FLOAT) as value, 
@@ -85,18 +84,14 @@ class FixedAssetController extends Controller
             ->where('id', $fixedAsset_id)
             ->first();
 
-        //dd($fixedAsset);
-
         $payMethods = PayMethod::all();
         $activeTypes = ActiveType::all();
-
 
         return Inertia::render('FixedAsset/Edit', [
             'fixedAsset' => $fixedAsset,
             'payMethods' => $payMethods,
             'activeTypes' => $activeTypes,
         ]);
-
     }
 
     public function update(FixedAssetUpdateRequest $fixedAssetUpdateRequest, FixedAsset $fixedAsset)
@@ -116,6 +111,4 @@ class FixedAssetController extends Controller
             'message' => 'Activo fijo eliminado correctamente.',
         ]);
     }
-
-
 }

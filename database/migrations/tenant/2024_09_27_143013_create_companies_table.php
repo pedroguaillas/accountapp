@@ -28,8 +28,8 @@ return new class extends Migration {
 
         Schema::create('pay_methods', function (Blueprint $table) {
             $table->id();
-            $table->integer('code'); //
-            $table->string('name'); // 
+            $table->integer('code');
+            $table->string('name');
 
             $table->timestamps();
             $table->softDeletes();
@@ -37,13 +37,13 @@ return new class extends Migration {
 
         Schema::create('active_types', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); //
-            $table->integer('depresiation_time'); // 
+            $table->string('name');
+            $table->integer('depreciation_time');
+            $table->bigInteger('account_id')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
         });
-
 
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
@@ -178,17 +178,14 @@ return new class extends Migration {
 
             $table->foreign('journal_id')->references('id')->on('journals');
             $table->foreign('account_id')->references('id')->on('accounts');
-
         });
-
-
 
         // activos fijos
         Schema::create('fixed_assets', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('pay_method_id');
             $table->bigInteger('company_id');
-            $table->bigInteger('type_id');
+            $table->bigInteger('active_type_id');
 
             $table->boolean('is_depretation_a')->default(false);
             $table->boolean('is_legal')->default(false);
@@ -208,16 +205,13 @@ return new class extends Migration {
 
             $table->foreign('pay_method_id')->references('id')->on('pay_methods');
             $table->foreign('company_id')->references('id')->on('companies');
-            $table->foreign('type_id')->references('id')->on('active_types');
-
+            $table->foreign('active_type_id')->references('id')->on('active_types');
         });
-
 
         Schema::create('intangible_assets', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('pay_method_id');
             $table->bigInteger('company_id');
-
 
             $table->String('type');
             $table->boolean('is_legal')->default(false);
@@ -234,10 +228,7 @@ return new class extends Migration {
 
             $table->foreign('pay_method_id')->references('id')->on('pay_methods');
             $table->foreign('company_id')->references('id')->on('companies');
-
         });
-
-
     }
 
     /**
@@ -261,8 +252,5 @@ return new class extends Migration {
         Schema::table('fixed_assets', function (Blueprint $table) {
             $table->dropSoftDeletes();
         });
-
     }
-
-
 };

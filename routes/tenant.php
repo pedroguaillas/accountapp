@@ -13,6 +13,7 @@ use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\AmortizationController;
 use App\Http\Controllers\AssetManagementController;
 use App\Http\Controllers\IntangibleManagementController;
+use App\Http\Controllers\SettingAccountController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -87,6 +88,9 @@ Route::middleware([
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
         Route::resource('account', AccountController::class)->only(['store', 'update', 'delete']);
+
+        // Emparejamiento de cuentas
+        Route::get('vinculacion-contable', [SettingAccountController::class, 'index'])->name('index');
 
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');

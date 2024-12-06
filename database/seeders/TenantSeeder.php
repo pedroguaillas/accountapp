@@ -33,12 +33,12 @@ class TenantSeeder extends Seeder
         PayMethod::create(['name' => 'OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO', 'code' => 20]);
         PayMethod::create(['name' => 'ENDOSO DE TÍTULOS', 'code' => 21]);
 
-        ActiveType::create(['name' => 'Terrenos', 'depresiation_time' => 0]);
-        ActiveType::create(['name' => 'Edificios', 'depresiation_time' => 20]);
-        ActiveType::create(['name' => 'Maquinaria, equipo e instalaciones', 'depresiation_time' => 10]);
-        ActiveType::create(['name' => 'Muebles enseres y equipos de oficina ', 'depresiation_time' => 10]);
-        ActiveType::create(['name' => 'Vehículos', 'depresiation_time' => 5]);
-        ActiveType::create(['name' => 'Equipo de computo, tecnológico y otros', 'depresiation_time' => 3]);
+        ActiveType::create(['name' => 'Terrenos', 'depreciation_time' => 0]);
+        ActiveType::create(['name' => 'Edificios', 'depreciation_time' => 20]);
+        ActiveType::create(['name' => 'Maquinaria, equipo e instalaciones', 'depreciation_time' => 10]);
+        ActiveType::create(['name' => 'Muebles enseres y equipos de oficina ', 'depreciation_time' => 10]);
+        ActiveType::create(['name' => 'Vehículos', 'depreciation_time' => 5]);
+        ActiveType::create(['name' => 'Equipo de computo, tecnológico y otros', 'depreciation_time' => 3]);
 
         Company::create([
             'ruc' => '1100167694001',
@@ -46,7 +46,6 @@ class TenantSeeder extends Seeder
             'economic_activity_id' => 1,
             'contributor_type_id' => 1,
         ]);
-
     }
 
 }

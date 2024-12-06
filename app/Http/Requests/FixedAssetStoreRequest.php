@@ -23,6 +23,7 @@ class FixedAssetStoreRequest extends FormRequest
     {
         return [
             'pay_method_id' => 'required|exists:pay_methods,id',
+            'active_type_id' => 'required|exists:active_types,id',
             'is_depretation_a' => 'boolean',
             'is_legal' => 'boolean',
             'vaucher' => 'nullable|string|max:17',

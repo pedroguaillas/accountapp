@@ -8,22 +8,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FixedAsset extends Model
 {
-    use HasFactory,  SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
-        'pay_method_id',  //id de metodos de pago
-        'company_id',//id de la compania
-        'is_depretation_a',//si es depreciacion acelerada
-        'is_legal',//si tiene sustento legal
-        'vaucher', //numero de comprobante
-        'date_acquisition',//fecha de adquisicion
-        'detail',//detalle de activo fijo
-        'code',//codigo de activo fijo
-        'type_id',//tipo de activo fijo
-        'address', // direccion o localizacion del activo fijo
-        'period',//tiempo de depreciacion en anios
-        'value', //valor  del af
-        'residual_value', //valor residual del af
-        'date_end',//fecha de finalizacion de la depreciacion
+        'pay_method_id',    //id de metodos de pago
+        'company_id',       //id de la compania
+        'is_depretation_a', //si es depreciacion acelerada
+        'is_legal',         //si tiene sustento legal
+        'vaucher',          //numero de comprobante
+        'date_acquisition', //fecha de adquisicion
+        'detail',           //detalle de activo fijo
+        'code',             //codigo de activo fijo
+        'active_type_id',   //tipo de activo fijo
+        'address',          //direccion o localizacion del activo fijo
+        'period',           //tiempo de depreciacion en anios
+        'value',            //valor  del af
+        'residual_value',   //valor residual del af
+        'date_end',         //fecha de finalizacion de la depreciacion
     ];
     protected $casts = [
         'is_depretation_a' => 'boolean',

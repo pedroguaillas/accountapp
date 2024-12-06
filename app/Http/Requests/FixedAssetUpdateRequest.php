@@ -23,7 +23,7 @@ class FixedAssetUpdateRequest extends FormRequest
     {
         return [
             'pay_method_id' => 'required|exists:pay_methods,id',
-
+            'active_type_id' => 'required|exists:active_types,id',
             'vaucher' => 'nullable|string|max:17',
             'date_acquisition' => 'required|date',
             'detail' => 'required|string|max:300',
