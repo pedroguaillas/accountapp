@@ -13,7 +13,8 @@ function nextPage() {
   let nextPageUrl = props.page.next_page_url;
 
   if (nextPageUrl) {
-    router.get(nextPageUrl, {}, { preserveState: true });
+   reloadPage(nextPageUrl);
+    //router.get(nextPageUrl, {}, { preserveState: true });
   }
 }
 
@@ -21,9 +22,12 @@ function prevPage() {
   let prevPageUrl = props.page.prev_page_url;
 
   if (prevPageUrl) {
-    router.get(prevPageUrl, {}, { preserveState: true });
+    reloadPage(prevPageUrl);
+    //router.get(prevPageUrl, {}, { preserveState: true });
   }
 }
+
+defineEmits(["reloadPage"]);
 </script>
 <template>
   <div>
