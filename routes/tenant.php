@@ -11,8 +11,6 @@ use App\Http\Controllers\IntangibleAssetController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\AmortizationController;
-use App\Http\Controllers\AssetManagementController;
-use App\Http\Controllers\IntangibleManagementController;
 use App\Http\Controllers\SettingAccountController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
