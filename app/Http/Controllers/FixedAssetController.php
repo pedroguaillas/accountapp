@@ -107,9 +107,8 @@ class FixedAssetController extends Controller
         return to_route('fixedassets.index')->with('success', 'Activo fijo actualizado exitosamente.');
     }
 
-    public function destroy(int $fixedAssetId)
+    public function destroy(FixedAsset $fixedAsset)
     {
-        $fixedAsset = FixedAsset::findOrFail($fixedAssetId);
         $fixedAsset->delete(); // Esto usará SoftDeletes
 
         return response()->json([

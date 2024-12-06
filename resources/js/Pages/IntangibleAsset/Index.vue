@@ -8,6 +8,7 @@ import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
+import Paginate from "@/Components/Paginate.vue";
 
 // Props
 
@@ -80,8 +81,10 @@ watch(
     <!-- Tarjeta de Activos Fijos -->
 
     <div class="p-4 bg-white rounded drop-shadow-md">
-      <div class="flex justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold">Activos Intangibles</h2>
+      <div class="flex flex-col sm:flex-row justify-between items-center">
+        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
+          Activos Intangibles
+        </h2>
         <div class="w-full flex sm:justify-end">
           <TextInput
             v-model="search"
@@ -90,14 +93,13 @@ watch(
             placeholder="Buscar ..."
           />
         </div>
-        <div class="flex justify-end mb-3">
-          <Link
-            :href="route('intangibleassets.create')"
-            class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
-          >
-            +
-          </Link>
-        </div>
+
+        <Link
+          :href="route('intangibleassets.create')"
+          class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+        >
+          +
+        </Link>
       </div>
 
       <!-- Tabla de Activos Fijos -->
@@ -148,6 +150,7 @@ watch(
             </tr>
           </tbody>
         </Table>
+        <Paginate :page="props.intangibleAssetss" />
       </div>
     </div>
   </AdminLayout>

@@ -9,6 +9,7 @@ import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import Paginate from "@/Components/Paginate.vue";
 
 
 // Props
@@ -219,6 +220,7 @@ watch(
           </tr>
         </tbody>
       </Table>
+      <Paginate :page="props.branches"/>
     </div>
   </AdminLayout>
 

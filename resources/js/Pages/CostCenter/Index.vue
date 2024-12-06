@@ -9,6 +9,7 @@ import Table from "@/Components/Table.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import Paginate from "@/Components/Paginate.vue";
 
 // Props
 const props = defineProps({
@@ -191,6 +192,7 @@ watch(
             </tr>
           </tbody>
         </Table>
+        <Paginate :page="props.costCenters"/>
       </div>
     </div>
   </AdminLayout>

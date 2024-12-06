@@ -1,7 +1,7 @@
 <script setup>
 // Importaciones
 import { Link, router } from "@inertiajs/vue3";
-import { ref,watch } from "vue";
+import { ref, watch } from "vue";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
@@ -18,8 +18,9 @@ const props = defineProps({
 
 const modal = ref(false);
 const deleteid = ref(0);
-const search = ref(""); // Término de búsqueda
+const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
+const currentUrl = ref(window.location.href);
 
 const toggle = () => {
   modal.value = !modal.value;
@@ -39,6 +40,12 @@ const deletefixed = () => {
     .catch((error) => {
       console.error("Error al eliminar el activo fijo", error);
     });
+};
+
+const reloadPage = async (url) => {
+
+    await router.get(url, { search }, { preserveState: true });
+
 };
 
 watch(
@@ -80,7 +87,9 @@ watch(
     <!-- Tarjeta de Activos Fijos -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <div class="flex flex-col sm:flex-row justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">Activos fijos</h2>
+        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
+          Activos fijos
+        </h2>
         <div class="w-full flex sm:justify-end">
           <TextInput
             v-model="search"
@@ -89,14 +98,13 @@ watch(
             placeholder="Buscar ..."
           />
         </div>
-        
-          <Link
-            :href="route('fixedassets.create')"
-            class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+
+        <Link
+          :href="route('fixedassets.create')"
+          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
         >
-            +
-          </Link>
-       
+          +
+        </Link>
       </div>
 
       <!-- Tabla de Activos Fijos -->
@@ -146,8 +154,7 @@ watch(
             </tr>
           </tbody>
         </Table>
-        <Paginate :page="props.fixedAssetss"/>
-          
+        <Paginate :page="props.fixedAssetss" @reloadPage="reloadPage" />
       </div>
     </div>
   </AdminLayout>
