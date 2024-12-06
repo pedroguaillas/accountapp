@@ -69,6 +69,7 @@ Route::middleware([
         Route::get('rucs', [CompanyController::class, 'index'])->name('rucs.index');
         Route::post('rucs', [CompanyController::class, 'store'])->name('company.store');
         Route::put('rucs/{company}', [CompanyController::class, 'update'])->name('company.update');
+        Route::delete('rucs/{companyId}', [CompanyController::class, 'destroy'])->name('company.delete');
 
         // Centro de costos
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
@@ -80,7 +81,7 @@ Route::middleware([
         Route::get('establecimientos', [BranchController::class, 'index'])->name('branch.index');
         Route::post('stores', [BranchController::class, 'store'])->name('branch.store');
         Route::put('stores/{branch}', [BranchController::class, 'update'])->name('branch.update');
-        Route::delete('stores/{branchId}', [BranchController::class, 'destroy'])->name('branch.delete');
+        Route::delete('stores/{branch}', [BranchController::class, 'destroy'])->name('branch.delete');
 
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
@@ -90,7 +91,13 @@ Route::middleware([
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
-        Route::post('journals', [JournalController::class, 'store'])->name('journal.store');
+       // Route::post('journals', [JournalController::class, 'store'])->name('journal.store');
+        Route::get('asiento/editar/{journalId}', [JournalController::class, 'edit'])->name('journal.edit');
+       // Route::put('journals/{journals}', [JournalController::class, 'update'])->name('journal.update');
+        Route::delete('journal/{journal}', [JournalController::class, 'destroy'])->name('journal.delete');
+
+
+        Route::resource('journal',JournalController::class)->only(['store','update']);
 
         // fixed assets  //poner las rutas con nombre en plural 
         Route::get('activos-fijos', [FixedAssetController::class, 'index'])->name('fixedassets.index');
@@ -98,13 +105,10 @@ Route::middleware([
         Route::post('fixedassets', [FixedAssetController::class, 'store'])->name('fixedassets.store');
         Route::get('activos-fijos/editar/{fixedAssetId}', [FixedAssetController::class, 'edit'])->name('fixedassets.edit');
         Route::put('fixedassets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('fixedassets.update');
-        Route::delete('fixedassets/{fixedAssetId}', [FixedAssetController::class, 'destroy'])->name('fixedassets.delete');
+        Route::delete('fixedassets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('fixedassets.delete');
 
         Route::get('/depreciacion', [DepreciationController::class, 'index'])->name('depreciations.index');
-
-        Route::get('/activos-depreciacion', [AssetManagementController::class, 'index'])->name('assetsdepreciation.index');
-
-
+    
         // intngible assets  //poner las rutas con nombre en plural 
         Route::get('activos-intangibles', [IntangibleAssetController::class, 'index'])->name('intangibleassets.index');
         Route::get('activos-intangibles/crear', [IntangibleAssetController::class, 'create'])->name('intangibleassets.create');
@@ -114,10 +118,6 @@ Route::middleware([
         Route::delete('intangibleassets/{intangibleasset}', [IntangibleAssetController::class, 'destroy'])->name('intangibleassets.delete');
 
         Route::get('/amortizacion', [AmortizationController::class, 'index'])->name('amortizations.index');
-
-
-        Route::get('/activos-amortizacion', [IntangibleManagementController::class, 'index'])->name('intangibleamortization.index');
-
 
         //resumir rutas
         // Route::resource('intangibleassets', IntangibleAssetController::class)->only(['store','update']);
