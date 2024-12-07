@@ -14,13 +14,25 @@ class SettingAccountController extends Controller
     {
         $company = Company::first();
 
-        $activeTypes = ActiveType::all();
-        $accounts = Account::where('is_detail', true)
+        $activeTypes = ActiveType::selectRaw("active_types.*, accounts.code || ' - ' || accounts.name AS account_info")
+            ->leftJoin('accounts', 'active_types.account_id', '=', 'accounts.id')
+            ->orderBy('id')
+            ->get();
+
+        $accounts = Account::select('id', 'code', 'name')
+            ->where('is_detail', true)
             ->where('company_id', $company->id)->get();
 
         return Inertia::render('Setting/Index', [
             'activeTypes' => $activeTypes,
             'accounts' => $accounts
+        ]);
+    }
+
+    public function update(Request $request, ActiveType $activeType)
+    {
+        $activeType->update([
+            'account_id' => $request->account_id
         ]);
     }
 }

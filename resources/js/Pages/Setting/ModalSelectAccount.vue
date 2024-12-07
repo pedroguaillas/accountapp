@@ -5,7 +5,7 @@ import DialogModal from "@/Components/DialogModal.vue";
 import Table from "@/Components/Table.vue";
 
 // Props
-const props = defineProps({
+defineProps({
   accounts: { type: Array, default: () => ([]) },
   show: { type: Boolean, default: () => true },
 });
@@ -22,15 +22,16 @@ defineEmits(["selectAccount", "close"]);
     <template #content>
       <Table>
         <thead>
-          <tr>
-            <th class="text-right w-24">CUENTA</th>
+          <tr class="border-b">
+            <th class="text-left w-24">CUENTA</th>
             <th class="text-left">DESCRIPCION</th>
           </tr>
         </thead>
-        <tbody class="h-6">
-          <tr v-for="(account, i) in accounts" :key="`account-${i}`">
+        <tbody>
+          <tr @click="$emit('selectAccount', account.id)" v-for="(account, i) in accounts" :key="`account-${i}`"
+            class="h-8 cursor-pointer">
             <td class="text-left">{{ account.code }}</td>
-            <td>{{ account.name }}</td>
+            <td class="text-left">{{ account.name }}</td>
           </tr>
         </tbody>
       </Table>

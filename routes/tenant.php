@@ -88,7 +88,8 @@ Route::middleware([
         Route::resource('account', AccountController::class)->only(['store', 'update', 'delete']);
 
         // Emparejamiento de cuentas
-        Route::get('vinculacion-contable', [SettingAccountController::class, 'index'])->name('index');
+        Route::get('vinculacion-contable', [SettingAccountController::class, 'index'])->name(name: 'index');
+        Route::put('settingaccount/update/{activeType}', [SettingAccountController::class, 'update'])->name('settingaccount.update');
 
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
