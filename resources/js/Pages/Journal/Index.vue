@@ -8,6 +8,8 @@ import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Paginate from "@/Components/Paginate.vue";
 import TextInput from "@/Components/TextInput.vue";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+
 
 // Props
 const props = defineProps({

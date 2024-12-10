@@ -10,6 +10,7 @@ import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
@@ -153,10 +154,17 @@ watch(
           Centro de costos
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput v-model="search" type="text" class="block sm:mr-2 h-8 w-full" placeholder="Buscar" />
+          <TextInput
+            v-model="search"
+            type="text"
+            class="block sm:mr-2 h-8 w-full"
+            placeholder="Buscar"
+          />
         </div>
-        <button @click="newCostCenter"
-          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
+        <button
+          @click="newCostCenter"
+          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+        >
           +
         </button>
       </div>
@@ -174,36 +182,55 @@ watch(
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(costCenter, i) in props.costCenters.data" :key="costCenter.id" class="border-t [&>td]:py-2">
+            <tr
+              v-for="(costCenter, i) in props.costCenters.data"
+              :key="costCenter.id"
+              class="border-t [&>td]:py-2"
+            >
               <td>{{ i + 1 }}</td>
               <td>{{ costCenter.code }}</td>
               <td>{{ costCenter.name }}</td>
-              <td>
-                <div class="relative inline-flex [&>a>i]:text-white [&>button>i]:text-white">
-                  <button class="rounded px-2 py-1 bg-red-500 text-white" @click="removeCostCenter(costCenter.id)">
-                    <i class="fa fa-trash"></i> Eliminar
-                  </button>
 
-                  <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(costCenter)">
-                    <i class="fa fa-edit"></i> Modificar
+              <td class="flex justify-end">
+                <div class="relative inline-flex gap-1">
+                  <button
+                    class="rounded px-1 py-1 bg-red-500 text-white"
+                    @click="removeCostCenter(costCenter.id)"
+                  >
+                    <TrashIcon class="size-6 text-white" />
+                  </button>
+                  <button
+                    class="rounded px-2 py-1 bg-blue-500 text-white"
+                    @click="update(costCenter)"
+                  >
+                    <PencilIcon class="size-4 text-white" />
                   </button>
                 </div>
               </td>
             </tr>
           </tbody>
         </Table>
-        <Paginate :page="props.costCenters"/>
+     
       </div>
     </div>
+    <Paginate :page="props.costCenters" />
   </AdminLayout>
 
   <!-- Modal Component for CostCenter -->
-  <ModalCostCenter :show="modal" :costCenter="costCenter" :error="errorForm" @close="toggle" @save="save" />
+  <ModalCostCenter
+    :show="modal"
+    :costCenter="costCenter"
+    :error="errorForm"
+    @close="toggle"
+    @save="save"
+  />
   <ConfirmationModal :show="modal1">
     <template #title> ELIMINAR CENTRO DE COSTOS </template>
     <template #content> Esta seguro de eliminar el centro de costo? </template>
     <template #footer>
-      <PrimaryButton type="button" @click="deletecostcenter">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deletecostcenter"
+        >Aceptar</PrimaryButton
+      >
     </template>
   </ConfirmationModal>
 </template>

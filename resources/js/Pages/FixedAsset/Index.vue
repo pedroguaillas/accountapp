@@ -9,6 +9,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
@@ -43,9 +44,7 @@ const deletefixed = () => {
 };
 
 const reloadPage = async (url) => {
-
-    await router.get(url, { search }, { preserveState: true });
-
+  await router.get(url, { search }, { preserveState: true });
 };
 
 watch(
@@ -135,28 +134,30 @@ watch(
               <td>
                 {{ fixe.value }}
               </td>
-              <td>
-                <div class="relative inline-flex">
-                  <Link
-                    :href="route('fixedassets.edit', fixe.id)"
-                    class="rounded px-2 py-1 bg-blue-500 text-white"
+
+              <td class="flex justify-end">
+                <div class="relative inline-flex gap-1">
+                  <button
+                    class="rounded px-1 py-1 bg-red-500 text-white"
+                    @click="removeFixedAsset(fixe.id)"
                   >
-                    <i class="fa fa-edit"> </i> Modificar
+                    <TrashIcon class="size-6 text-white" />
+                  </button>
+                  <Link
+                    class="rounded px-2 py-1 bg-blue-500 text-white"
+                    :href="route('fixedassets.edit', fixe.id)"
+                  >
+                    <PencilIcon class="size-4 text-white" />
                   </Link>
                 </div>
-                <button
-                  class="rounded px-2 py-1 bg-red-500 text-white"
-                  @click="removeFixedAsset(fixe.id)"
-                >
-                  <i class="fa fa-trash"></i> Eliminar
-                </button>
               </td>
             </tr>
           </tbody>
         </Table>
-        <Paginate :page="props.fixedAssetss" @reloadPage="reloadPage" />
+ 
       </div>
     </div>
+    <Paginate :page="props.fixedAssetss" />
   </AdminLayout>
   <ConfirmationModal :show="modal">
     <template #title> ELIMINAR ACTIVOS FIJOS </template>

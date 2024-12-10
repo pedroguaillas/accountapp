@@ -6,6 +6,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
 use App\Http\Controllers\JournalController;
@@ -94,13 +95,13 @@ Route::middleware([
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
-       // Route::post('journals', [JournalController::class, 'store'])->name('journal.store');
+        // Route::post('journals', [JournalController::class, 'store'])->name('journal.store');
         Route::get('asiento/editar/{journalId}', [JournalController::class, 'edit'])->name('journal.edit');
-       // Route::put('journals/{journals}', [JournalController::class, 'update'])->name('journal.update');
+        // Route::put('journals/{journals}', [JournalController::class, 'update'])->name('journal.update');
         Route::delete('journal/{journal}', [JournalController::class, 'destroy'])->name('journal.delete');
 
 
-        Route::resource('journal',JournalController::class)->only(['store','update']);
+        Route::resource('journal', JournalController::class)->only(['store', 'update']);
 
         // fixed assets  //poner las rutas con nombre en plural 
         Route::get('activos-fijos', [FixedAssetController::class, 'index'])->name('fixedassets.index');
@@ -111,7 +112,7 @@ Route::middleware([
         Route::delete('fixedassets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('fixedassets.delete');
 
         Route::get('/depreciacion', [DepreciationController::class, 'index'])->name('depreciations.index');
-    
+
         // intngible assets  //poner las rutas con nombre en plural 
         Route::get('activos-intangibles', [IntangibleAssetController::class, 'index'])->name('intangibleassets.index');
         Route::get('activos-intangibles/crear', [IntangibleAssetController::class, 'create'])->name('intangibleassets.create');
@@ -122,8 +123,13 @@ Route::middleware([
 
         Route::get('/amortizacion', [AmortizationController::class, 'index'])->name('amortizations.index');
 
-        //resumir rutas
-        // Route::resource('intangibleassets', IntangibleAssetController::class)->only(['store','update']);
+        //empleados
+        Route::get('empleados', [EmployeeController::class, 'index'])->name('employee.index');
+        //  Route::post('employees', [EmployeeController::class, 'store'])->name('employee.store');
+        //Route::put('employees/{employee}', [EmployeeController::class, 'update'])->name('employee.update');
+        Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.delete');
+
+        Route::resource('employee', EmployeeController::class)->only(['store', 'update']);
 
     });
 });
