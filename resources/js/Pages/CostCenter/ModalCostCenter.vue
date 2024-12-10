@@ -55,7 +55,7 @@ const stateOptions = [
       </div>
     </template>
     <template #footer>
-      <button @click="$emit('save')"
+      <button @click="$emit('save')" :disabled="costCenter.processing"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded">
         Guardar
       </button>

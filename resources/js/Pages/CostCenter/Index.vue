@@ -1,8 +1,9 @@
 <script setup>
+
 // Imports
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import ModalCostCenter from "./ModalCostCenter.vue";
-import { router } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import { ref, reactive, watch } from "vue";
 import axios from "axios";
 import Table from "@/Components/Table.vue";
@@ -26,8 +27,8 @@ const search = ref(props.filters);
 const initialCostCenter = { name: "", code: "", state: "" };
 
 // Reactives
-const costCenter = reactive({ ...initialCostCenter });
-const errorForm = reactive({ ...initialCostCenter });
+const costCenter = useForm({ ...initialCostCenter });
+const errorForm = reactive({});
 
 // Functions
 const newCostCenter = () => {
@@ -60,28 +61,47 @@ const save = () => {
     return;
   }
 
-  const routeMethod = costCenter.id ? "put" : "post";
+  const routeMethod = employee.id ? "put" : "post"; // Determinar el método HTTP
   const routeName = costCenter.id
-    ? route("costCenter.update", costCenter.id)
-    : route("costCenter.store");
+    ? route("costCenter.update", costCenter.id) // Ruta para actualización
+    : route("costCenter.store"); // Ruta para creación
 
-  axios[routeMethod](routeName, costCenter)
-    .then(() => {
+  costCenter[routeMethod](routeName, {
+    onSuccess: () => {
       toggle();
       resetErrorForm();
       router.reload({ only: ["costCenters"] });
-    })
-    .catch((error) => {
+    },
+    onError: (error) => {
       resetErrorForm();
-      if (error.response) {
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
-        });
-      } else {
-        console.error("Error desconocido", error);
-        alert("Hubo un error al procesar la solicitud");
-      }
-    });
+      Object.keys(error.response.data.errors).forEach((key) => {
+        errorForm[key] = error.response.data.errors[key][0];
+      })
+    }
+  });
+
+  //   const routeMethod = costCenter.id ? "put" : "post";
+  // const routeName = costCenter.id
+  //   ? route("costCenter.update", costCenter.id)
+  //   : route("costCenter.store");
+
+  // axios[routeMethod](routeName, costCenter)
+  // .then(() => {
+  //   toggle();
+  //   resetErrorForm();
+  //   router.reload({ only: ["costCenters"] });
+  // })
+  // .catch((error) => {
+  //   resetErrorForm();
+  //   if (error.response) {
+  //     Object.keys(error.response.data.errors).forEach((key) => {
+  //       errorForm[key] = error.response.data.errors[key][0];
+  //     });
+  //   } else {
+  //     console.error("Error desconocido", error);
+  //     alert("Hubo un error al procesar la solicitud");
+  //   }
+  // });
 };
 
 const update = (costCenterEdit) => {
@@ -154,17 +174,10 @@ watch(
           Centro de costos
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="text"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar"
-          />
+          <TextInput v-model="search" type="text" class="block sm:mr-2 h-8 w-full" placeholder="Buscar" />
         </div>
-        <button
-          @click="newCostCenter"
-          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
-        >
+        <button @click="newCostCenter"
+          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -182,27 +195,17 @@ watch(
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(costCenter, i) in props.costCenters.data"
-              :key="costCenter.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(costCenter, i) in props.costCenters.data" :key="costCenter.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td>{{ costCenter.code }}</td>
               <td>{{ costCenter.name }}</td>
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-red-500 text-white"
-                    @click="removeCostCenter(costCenter.id)"
-                  >
+                  <button class="rounded px-1 py-1 bg-red-500 text-white" @click="removeCostCenter(costCenter.id)">
                     <TrashIcon class="size-6 text-white" />
                   </button>
-                  <button
-                    class="rounded px-2 py-1 bg-blue-500 text-white"
-                    @click="update(costCenter)"
-                  >
+                  <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="update(costCenter)">
                     <PencilIcon class="size-4 text-white" />
                   </button>
                 </div>
@@ -210,27 +213,19 @@ watch(
             </tr>
           </tbody>
         </Table>
-     
+
       </div>
     </div>
     <Paginate :page="props.costCenters" />
   </AdminLayout>
 
   <!-- Modal Component for CostCenter -->
-  <ModalCostCenter
-    :show="modal"
-    :costCenter="costCenter"
-    :error="errorForm"
-    @close="toggle"
-    @save="save"
-  />
+  <ModalCostCenter :show="modal" :costCenter="costCenter" :error="errorForm" @close="toggle" @save="save" />
   <ConfirmationModal :show="modal1">
     <template #title> ELIMINAR CENTRO DE COSTOS </template>
     <template #content> Esta seguro de eliminar el centro de costo? </template>
     <template #footer>
-      <PrimaryButton type="button" @click="deletecostcenter"
-        >Aceptar</PrimaryButton
-      >
+      <PrimaryButton type="button" @click="deletecostcenter">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>
