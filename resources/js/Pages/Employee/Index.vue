@@ -12,9 +12,10 @@ import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
+
 // Props
 const props = defineProps({
-  branches: { type: Object, default: () => ({}) },
+  employees: { type: Object, default: () => ({}) },
   filters: { type: String, default: "" },
 });
 
@@ -30,29 +31,35 @@ const toggle1 = () => {
 };
 
 // Inicializador de objetos
-const initialBranch = {
-  number: "",
+const initialEmployee = {
+  cuit: "",
   name: "",
-  city: "",
-  address: "",
-  is_matriz: false,
-  enviroment_type: "",
+  sector_code: "",
+  post: "",
+  days: "",
+  salary: "",
+  porcent_aportation: "",
+  is_a_parner: false,
+  is_a_qualified_craftsman: false,
+  affiliated_with_spouse: false,
+  date_start:"",
+ 
 };
 
 // Reactives
-const branch = reactive({ ...initialBranch });
-const errorForm = reactive({ ...initialBranch });
+const employee = reactive({ ...initialEmployee });
+const errorForm = reactive({ ...initialEmployee });
 
-const newBranch = () => {
-  if (branch.id !== undefined) {
-    delete branch.id;
+const newemployee = () => {
+  if (employee.id !== undefined) {
+    delete employee.id;
   }
-  Object.assign(branch, initialBranch);
+  Object.assign(employee, initialEmployee);
   toggle();
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialBranch);
+  Object.assign(errorForm, initialEmployee);
 };
 
 const toggle = () => {
@@ -61,21 +68,18 @@ const toggle = () => {
 
 const save = () => {
   // Validar campos obligatorios antes de enviar la solicitud
-  if (!branch.number || !branch.name || !branch.city || !branch.address) {
-    alert("Por favor, complete todos los campos obligatorios");
-    return;
-  }
+  
 
-  const routeMethod = branch.id ? "put" : "post"; // Determinar el método HTTP
-  const routeName = branch.id
-    ? route("branch.update", branch.id) // Ruta para actualización
-    : route("branch.store"); // Ruta para creación
+  const routeMethod = employee.id ? "put" : "post"; // Determinar el método HTTP
+  const routeName = employee.id
+    ? route("employee.update", employee.id) // Ruta para actualización
+    : route("employee.store"); // Ruta para creación
 
-  axios[routeMethod](routeName, branch)
+  axios[routeMethod](routeName, employee)
     .then(() => {
       toggle(); // Cierra el modal
       resetErrorForm(); // Reinicia los errores del formulario
-      router.reload({ only: ["branches"] }); // Recarga los datos de sucursales
+      router.reload({ only: ["employees"] }); // Recarga los datos de sucursales
     })
     .catch((error) => {
       resetErrorForm();
@@ -90,35 +94,36 @@ const save = () => {
     });
 };
 
-const update = (branchEdit) => {
+
+const update = (employeeEdit) => {
   resetErrorForm();
-  Object.keys(branchEdit).forEach((key) => {
-    branch[key] = branchEdit[key];
-  });
+  Object.assign(employee, { ...initialEmployee, ...employeeEdit });
   toggle();
 };
 
-const removeBranch = (branchId) => {
+const removeEmployee = (employeeId) => {
   toggle1();
-  deleteid.value = branchId;
+  deleteid.value = employeeId;
 };
 
-const deletebranch = () => {
+
+
+const deleteEmployee = () => {
   axios
-    .delete(route("branch.delete", deleteid.value)) // Eliminar centro de costos
+    .delete(route("employee.delete", deleteid.value)) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("branch.index"));
+      router.visit(route("employee.index"));
     })
     .catch((error) => {
-      console.error("Error al eliminar a sucursal", error);
+      console.error("Error al eliminar al empleado", error);
     });
 };
 
 watch(
   search,
   async (newQuery) => {
-    const url = route("branch.index"); // Ruta del índice de sucursales
+    const url = route("employee.index"); // Ruta del índice de sucursales
     loading.value = true; // Activa el indicador de carga
 
     try {
@@ -149,13 +154,13 @@ watch(
 </script>
 
 <template>
-  <AdminLayout title="Sucursales / establecimientos">
+  <AdminLayout title="Empleados">
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Sucursales / establecimientos
+          Empleados
         </h2>
         <div class="w-full flex sm:justify-end">
           <TextInput
@@ -166,7 +171,7 @@ watch(
           />
         </div>
         <button
-          @click="newBranch"
+          @click="newemployee"
           class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
         >
           +
@@ -177,69 +182,60 @@ watch(
         <thead>
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
-            <th>ESTAB</th>
+            <th>CEDULA</th>
             <th>NOMBRE</th>
-            <th>CIUDAD</th>
-            <th>DIRECCION</th>
-            <th>MATRIZ</th>
-            <th>AMBIENTE</th>
             <th class="w-1"></th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(branch, i) in props.branches.data"
-            :key="branch.id"
+            v-for="(employee, i) in props.employees.data"
+            :key="employee.id"
             class="border-t [&>td]:py-2"
           >
             <td>{{ i + 1 }}</td>
-            <td>{{ branch.number }}</td>
-            <td>{{ branch.name }}</td>
-            <td>{{ branch.city }}</td>
-            <td>{{ branch.address }}</td>
-            <td>{{ branch.is_matriz ? "Matriz" : "Sucursal" }}</td>
-            <td>
-              {{ branch.enviroment_type === 1 ? "Prueba" : "Producción" }}
-            </td>
-            
+            <td>{{ employee.cuit }}</td>
+            <td>{{ employee.name }}</td>
+           
+
 
             <td class="flex justify-end">
-              <div class="relative inline-flex gap-1">
-                <button
-                  class="rounded px-1 py-1 bg-red-500 text-white"
-                  @click="removeBranch(branch.id)"
-                >
-                  <TrashIcon class="size-6 text-white" />
-                </button>
-                <button
-                  class="rounded px-2 py-1 bg-blue-500 text-white"
-                  @click="update(branch)"
-                >
-                  <PencilIcon class="size-4 text-white" />
-                </button>
-              </div>
-            </td>
+                <div class="relative inline-flex gap-1">
+                  <button
+                    class="rounded px-1 py-1 bg-red-500 text-white"
+                    @click="removeEmployee(employee.id)"
+                  >
+                    <TrashIcon class="size-6 text-white" />
+                  </button>
+                  <button
+                    class="rounded px-2 py-1 bg-blue-500 text-white"
+                    @click="update(employee)"
+                  >
+                    <PencilIcon class="size-4 text-white" />
+                  </button>
+                </div>
+              </td>
           </tr>
         </tbody>
       </Table>
-     
+
     </div>
-    <Paginate :page="props.branches" />
+    <Paginate :page="props.employees"/>
   </AdminLayout>
 
   <FormModal
     :show="modal"
-    :branch="branch"
+    :employee="employee"
     :error="errorForm"
     @close="toggle"
     @save="save"
   />
 
   <ConfirmationModal :show="modal1">
-    <template #title> ELIMINAR ESTABLECIMIENTOS </template>
-    <template #content> Esta seguro de eliminar el establecimiento? </template>
+    <template #title> ELIMINAR EMPLEADOS </template>
+    <template #content> Esta seguro de eliminar el empleado? </template>
     <template #footer>
-      <PrimaryButton type="button" @click="deletebranch">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deleteEmployee">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

@@ -9,6 +9,8 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+
 
 // Props
 
@@ -130,29 +132,32 @@ watch(
               <td>
                 {{ inta.value }}
               </td>
-              <td>
-                <div class="relative inline-flex">
-                  <Link
-                    :href="route('intangibleassets.edit', inta.id)"
-                    class="rounded px-2 py-1 bg-blue-500 text-white"
-                  >
-                    <i class="fa fa-edit"> </i> Modificar
-                  </Link>
-
+      
+                 
+              <td class="flex justify-end">
+                <div class="relative inline-flex gap-1">
                   <button
-                    class="rounded px-2 py-1 bg-red-500 text-white"
+                    class="rounded px-1 py-1 bg-red-500 text-white"
                     @click="removeIntangibleAsset(inta.id)"
                   >
-                    <i class="fa fa-trash"></i> Eliminar
+                    <TrashIcon class="size-6 text-white" />
                   </button>
+                  <Link
+                    class="rounded px-2 py-1 bg-blue-500 text-white"
+                    :href="route('intangibleassets.edit', inta.id)"
+                  >
+                    <PencilIcon class="size-4 text-white" />
+                  </Link>
                 </div>
               </td>
+
             </tr>
           </tbody>
         </Table>
-        <Paginate :page="props.intangibleAssetss" />
+        
       </div>
     </div>
+    <Paginate :page="props.intangibleAssetss" />
   </AdminLayout>
   <ConfirmationModal :show="modal">
     <template #title> ELIMINAR ACTIVOS FIJOS </template>

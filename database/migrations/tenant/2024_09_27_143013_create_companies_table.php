@@ -229,6 +229,30 @@ return new class extends Migration {
             $table->foreign('pay_method_id')->references('id')->on('pay_methods');
             $table->foreign('company_id')->references('id')->on('companies');
         });
+
+        Schema::create('employees', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+
+            $table->String('cuit');
+            $table->string('name')->nullable();
+            $table->string('sector_code');
+            $table->string('post');
+            $table->integer('days');
+            $table->decimal('salary', 14, 2)->default(0);
+            $table->decimal('porcent_aportation', 14, 2)->default(0);
+            $table->boolean('is_a_parner')->default(false);
+            $table->boolean('is_a_qualified_craftsman')->default(false);
+            $table->boolean('affiliated_with_spouse')->default(false);
+            $table->date('date_start');
+
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
     }
 
     /**

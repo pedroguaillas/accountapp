@@ -61,4 +61,9 @@ class Company extends Model
     {
         return $this->hasMany(IntangibleAsset::class);
     }
+
+    public function employee()
+    {
+        return $this->hasMany(Employee::class);
+    }
 }

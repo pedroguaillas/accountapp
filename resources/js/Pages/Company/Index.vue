@@ -10,6 +10,7 @@ import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 //Props
 const props = defineProps({
@@ -202,30 +203,30 @@ watch(
               <td>{{ i + 1 }}</td>
               <td>{{ company.ruc }}</td>
               <td>{{ company.company }}</td>
-              <td>
-                <div
-                  class="relative inline-flex [&>a>i]:text-white [&>button>i]:text-white"
-                >
+
+              <td class="flex justify-end">
+                <div class="relative inline-flex gap-1">
+                  <button
+                    class="rounded px-1 py-1 bg-red-500 text-white"
+                    @click="removeCompany(company.id)"
+                  >
+                    <TrashIcon class="size-6 text-white" />
+                  </button>
                   <button
                     class="rounded px-2 py-1 bg-blue-500 text-white"
                     @click="update(company)"
                   >
-                    <i class="fa fa-trash"></i> Modificar
-                  </button>
-                  <button
-                    class="rounded px-2 py-1 bg-red-500 text-white"
-                    @click="removeCompany(company.id)"
-                  >
-                    <i class="fa fa-trash"></i> Eliminar
+                    <PencilIcon class="size-4 text-white" />
                   </button>
                 </div>
               </td>
             </tr>
           </tbody>
         </Table>
-        <Paginate :page="props.companies" />
+        
       </div>
     </div>
+    <Paginate :page="props.companies" />
   </AdminLayout>
 
   <ModalCompany
