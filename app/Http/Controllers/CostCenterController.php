@@ -14,23 +14,26 @@ class CostCenterController extends Controller
     {
         $company = Company::first();
 
+        // Construimos la consulta base
         $costCenters = CostCenter::select("*")
             ->where('company_id', $company->id);
 
-        if ($request->search) {
-            $costCenters->where('code', 'LIKE', '%' . $request->search . '%');
+        // Aplicamos el filtro si existe
+        if ($request->has('search') && !empty($request->search)) {
+            $costCenters->where('code', 'LIKE', '%' . $request->search . '%')
+                ->orWhere('name', 'LIKE', '%' . $request->search . '%');
         }
 
-        $costCenters = $costCenters->paginate(10);
+        // Paginamos los resultados
+        $costCenters = $costCenters->paginate(10)->withQueryString(); // Importante usar withQueryString()
 
-        return Inertia::render(
-            'CostCenter/Index',
-            [
-                "filters" => $request->search,
-                "costCenters" => $costCenters,
-            ]
-        );
+        // Renderizamos la vista con los datos necesarios
+        return Inertia::render('CostCenter/Index', [
+            'filters' => $request->search,
+            'costCenters' => $costCenters,
+        ]);
     }
+
 
     public function store(Request $request)
     {
