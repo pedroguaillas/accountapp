@@ -9,21 +9,31 @@ import { Link, router } from "@inertiajs/vue3";
 import { ref } from "vue";
 
 // Props
-defineProps({
+const props = defineProps({
     activeTypes: { type: Array, default: () => ([]) },
     accounts: { type: Array, default: () => ([]) },
+    payMethods: { type: Array, default: () => ([]) },
 });
 
 // Refs
 const modal = ref(true);
 const activeTypeId = ref(0)
+const payMethodId = ref(0)
+const accounts = ref(props.accounts)
 
 const toggle = () => {
     modal.value = !modal.value
 }
 
-const edit = (activeType) => {
-    activeTypeId.value = activeType.id
+const editActiveType = (activeTypeIdEdit) => {
+    accounts.value = Array.isArray(props.accounts) ? props.accounts.filter(acc => acc.code.startsWith('1.2')) : []
+    activeTypeId.value = activeTypeIdEdit
+    toggle()
+}
+
+const editPayMethod = (payMethodIdEdit) => {
+    accounts.value = Array.isArray(props.accounts) ? props.accounts.filter(acc => acc.code.startsWith('1.2')) : []
+    payMethodId.value = payMethodIdEdit
     toggle()
 }
 
@@ -46,10 +56,13 @@ const selectAccount = (accountId) => {
 
             <!-- Card Header -->
             <div class="items-center">
-                <h2 class="text-sm sm:text-lg">
+                <h2 class="text-sm sm:text-lg font-bold">
                     Vinculación de cuentas
                 </h2>
             </div>
+
+            <h3 class="mt-2">Activos fijos</h3>
+            <hr />
 
             <Table>
                 <thead>
@@ -60,14 +73,43 @@ const selectAccount = (accountId) => {
                     </tr>
                 </thead>
                 <tbody class="h-6">
-                    <tr v-for="(activeType, i) in activeTypes" :key="`activeType-${i}`">
+                    <tr v-for="(activeType, i) in props.activeTypes" :key="`activeType-${i}`">
                         <td>{{ i + 1 }}</td>
                         <td class="text-left">{{ activeType.name }}</td>
                         <td>
                             <div class="flex h-8">
                                 <input type="text" :value="activeType.account_info ?? ''"
                                     class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" />
-                                <button @click="edit(activeType)"
+                                <button @click="editActiveType(activeType.id)"
+                                    class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
+                                    <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </Table>
+
+            <h3 class="mt-2">Métodos de pago</h3>
+            <hr />
+
+            <Table>
+                <thead>
+                    <tr>
+                        <th class="w-10">N.</th>
+                        <th class="text-left">DESCRIPCION</th>
+                        <th>CUENTA</th>
+                    </tr>
+                </thead>
+                <tbody class="h-6">
+                    <tr v-for="(payMethod, i) in props.payMethods" :key="`payMethod-${i}`">
+                        <td>{{ i + 1 }}</td>
+                        <td class="text-left">{{ payMethod.name }}</td>
+                        <td>
+                            <div class="flex h-8">
+                                <input type="text"
+                                    class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" />
+                                <button @click="editPayMethod(payMethod.id)"
                                     class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
                                     <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
                                 </button>
@@ -78,7 +120,5 @@ const selectAccount = (accountId) => {
             </Table>
         </div>
     </AdminLayout>
-    <ModalSelectAccount :show="modal"
-        :accounts="Array.isArray(accounts) ? accounts.filter(acc => acc.code.startsWith('1.2')) : []" @close="toggle"
-        @selectAccount="selectAccount" />
+    <ModalSelectAccount :show="modal" :accounts="accounts" @close="toggle" @selectAccount="selectAccount" />
 </template>

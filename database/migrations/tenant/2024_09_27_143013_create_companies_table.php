@@ -28,9 +28,10 @@ return new class extends Migration {
 
         Schema::create('pay_methods', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger("company_id")->nullable();
+            $table->bigInteger('account_id')->nullable();
             $table->integer('code');
             $table->string('name');
-            $table->bigInteger('account_id')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

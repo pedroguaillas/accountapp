@@ -24,7 +24,7 @@ class SettingAccountController extends Controller
             ->where('is_detail', true)
             ->where('company_id', $company->id)->get();
 
-        $payMethods = PayMethod::where('company_id', $company->id)->get();
+        $payMethods = PayMethod::all();
 
         return Inertia::render('Setting/Index', [
             'activeTypes' => $activeTypes,

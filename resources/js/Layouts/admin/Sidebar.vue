@@ -110,7 +110,7 @@ const user = computed(() => page.props.auth.user)
                     </Link>
                 </li>
                 <li>
-                    <Link class="rounded hover:bg-sky-900" :href="route('dashboard')">
+                    <Link class="rounded hover:bg-sky-900" :href="route('employee.index')">
                     <i class="fa fa-bell"></i> Personal
                     </Link>
                 </li>

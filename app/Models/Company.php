@@ -38,6 +38,11 @@ class Company extends Model
         ];
     }
 
+    public function paymethods()
+    {
+        return $this->hasMany(PayMethod::class);//relacion muchos a muchos 
+    }
+
     public function branches()
     {
         return $this->hasMany(Branch::class);//relacion muchos a muchos 

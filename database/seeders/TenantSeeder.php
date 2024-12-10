@@ -40,12 +40,14 @@ class TenantSeeder extends Seeder
         ActiveType::create(['name' => 'Vehículos', 'depreciation_time' => 5]);
         ActiveType::create(['name' => 'Equipo de computo, tecnológico y otros', 'depreciation_time' => 3]);
 
-        Company::create([
+        $company = Company::create([
             'ruc' => '1100167694001',
             'company' => 'EJEMPLO COMPANIA',
             'economic_activity_id' => 1,
             'contributor_type_id' => 1,
         ]);
+
+        // $company->paymethods()->update(['company_id' => $company->id]);
     }
 
 }

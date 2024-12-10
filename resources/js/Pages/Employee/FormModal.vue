@@ -22,7 +22,7 @@ defineEmits(["close", "save"]);
 <template>
   <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">
     <template #title>
-      {{ `${employee.id === undefined ? "Añadir" : "Editar"} Empleados` }}
+      {{ `${employee.id === undefined ? "Añadir" : "Editar"} empleado` }}
     </template>
     <template #content>
       <div class="mt-4">

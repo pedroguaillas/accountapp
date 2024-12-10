@@ -10,13 +10,14 @@ class PayMethod extends Model
     use HasFactory;
 
     protected $fillable = [
+        'company_id',   // Compania extends
+        'account_id',   // Vinculo con la cuenta contable
         'code',         // Codigo del metodo de pago
         'name',         // Nombre del method de pago
-        'account_id',   // Vinculo con la cuenta
     ];
 
     protected $casts = [
-        'code' => 'integer',
         'account_id' => 'integer',
+        'code' => 'integer',
     ];
 }

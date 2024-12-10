@@ -1,4 +1,5 @@
 <script setup>
+
 // Imports
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
@@ -11,7 +12,6 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
-
 
 // Props
 const props = defineProps({
@@ -30,6 +30,8 @@ const toggle1 = () => {
   modal1.value = !modal1.value;
 };
 
+const date = new Date().toISOString().split("T")[0];
+
 // Inicializador de objetos
 const initialEmployee = {
   cuit: "",
@@ -42,19 +44,19 @@ const initialEmployee = {
   is_a_parner: false,
   is_a_qualified_craftsman: false,
   affiliated_with_spouse: false,
-  date_start:"",
- 
+  date_start: date,
 };
 
 // Reactives
 const employee = reactive({ ...initialEmployee });
-const errorForm = reactive({ ...initialEmployee });
+const errorForm = reactive({});
 
-const newemployee = () => {
+const newEmployee = () => {
   if (employee.id !== undefined) {
     delete employee.id;
   }
   Object.assign(employee, initialEmployee);
+  Object.assign(errorForm, { ...initialEmployee, date_start: "" });
   toggle();
 };
 
@@ -68,7 +70,6 @@ const toggle = () => {
 
 const save = () => {
   // Validar campos obligatorios antes de enviar la solicitud
-  
 
   const routeMethod = employee.id ? "put" : "post"; // Determinar el método HTTP
   const routeName = employee.id
@@ -94,10 +95,10 @@ const save = () => {
     });
 };
 
-
-const update = (employeeEdit) => {
+const edit = (employeeEdit) => {
   resetErrorForm();
   Object.assign(employee, { ...initialEmployee, ...employeeEdit });
+  Object.assign(errorForm, { ...initialEmployee, date_start: "" });
   toggle();
 };
 
@@ -105,8 +106,6 @@ const removeEmployee = (employeeId) => {
   toggle1();
   deleteid.value = employeeId;
 };
-
-
 
 const deleteEmployee = () => {
   axios
@@ -163,17 +162,10 @@ watch(
           Empleados
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
-        <button
-          @click="newemployee"
-          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
-        >
+        <button @click="newEmployee"
+          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -183,53 +175,34 @@ watch(
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
             <th>CEDULA</th>
-            <th>NOMBRE</th>
+            <th class="text-left">NOMBRE</th>
             <th class="w-1"></th>
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(employee, i) in props.employees.data"
-            :key="employee.id"
-            class="border-t [&>td]:py-2"
-          >
+          <tr v-for="(employee, i) in props.employees.data" :key="employee.id" class="border-t [&>td]:py-2">
             <td>{{ i + 1 }}</td>
             <td>{{ employee.cuit }}</td>
-            <td>{{ employee.name }}</td>
-           
-
-
+            <td class="text-left">{{ employee.name }}</td>
             <td class="flex justify-end">
-                <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-red-500 text-white"
-                    @click="removeEmployee(employee.id)"
-                  >
-                    <TrashIcon class="size-6 text-white" />
-                  </button>
-                  <button
-                    class="rounded px-2 py-1 bg-blue-500 text-white"
-                    @click="update(employee)"
-                  >
-                    <PencilIcon class="size-4 text-white" />
-                  </button>
-                </div>
-              </td>
+              <div class="relative inline-flex gap-1">
+                <button class="rounded px-1 py-1 bg-red-500 text-white" @click="removeEmployee(employee.id)">
+                  <TrashIcon class="size-6 text-white" />
+                </button>
+                <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="edit(employee)">
+                  <PencilIcon class="size-4 text-white" />
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </Table>
 
     </div>
-    <Paginate :page="props.employees"/>
+    <Paginate :page="props.employees" />
   </AdminLayout>
 
-  <FormModal
-    :show="modal"
-    :employee="employee"
-    :error="errorForm"
-    @close="toggle"
-    @save="save"
-  />
+  <FormModal :show="modal" :employee="employee" :error="errorForm" @close="toggle" @save="save" />
 
   <ConfirmationModal :show="modal1">
     <template #title> ELIMINAR EMPLEADOS </template>
