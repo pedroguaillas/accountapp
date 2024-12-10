@@ -1,12 +1,17 @@
-<<script setup>
+<script setup>
 // Imports
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/24/outline";
 import { router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
 // Props
 const props = defineProps({
   page: { type: Object, default: () => ({}) },
 });
+
+// States
+const currentGroup = ref(0); // Tracks the current group of pages
+const itemsPerGroup = 5; // Number of pages per group
 
 function nextPage() {
   if (props.page.next_page_url) {
@@ -25,6 +30,35 @@ function interPage(url) {
     router.get(url, {}, { preserveState: true });
   }
 }
+
+// Divide pagination links into groups
+const groupedLinks = computed(() => {
+  const links = props.page.links.filter(link => link.url); // Only include valid links
+  const groups = [];
+
+  for (let i = 0; i < links.length; i += itemsPerGroup) {
+    groups.push(links.slice(i, i + itemsPerGroup));
+  }
+
+  return groups;
+});
+
+// Get the current group of links
+const visibleLinks = computed(() => groupedLinks.value[currentGroup.value] || []);
+
+// Navigate to the next group
+function nextGroup() {
+  if (currentGroup.value < groupedLinks.value.length - 1) {
+    currentGroup.value++;
+  }
+}
+
+// Navigate to the previous group
+function prevGroup() {
+  if (currentGroup.value > 0) {
+    currentGroup.value--;
+  }
+}
 </script>
 
 <template>
@@ -36,14 +70,18 @@ function interPage(url) {
       <span class="font-semibold text-gray-900 dark:text-white">{{ props.page.last_page }}</span>
     </span>
     <ul class="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+      <!-- Previous Group Button -->
       <li>
-        <button @click="prevPage"
-          :disabled="!props.page.prev_page_url"
-          class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+        <button
+          @click="prevGroup"
+          :disabled="currentGroup === 0"
+          class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
           <ChevronLeftIcon class="size-4 text-gray-500 stroke-[3px]" />
         </button>
       </li>
-      <li v-for="(link, i) in props.page.links" :key="`pagination-${i}`">
+      
+      <!-- Page Links -->
+      <li v-for="(link, i) in visibleLinks" :key="`pagination-${i}`">
         <button
           :disabled="!link.url || link.active"
           @click="interPage(link.url)"
@@ -55,9 +93,12 @@ function interPage(url) {
           v-html="link.label"
         ></button>
       </li>
+      
+      <!-- Next Group Button -->
       <li>
-        <button @click="nextPage"
-          :disabled="!props.page.next_page_url"
+        <button
+          @click="nextGroup"
+          :disabled="currentGroup === groupedLinks.length - 1"
           class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
           <ChevronRightIcon class="size-4 text-gray-500 stroke-[3px]" />
         </button>
