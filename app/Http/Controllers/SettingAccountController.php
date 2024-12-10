@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Models\ActiveType;
 use App\Models\Company;
+use App\Models\PayMethod;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -23,9 +24,12 @@ class SettingAccountController extends Controller
             ->where('is_detail', true)
             ->where('company_id', $company->id)->get();
 
+        $payMethods = PayMethod::where('company_id', $company->id)->get();
+
         return Inertia::render('Setting/Index', [
             'activeTypes' => $activeTypes,
-            'accounts' => $accounts
+            'accounts' => $accounts,
+            'payMethods' => $payMethods
         ]);
     }
 

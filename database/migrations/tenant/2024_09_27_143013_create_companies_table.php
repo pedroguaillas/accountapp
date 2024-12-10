@@ -30,6 +30,7 @@ return new class extends Migration {
             $table->id();
             $table->integer('code');
             $table->string('name');
+            $table->bigInteger('account_id')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

@@ -9,7 +9,14 @@ class PayMethod extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['code','name'];
+    protected $fillable = [
+        'code',         // Codigo del metodo de pago
+        'name',         // Nombre del method de pago
+        'account_id',   // Vinculo con la cuenta
+    ];
 
-    protected $casts = ['code'=> 'integer'];
+    protected $casts = [
+        'code' => 'integer',
+        'account_id' => 'integer',
+    ];
 }
