@@ -53,28 +53,6 @@ const toggle1 = () => {
   modal1.value = !modal1.value;
 };
 
-//   const routeMethod = costCenter.id ? "put" : "post";
-// const routeName = costCenter.id
-//   ? route("costCenter.update", costCenter.id)
-//   : route("costCenter.store");
-
-// axios[routeMethod](routeName, costCenter)
-// .then(() => {
-//   toggle();
-//   resetErrorForm();
-//   router.reload({ only: ["costCenters"] });
-// })
-// .catch((error) => {
-//   resetErrorForm();
-//   if (error.response) {
-//     Object.keys(error.response.data.errors).forEach((key) => {
-//       errorForm[key] = error.response.data.errors[key][0];
-//     });
-//   } else {
-//     console.error("Error desconocido", error);
-//     alert("Hubo un error al procesar la solicitud");
-//   }
-// });
 const save = () => {
   // Validar los campos obligatorios
   if (!costCenter.name || !costCenter.code) {
