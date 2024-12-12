@@ -1,10 +1,9 @@
 <script setup>
-
 // Imports
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
-import { router } from "@inertiajs/vue3";
+import { router, useForm, Link } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
@@ -48,7 +47,7 @@ const initialEmployee = {
 };
 
 // Reactives
-const employee = reactive({ ...initialEmployee });
+const employee = useForm({ ...initialEmployee });
 const errorForm = reactive({});
 
 const newEmployee = () => {
@@ -66,33 +65,6 @@ const resetErrorForm = () => {
 
 const toggle = () => {
   modal.value = !modal.value;
-};
-
-const save = () => {
-  // Validar campos obligatorios antes de enviar la solicitud
-
-  const routeMethod = employee.id ? "put" : "post"; // Determinar el método HTTP
-  const routeName = employee.id
-    ? route("employee.update", employee.id) // Ruta para actualización
-    : route("employee.store"); // Ruta para creación
-
-  axios[routeMethod](routeName, employee)
-    .then(() => {
-      toggle(); // Cierra el modal
-      resetErrorForm(); // Reinicia los errores del formulario
-      router.reload({ only: ["employees"] }); // Recarga los datos de sucursales
-    })
-    .catch((error) => {
-      resetErrorForm();
-      if (error.response && error.response.data.errors) {
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
-        });
-      } else {
-        console.error("Error desconocido", error);
-        alert("Hubo un error al procesar la solicitud");
-      }
-    });
 };
 
 const edit = (employeeEdit) => {
@@ -121,35 +93,44 @@ const deleteEmployee = () => {
 
 watch(
   search,
+
   async (newQuery) => {
-    const url = route("employee.index"); // Ruta del índice de sucursales
-    loading.value = true; // Activa el indicador de carga
+    const url = route("employee.index");
+    loading.value = true;
+    console.log("si entra");
 
     try {
-      if (newQuery.length === 0) {
-        // Si el término de búsqueda está vacío, recarga todos los datos
-        await router.get(
-          url,
-          {}, // Sin parámetros de búsqueda
-          { preserveState: true }
-        );
-      } else if (newQuery.length >= 1) {
-        // Realizar búsqueda con el término
-        await router.get(
-          url,
-          { search: newQuery }, // Pasar los parámetros de búsqueda
-          { preserveState: true }
-        );
-      }
+      await router.get(
+        url,
+        { search: newQuery, page: props.employees.current_page }, // Mantener la página actual
+        { preserveState: true }
+      );
     } catch (error) {
-      console.log(error);
+      console.error("Error al filtrar:", error);
     } finally {
-      // Finalizar el estado de carga
       loading.value = false;
     }
   },
   { immediate: false }
 );
+
+// Función para manejar el cambio de página
+const handlePageChange = async (page) => {
+  const url = route("employee.index"); // Ruta hacia el backend
+  loading.value = true;
+
+  try {
+    await router.get(
+      url,
+      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
+      { preserveState: true }
+    );
+  } catch (error) {
+    console.error("Error al paginar:", error);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -162,12 +143,19 @@ watch(
           Empleados
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
+          <TextInput
+            v-model="search"
+            type="search"
+            class="block sm:mr-2 h-8 w-full"
+            placeholder="Buscar ..."
+          />
         </div>
-        <button @click="newEmployee"
-          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
+        <Link
+          :href="route('employee.create')"
+          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+        >
           +
-        </button>
+        </Link>
       </div>
 
       <Table>
@@ -176,39 +164,62 @@ watch(
             <th class="w-1">N°</th>
             <th>CEDULA</th>
             <th class="text-left">NOMBRE</th>
+            <th class="text-left">CARGO</th>
+            <th>DIAS</th>
+            <th class="text-right pr-4">SALARIO</th>
             <th class="w-1"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(employee, i) in props.employees.data" :key="employee.id" class="border-t [&>td]:py-2">
+          <tr
+            v-for="(employee, i) in props.employees.data"
+            :key="employee.id"
+            class="border-t [&>td]:py-2"
+          >
             <td>{{ i + 1 }}</td>
             <td>{{ employee.cuit }}</td>
             <td class="text-left">{{ employee.name }}</td>
+            <td class="text-left">{{ employee.position }}</td>
+            <td>{{ employee.days }}</td>
+            <td class="text-right pr-4">{{ employee.salary.toFixed(2) }}</td>
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
-                <button class="rounded px-1 py-1 bg-red-500 text-white" @click="removeEmployee(employee.id)">
+                <button
+                  class="rounded px-1 py-1 bg-red-500 text-white"
+                  @click="removeEmployee(employee.id)"
+                >
                   <TrashIcon class="size-6 text-white" />
                 </button>
-                <button class="rounded px-2 py-1 bg-blue-500 text-white" @click="edit(employee)">
+                <Link
+                  class="rounded px-2 py-1 bg-blue-500 text-white"
+                  :href="route('employee.edit',employee.id)"
+                >
                   <PencilIcon class="size-4 text-white" />
-                </button>
+                </Link>
               </div>
             </td>
           </tr>
         </tbody>
       </Table>
-
     </div>
-    <Paginate :page="props.employees" />
+    <Paginate :page="props.employees" @page-change="handlePageChange" />
   </AdminLayout>
 
-  <FormModal :show="modal" :employee="employee" :error="errorForm" @close="toggle" @save="save" />
+  <FormModal
+    :show="modal"
+    :employee="employee"
+    :error="errorForm"
+    @close="toggle"
+    @save="save"
+  />
 
   <ConfirmationModal :show="modal1">
     <template #title> ELIMINAR EMPLEADOS </template>
     <template #content> Esta seguro de eliminar el empleado? </template>
     <template #footer>
-      <PrimaryButton type="button" @click="deleteEmployee">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deleteEmployee"
+        >Aceptar</PrimaryButton
+      >
     </template>
   </ConfirmationModal>
 </template>

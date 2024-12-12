@@ -10,8 +10,6 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
 use App\Http\Controllers\JournalController;
-use App\Http\Controllers\DepreciationController;
-use App\Http\Controllers\AmortizationController;
 use App\Http\Controllers\SettingAccountController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -95,12 +93,8 @@ Route::middleware([
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
-        // Route::post('journals', [JournalController::class, 'store'])->name('journal.store');
         Route::get('asiento/editar/{journalId}', [JournalController::class, 'edit'])->name('journal.edit');
-        // Route::put('journals/{journals}', [JournalController::class, 'update'])->name('journal.update');
         Route::delete('journal/{journal}', [JournalController::class, 'destroy'])->name('journal.delete');
-
-
         Route::resource('journal', JournalController::class)->only(['store', 'update']);
 
         // fixed assets  //poner las rutas con nombre en plural 
@@ -111,8 +105,6 @@ Route::middleware([
         Route::put('fixedassets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('fixedassets.update');
         Route::delete('fixedassets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('fixedassets.delete');
 
-        Route::get('/depreciacion', [DepreciationController::class, 'index'])->name('depreciations.index');
-
         // intngible assets  //poner las rutas con nombre en plural 
         Route::get('activos-intangibles', [IntangibleAssetController::class, 'index'])->name('intangibleassets.index');
         Route::get('activos-intangibles/crear', [IntangibleAssetController::class, 'create'])->name('intangibleassets.create');
@@ -121,15 +113,20 @@ Route::middleware([
         Route::put('intangibleassets/{intangibleasset}', [IntangibleAssetController::class, 'update'])->name('intangibleassets.update');
         Route::delete('intangibleassets/{intangibleasset}', [IntangibleAssetController::class, 'destroy'])->name('intangibleassets.delete');
 
-        Route::get('/amortizacion', [AmortizationController::class, 'index'])->name('amortizations.index');
-
         //empleados
         Route::get('empleados', [EmployeeController::class, 'index'])->name('employee.index');
-        //  Route::post('employees', [EmployeeController::class, 'store'])->name('employee.store');
-        //Route::put('employees/{employee}', [EmployeeController::class, 'update'])->name('employee.update');
+        Route::get('empleados/crear', [EmployeeController::class, 'create'])->name('employee.create');
+        Route::get('empleados/editar/{employeeId}', [EmployeeController::class, 'edit'])->name('employee.edit');
         Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.delete');
-
         Route::resource('employee', EmployeeController::class)->only(['store', 'update']);
 
+
+        //adelantos
+        Route::get('adelantos', [EmployeeController::class, 'index'])->name('advances.index');
+        
+        //rples
+
+        Route::get('roles-de-pago', [EmployeeController::class, 'index'])->name('paymentrol.index');
+        
     });
 });

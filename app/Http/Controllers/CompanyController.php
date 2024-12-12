@@ -7,33 +7,36 @@ use App\Models\ContributorType;
 use App\Models\EconomicActivity;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
 
 class CompanyController extends Controller
 {
     public function index(Request $request)
     {
-        // Obtener el término de búsqueda desde la solicitud
-        $search = $request->input('search', ''); // Valor predeterminado vacío si no hay búsqueda
-
-        // Consultar las empresas y aplicar filtro si hay término de búsqueda
+        // Construimos la consulta base para las empresas
         $companies = Company::query()
-            ->when($search, function ($query, $search) {
-                $query->where('ruc', 'like', '%' . $search . '%'); // Filtrar por RUC
-            })
-            ->get(); // Puedes usar paginate() si necesitas paginación
+            ->when($request->has('search') && !empty($request->search), function ($query) use ($request) {
+                $query->where('ruc', 'LIKE', '%' . $request->search . '%'); // Filtrar por RUC
+            });
+
+        // Paginamos los resultados y preservamos los filtros en la URL
+        $companies = $companies->paginate(10)->withQueryString();
 
         // Obtener actividades económicas y tipos de contribuyente
         $economyActivities = EconomicActivity::all();
         $contributorTypes = ContributorType::all();
 
-        // Retornar datos a la vista
+
+
+        // Renderizamos la vista con los datos necesarios
         return Inertia::render('Company/Index', [
-            'companies' => $companies,
-            'economyActivities' => $economyActivities,
-            'contributorTypes' => $contributorTypes,
-            'search' => $search, // Pasar el término de búsqueda a la vista (opcional para el frontend)
+            'companies' => $companies, // Datos de empresas paginados
+            'filters' => $request->search, // Pasar el término de búsqueda como filtro
+            'economyActivities' => $economyActivities, // Actividades económicas
+            'contributorTypes' => $contributorTypes, // Tipos de contribuyente
         ]);
     }
+
 
 
     public function store(Request $request)
@@ -43,11 +46,12 @@ class CompanyController extends Controller
             'company' => 'required|min:3|max:300',
             'economic_activity_id' => 'required',
             'contributor_type_id' => 'required',
+            
         ]);
-    
+
         Company::create($request->all());
     }
-    
+
     public function update(Request $request, Company $company)
     {
         $request->validate([
@@ -62,13 +66,13 @@ class CompanyController extends Controller
             'economic_activity_id' => 'required',
             'contributor_type_id' => 'required',
         ]);
-    
+
         $company->update($request->all());
     }
 
     public function destroy(int $companyId)
     {
-        $company= Company::findOrFail($companyId);
+        $company = Company::findOrFail($companyId);
         $company->delete(); // Esto usará SoftDeletes
 
         return response()->json([
@@ -76,5 +80,5 @@ class CompanyController extends Controller
             'message' => 'Compania eliminado correctamente.',
         ]);
     }
-    
+
 }

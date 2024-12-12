@@ -5,27 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\Branch;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 
 class BranchController extends Controller
 {
     public function index(Request $request)
     {
-        // Obtener el término de búsqueda desde la solicitud
-        $search = $request->input('search', ''); // Usar un valor por defecto vacío si no hay búsqueda
-    
-        // Consultar las sucursales y aplicar filtro si hay término de búsqueda
+        $company = Company::first();
+
+        // Construimos la consulta base
         $branches = Branch::query()
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'like', '%' . $search . '%');
-            });
-        $branches = $branches->paginate(10);
-        // Retornar las sucursales a la vista
-        return inertia('Branch/Index', [
+            ->where('company_id', $company->id);
+
+        // Aplicamos el filtro si existe
+        if ($request->has('search') && !empty($request->search)) {
+            $branches->where('name', 'LIKE', '%' . $request->search . '%');
+        }
+
+        // Paginamos los resultados y preservamos los filtros en la URL
+        $branches = $branches->paginate(10)->withQueryString();
+
+        // Renderizamos la vista con los datos necesarios
+        return Inertia::render('Branch/Index', [
+            'filters' => $request->search,
             'branches' => $branches,
         ]);
     }
-    
+
 
     public function store(Request $request)
     {
@@ -39,13 +46,13 @@ class BranchController extends Controller
 
         ]);
 
-        $company= Company::first();
+        $company = Company::first();
 
         $company->branches()->create($request->all());
 
     }
 
-    public function update(Request $request,Branch $branch)
+    public function update(Request $request, Branch $branch)
     {
         $request->validate([
             'number' => 'required|min:1|max:999',
@@ -55,13 +62,12 @@ class BranchController extends Controller
             //'is_matriz' => '',
             'enviroment_type' => 'required',
         ]);
-        if($request->is_matriz)
-        {
-            $company= Company::first();
+        if ($request->is_matriz) {
+            $company = Company::first();
 
-            $company->branches()->update(['is_matriz'=>false]);
+            $company->branches()->update(['is_matriz' => false]);
         }
-        
+
         $branch->update($request->all());
     }
 
