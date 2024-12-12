@@ -3,7 +3,7 @@
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
-import { router } from "@inertiajs/vue3";
+import { router, useForm  } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
@@ -40,7 +40,7 @@ const initialBranch = {
 };
 
 // Reactives
-const branch = reactive({ ...initialBranch });
+const branch = useForm({ ...initialBranch });
 const errorForm = reactive({ ...initialBranch });
 
 const newBranch = () => {
@@ -65,30 +65,35 @@ const save = () => {
     alert("Por favor, complete todos los campos obligatorios");
     return;
   }
-
-  const routeMethod = branch.id ? "put" : "post"; // Determinar el método HTTP
-  const routeName = branch.id
-    ? route("branch.update", branch.id) // Ruta para actualización
+  // Determinar el método HTTP y la ruta correspondiente
+  const isUpdate = Boolean(branch.id);
+  const routeMethod = isUpdate ? "put" : "post";
+  const routeName = isUpdate
+    ? route("branch.update", { id:branch.id}) // Ruta para actualización
     : route("branch.store"); // Ruta para creación
 
-  axios[routeMethod](routeName, branch)
-    .then(() => {
-      toggle(); // Cierra el modal
-      resetErrorForm(); // Reinicia los errores del formulario
-      router.reload({ only: ["branches"] }); // Recarga los datos de sucursales
-    })
-    .catch((error) => {
-      resetErrorForm();
-      if (error.response && error.response.data.errors) {
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
+  // Preparar la solicitud
+  branch[routeMethod](routeName, {
+    onSuccess: () => {
+      toggle(); // Cerrar modal o reiniciar estados
+      resetErrorForm(); // Limpiar errores del formulario
+      router.reload({ only: ["stores"] }); // Recargar datos
+    },
+    onError: (error) => {
+      resetErrorForm(); // Asegurarte de limpiar los errores previos
+      if (error.response?.data?.errors) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          errorForm[key] = value[0]; // Mostrar el primer error asociado a cada campo
         });
       } else {
-        console.error("Error desconocido", error);
-        alert("Hubo un error al procesar la solicitud");
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
       }
-    });
+    },
+  });
 };
+
 
 const update = (branchEdit) => {
   resetErrorForm();
@@ -117,35 +122,47 @@ const deletebranch = () => {
 
 watch(
   search,
+
   async (newQuery) => {
-    const url = route("branch.index"); // Ruta del índice de sucursales
-    loading.value = true; // Activa el indicador de carga
+    const url = route("branch.index");
+    loading.value = true;
+    console.log("si entra");
 
     try {
-      if (newQuery.length === 0) {
-        // Si el término de búsqueda está vacío, recarga todos los datos
-        await router.get(
-          url,
-          {}, // Sin parámetros de búsqueda
-          { preserveState: true }
-        );
-      } else if (newQuery.length >= 1) {
-        // Realizar búsqueda con el término
-        await router.get(
-          url,
-          { search: newQuery }, // Pasar los parámetros de búsqueda
-          { preserveState: true }
-        );
-      }
+      await router.get(
+        url,
+        { search: newQuery, page: props.branches.current_page }, // Mantener la página actual
+        { preserveState: true }
+      );
     } catch (error) {
-      console.log(error);
+      console.error("Error al filtrar:", error);
     } finally {
-      // Finalizar el estado de carga
       loading.value = false;
     }
   },
   { immediate: false }
 );
+
+// Función para manejar el cambio de página
+const handlePageChange = async (page) => {
+  const url = route("branch.index"); // Ruta hacia el backend
+  loading.value = true;
+
+  try {
+    await router.get(
+      url,
+      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
+      { preserveState: true }
+    );
+  } catch (error) {
+    console.error("Error al paginar:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+
+
 </script>
 
 <template>
@@ -201,7 +218,6 @@ watch(
             <td>
               {{ branch.enviroment_type === 1 ? "Prueba" : "Producción" }}
             </td>
-            
 
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
@@ -222,9 +238,8 @@ watch(
           </tr>
         </tbody>
       </Table>
-     
     </div>
-    <Paginate :page="props.branches" />
+    <Paginate :page="props.branches" @page-change="handlePageChange" />
   </AdminLayout>
 
   <FormModal

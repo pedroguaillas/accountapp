@@ -3,7 +3,7 @@
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import ModalCompany from "./ModalCompany.vue";
-import { router } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import axios from "axios";
 import Table from "@/Components/Table.vue";
 import TextInput from "@/Components/TextInput.vue";
@@ -14,7 +14,8 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 //Props
 const props = defineProps({
-  companies: { type: Array, default: () => [] },
+  companies: { type: Object, default: () => ({}) },
+  filters: { type: String, default: "" },
   economyActivities: { type: Array, default: () => [] },
   contributorTypes: { type: Array, default: () => [] },
 });
@@ -34,7 +35,7 @@ const initialCompany = {
 };
 
 // Reactives
-const company = reactive({ ...initialCompany });
+const company = useForm({ ...initialCompany });
 const errorForm = reactive({});
 const deleteid = ref(0);
 
@@ -61,40 +62,29 @@ const toggle1 = () => {
 };
 
 const save = () => {
-  if (company.id === undefined) {
-    // const data = { ...club, category_id: props.category.id, group_id: club.group_id > 0 ? club.group_id : null, extra_points: club.extra_points === '' ? 0 : club.extra_points }
-    axios
-      .post(route("company.store"), company)
-      .then(() => {
-        toggle();
-        resetErrorForm();
+  // Determinar el método HTTP y la ruta correspondiente
+  const isUpdate = Boolean(company.id);
+  const routeMethod = isUpdate ? "put" : "post";
+  const routeName = isUpdate
+    ? route("company.update", { id: company.id }) // Ruta para actualización
+    : route("company.store"); // Ruta para creación
 
-        router.reload({ only: ["companies"] });
-      })
-      .catch((error) => {
-        resetErrorForm();
+  // Preparar la solicitud
+  company[routeMethod](routeName, {
+    onSuccess: () => {
+      toggle(); // Cerrar modal o reiniciar estados
+      resetErrorForm(); // Limpiar errores del formulario
+      router.reload({ only: ["rucs"] }); // Recargar datos
+    },
+    onError: (error) => {
+      resetErrorForm(); // Asegurarte de limpiar los errores previos
 
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
-        });
+      // Iterar sobre los errores recibidos del servidor
+      Object.entries(error).forEach(([key, value]) => {
+        errorForm[key] = value; // Mostrar el primer error asociado a cada campo
       });
-  } else {
-    axios
-      .put(route("company.update", company.id), company)
-      .then(() => {
-        toggle();
-        resetErrorForm();
-
-        router.reload({ only: ["companies"] });
-      })
-      .catch((error) => {
-        resetErrorForm();
-
-        Object.keys(error.response.data.errors).forEach((key) => {
-          errorForm[key] = error.response.data.errors[key][0];
-        });
-      });
-  }
+    },
+  });
 };
 
 const update = (companyEdit) => {
@@ -123,35 +113,44 @@ const deletecompany = () => {
 
 watch(
   search,
+
   async (newQuery) => {
-    const url = route("rucs.index"); // Ruta del índice de sucursales
-    loading.value = true; // Activa el indicador de carga
+    const url = route("rucs.index");
+    loading.value = true;
+    console.log("si entra");
 
     try {
-      if (newQuery.length === 0) {
-        // Si el término de búsqueda está vacío, recarga todos los datos
-        await router.get(
-          url,
-          {}, // Sin parámetros de búsqueda
-          { preserveState: true }
-        );
-      } else if (newQuery.length >= 1) {
-        // Realizar búsqueda con el término
-        await router.get(
-          url,
-          { search: newQuery }, // Pasar los parámetros de búsqueda
-          { preserveState: true }
-        );
-      }
+      await router.get(
+        url,
+        { search: newQuery, page: props.companies.current_page }, // Mantener la página actual
+        { preserveState: true }
+      );
     } catch (error) {
-      console.log(error);
+      console.error("Error al filtrar:", error);
     } finally {
-      // Finalizar el estado de carga
       loading.value = false;
     }
   },
   { immediate: false }
 );
+
+// Función para manejar el cambio de página
+const handlePageChange = async (page) => {
+  const url = route("rucs.index"); // Ruta hacia el backend
+  loading.value = true;
+
+  try {
+    await router.get(
+      url,
+      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
+      { preserveState: true }
+    );
+  } catch (error) {
+    console.error("Error al paginar:", error);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -171,7 +170,7 @@ watch(
             minlength="3"
             maxlength="300"
             required
-            placeholder="BUSCAR"
+            placeholder="Buscar..."
           />
         </div>
         <button
@@ -196,7 +195,7 @@ watch(
           </thead>
           <tbody>
             <tr
-              v-for="(company, i) in props.companies"
+              v-for="(company, i) in props.companies.data"
               :key="company.id"
               class="border-t [&>td]:py-2"
             >
@@ -223,10 +222,9 @@ watch(
             </tr>
           </tbody>
         </Table>
-        
       </div>
     </div>
-    <Paginate :page="props.companies" />
+    <Paginate :page="props.companies" @page-change="handlePageChange" />
   </AdminLayout>
 
   <ModalCompany

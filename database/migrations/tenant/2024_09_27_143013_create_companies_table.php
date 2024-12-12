@@ -237,17 +237,20 @@ return new class extends Migration {
             $table->bigInteger('company_id');
 
             $table->String('cuit');
-            $table->string('name')->nullable();
-            $table->string('sector_code');
-            $table->string('post');
+            $table->string('name');
+            $table->string('sector_code')->nullable();
+            $table->string('position');
             $table->integer('days');
             $table->decimal('salary', 14, 2)->default(0);
             $table->decimal('porcent_aportation', 14, 2)->default(0);
-            $table->boolean('is_a_parner')->default(false);
+            $table->boolean('is_a_parnert')->default(false);
             $table->boolean('is_a_qualified_craftsman')->default(false);
             $table->boolean('affiliated_with_spouse')->default(false);
             $table->date('date_start');
-
+            $table->boolean('xiii')->default(false);
+            $table->boolean('xiv')->default(false);
+            $table->boolean('reserve_funds')->default(false);
+            $table->string('email')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
@@ -275,8 +278,6 @@ return new class extends Migration {
         Schema::dropIfExists('fixed_assets');
         Schema::dropIfExists('active_types');
         Schema::dropIfExists('intangible_assets');
-        Schema::table('fixed_assets', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        Schema::dropIfExists('employees');
     }
 };
