@@ -93,9 +93,12 @@ class JournalController extends Controller
         $costCenters = CostCenter::select('id', 'code', 'name')
             ->where('company_id', $company->id)->get();
 
+        $countJournals = Journal::count();
+
         return Inertia::render('Journal/Create', [
             'accounts' => $accounts,
             'costCenters' => $costCenters,
+            'countJournals' => $countJournals,
         ]);
     }
 
@@ -135,6 +138,7 @@ class JournalController extends Controller
 
         return to_route('journal.index');
     }
+
     public function edit(int $journal_id)
     {
         // Obtén la información del asiento contable
@@ -203,8 +207,6 @@ class JournalController extends Controller
         ]);
     }
 
-
-
     public function update(Request $request, int $journal_id)
     {
         // Validación de los datos
@@ -260,8 +262,6 @@ class JournalController extends Controller
         return to_route('journal.index')->with('success', 'Asiento contable actualizado correctamente.');
     }
 
-
-
     public function destroy(Journal $journal)
     {
         $journal->delete(); // Esto usará SoftDeletes
@@ -270,8 +270,6 @@ class JournalController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Asiento  contable eliminado correctamente.',
-
-
         ]);
     }
 }

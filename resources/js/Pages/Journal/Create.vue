@@ -17,6 +17,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 const props = defineProps({
   accounts: { type: Array, default: () => [] },
   costCenters: { type: Array, default: () => [] },
+  countJournals: { type: Number, default: 0 },
 });
 
 const date = new Date().toISOString().split("T")[0];
@@ -32,6 +33,9 @@ const initialJournal = {
 
 // Reactives
 const journal = useForm({ ...initialJournal });
+if (props.countJournals && props.countJournals === 0) {
+  journal.description = "ASIENTO INICIAL";
+}
 const errorForm = reactive({ description: "" });
 
 const eliminarCuenta = (index) => {
@@ -121,19 +125,18 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
 
           <!-- Centro de costos-->
           <div v-if="costCenters.length > 0" class="col-span-6 sm:col-span-4">
-            <InputLabel for="cost_center_id" value="Centro de costos" />
+            <InputLabel for="cost_center_id" value="Centro de costo" />
             <DynamicSelect v-if="costCenters.length <= 5" class="mt-2 block w-full sm:w-[50%]"
               v-model="journal.cost_center_id" :options="costcenterOptions" autofocus />
-            <div v-else-if="costCenters.length > 5">
-              <SearchCostCenter :costCenters="costCenters" @selectCostCenter="handleCostCenterSelect" />
-            </div>
+            <SearchCostCenter v-else-if="costCenters.length > 5" :costCenters="costCenters"
+              @selectCostCenter="handleCostCenterSelect" />
             <InputError :message="errorForm.cost_center_id" class="mt-2" />
           </div>
 
           <!-- Es deducible -->
           <div class="col-span-6 sm:col-span-4">
             <div class="w-full sm:w-[50%]">
-              <Checkbox v-model:checked="journal.is_deductible" label="¿Es deducible?"/>
+              <Checkbox v-model:checked="journal.is_deductible" label="¿Es deducible?" />
             </div>
           </div>
         </div>
