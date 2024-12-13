@@ -20,29 +20,23 @@ const emit = defineEmits(["close", "selectAccount"]);
 
 <template>
   <DialogModal :show="show" maxWidth="lg" @close="close">
-    <template #title> Seleccionar Cuenta </template>
+    <template #title>Seleccionar cuenta</template>
     <template #content>
-      <div class="mt-4 max-h-[300px] overflow-y-auto">
-        <table
-          class="mt-4 text-xs sm:text-sm table-auto w-full text-center text-gray-700"
-        >
+      <div class="max-h-[300px] overflow-y-auto">
+        <table class="mt-4 text-xs sm:text-sm table-auto w-full text-center text-gray-700">
           <thead>
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
               <th>Cuenta</th>
-              <th>Descripción</th>
+              <th class="text-left">Descripción</th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(account, i) in accounts"
-              :key="account.id"
-              class="border-t [&>td]:py-2 cursor-pointer"
-              @click="handleSelectAccount(account)"
-            >
+            <tr v-for="(account, i) in accounts" :key="account.id" class="border-t [&>td]:py-2 cursor-pointer"
+              @click="handleSelectAccount(account)">
               <td>{{ i + 1 }}</td>
               <td>{{ account.code }}</td>
-              <td>{{ account.name }}</td>
+              <td class="text-left">{{ account.name }}</td>
             </tr>
           </tbody>
         </table>

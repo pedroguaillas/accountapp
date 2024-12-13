@@ -1,4 +1,5 @@
 <script setup>
+
 // Imports
 import { reactive, computed } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
@@ -32,11 +33,9 @@ const initialJournal = {
 };
 
 // Reactives
-const journal = useForm({ ...initialJournal });
-if (props.countJournals && props.countJournals === 0) {
-  journal.description = "ASIENTO INICIAL";
-}
-const errorForm = reactive({ description: "" });
+const journal = useForm({ ...initialJournal, description: props.countJournals === 0 ? "ASIENTO INICIAL" : "" });
+const errorForm = reactive({});
+
 
 const eliminarCuenta = (index) => {
   journal.journalEntries.splice(index, 1);
@@ -108,26 +107,28 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
       <div class="mt-4">
 
         <!-- Campos solo del journal -->
-        <div class="grid grid-cols-1 gap-4">
+        <div class="grid grid-cols-1 gap-4 w-full sm:w-[50%]">
+
           <!-- Fecha -->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="date" value="Fecha" />
-            <TextInput v-model="journal.date" type="date" class="mt-2 block w-full sm:w-[50%]" />
+            <TextInput v-model="journal.date" type="date" class="mt-2 block w-full" />
             <InputError :message="errorForm.date" class="mt-2" />
           </div>
 
           <!-- Descripción -->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="description" value="Descripción" />
-            <TextInput v-model="journal.description" type="text" class="mt-2 block w-full sm:w-[50%]" />
+            <TextInput v-model="journal.description" type="text" class="mt-2 block w-full"
+              :disabled="props.countJournals === 0" />
             <InputError :message="errorForm.description" class="mt-2" />
           </div>
 
           <!-- Centro de costos-->
           <div v-if="costCenters.length > 0" class="col-span-6 sm:col-span-4">
             <InputLabel for="cost_center_id" value="Centro de costo" />
-            <DynamicSelect v-if="costCenters.length <= 5" class="mt-2 block w-full sm:w-[50%]"
-              v-model="journal.cost_center_id" :options="costcenterOptions" autofocus />
+            <DynamicSelect v-if="costCenters.length <= 5" class="mt-2 block w-full" v-model="journal.cost_center_id"
+              :options="costcenterOptions" autofocus />
             <SearchCostCenter v-else-if="costCenters.length > 5" :costCenters="costCenters"
               @selectCostCenter="handleCostCenterSelect" />
             <InputError :message="errorForm.cost_center_id" class="mt-2" />
@@ -135,7 +136,7 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
 
           <!-- Es deducible -->
           <div class="col-span-6 sm:col-span-4">
-            <div class="w-full sm:w-[50%]">
+            <div class="w-full">
               <Checkbox v-model:checked="journal.is_deductible" label="¿Es deducible?" />
             </div>
           </div>

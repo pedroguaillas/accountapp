@@ -75,7 +75,7 @@ const emit = defineEmits(["selectAccount", "addJournalEntry"]);
     <!-- Campo para el código -->
     <div>
       <InputLabel for="code" value="Código" />
-      <div class="block w-full h-10 border border-gray-300 rounded-l px-4 py-2 focus:outline-none">
+      <div class="block w-full h-10 border-y border-l border-gray-300 rounded-l px-4 py-2 focus:outline-none">
         {{ code }}
       </div>
     </div>
@@ -84,7 +84,7 @@ const emit = defineEmits(["selectAccount", "addJournalEntry"]);
     <div class="col-span-3">
       <InputLabel for="search" value="Buscar" />
       <div class="flex">
-        <input v-model="search" type="text" class="block w-full border border-gray-300 px-4 py-2 focus:outline-none" />
+        <input v-model="search" type="search" placeholder="Buscar ..." class="block w-full border border-gray-300 px-4 py-1 focus:outline-none" />
         <button @click="toggleModal" class="bg-slate-500 text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
           <MagnifyingGlassIcon class="size-6 text-white stroke-[3px]" />
         </button>
@@ -95,14 +95,14 @@ const emit = defineEmits(["selectAccount", "addJournalEntry"]);
     <div>
       <InputLabel for="debit" value="Debe" />
       <input type="number" v-model.number="debit"
-        class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none" />
+        class="block w-full border-y border-gray-300 px-4 py-2 focus:outline-none" />
     </div>
 
     <!-- Campo para "Haber" -->
     <div>
       <InputLabel for="have" value="Haber" />
       <input type="number" v-model.number="have"
-        class="block w-full border border-gray-300 rounded-l px-4 py-2 focus:outline-none" />
+        class="block w-full border-y border-gray-300 px-4 py-2 focus:outline-none" />
     </div>
 
     <div class="content-end">
