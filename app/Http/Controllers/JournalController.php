@@ -42,16 +42,17 @@ class JournalController extends Controller
                 'journal_entries.have'
             )
             ->join('accounts', function ($join) {
-                $join->on('accounts.id', '=', 'journal_entries.account_id') // Relación con accounts
-                    ->where('accounts.is_detail', true); // Filtrar por cuentas donde is_detail es true
+                $join->on('accounts.id', '=', 'journal_entries.account_id')
+                    ->where('accounts.is_detail', true);
             })
             ->joinSub($journal, 'journals_sub', function ($join) {
-                $join->on('journal_entries.journal_id', '=', 'journals_sub.id'); // Relación entre journal_entries y journals
+                $join->on('journal_entries.journal_id', '=', 'journals_sub.id');
             })
-            ->whereNull('journal_entries.deleted_at') // Excluir entradas eliminadas
+            ->whereNull('journal_entries.deleted_at')
             ->orderBy('journals_sub.id', 'asc')
             ->orderBy('journal_entries.id', 'asc')
-            ->paginate(10); // Aquí limitamos a 10 registros por página
+            ->paginate(10)
+            ->withQueryString(); // Mantiene los parámetros de búsqueda en la URL
 
         // Agrupar los resultados por journal
         $journals = collect($journalsRaw->items())->groupBy('idjournal')->map(function ($entries, $idjournal) {
@@ -75,12 +76,39 @@ class JournalController extends Controller
             ];
         })->values();
 
-        // Retornar a la vista con los datos procesados y la paginación
-        return Inertia::render('Journal/Index', [
-            'journals' => $journals,
-            'pagination' => $journalsRaw->links(), // Incluye los enlaces de la paginación
-        ]);
+        // Estructura de paginación similar a la que pides
+        $pagination = [
+            'current_page' => $journalsRaw->currentPage(),
+            'data' => $journals,
+            'first_page_url' => $journalsRaw->url(1),
+            'last_page_url' => $journalsRaw->url($journalsRaw->lastPage()),
+            'next_page_url' => $journalsRaw->nextPageUrl(),
+            'prev_page_url' => $journalsRaw->previousPageUrl(),
+            'path' => $journalsRaw->path(),
+            'per_page' => $journalsRaw->perPage(),
+            'total' => $journalsRaw->total(),
+            'links' => $journalsRaw->links(), // Convierte los enlaces a un array
+        ];
+
+        return response()->json([
+            'journals' => $pagination, // Paginación con los datos
+            'filters' => [
+                'search' => $request->search,
+            ],
+            ])
+            ;
+
+        // // Retornar a la vista con los datos procesados y la paginación
+        // return Inertia::render('Journal/Index', [
+        //     'journals' => $pagination, // Paginación con los datos
+        //     'filters' => [
+        //         'search' => $request->search,
+        //     ],
+        // ]);
     }
+
+
+
 
     public function create()
     {

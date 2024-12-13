@@ -47,37 +47,46 @@ const reloadPage = async (url) => {
   await router.get(url, { search }, { preserveState: true });
 };
 
+
 watch(
   search,
+
   async (newQuery) => {
-    const url = route("fixedassets.index"); // Ruta del índice de sucursales
-    loading.value = true; // Activa el indicador de carga
+    const url = route("fixedassets.index");
+    loading.value = true;
 
     try {
-      if (newQuery.length === 0) {
-        // Si el término de búsqueda está vacío, recarga todos los datos
-        await router.get(
-          url,
-          {}, // Sin parámetros de búsqueda
-          { preserveState: true }
-        );
-      } else if (newQuery.length >= 1) {
-        // Realizar búsqueda con el término
-        await router.get(
-          url,
-          { search: newQuery }, // Pasar los parámetros de búsqueda
-          { preserveState: true }
-        );
-      }
+      await router.get(
+        url,
+        { search: newQuery, page: props.fixedAssetss.current_page }, // Mantener la página actual
+        { preserveState: true }
+      );
     } catch (error) {
-      console.log(error);
+      console.error("Error al filtrar:", error);
     } finally {
-      // Finalizar el estado de carga
       loading.value = false;
     }
   },
   { immediate: false }
 );
+
+// Función para manejar el cambio de página
+const handlePageChange = async (page) => {
+  const url = route("fixedassets.index"); // Ruta hacia el backend
+  loading.value = true;
+
+  try {
+    await router.get(
+      url,
+      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
+      { preserveState: true }
+    );
+  } catch (error) {
+    console.error("Error al paginar:", error);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 
@@ -157,7 +166,7 @@ watch(
  
       </div>
     </div>
-    <Paginate :page="props.fixedAssetss" />
+    <Paginate :page="props.fixedAssetss"  @page-change="handlePageChange" />
   </AdminLayout>
   <ConfirmationModal :show="modal">
     <template #title> ELIMINAR ACTIVOS FIJOS </template>

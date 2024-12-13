@@ -258,6 +258,24 @@ return new class extends Migration {
             $table->foreign('company_id')->references('id')->on('companies');
         });
 
+
+        Schema::create('advances', function (Blueprint $table) {
+            $table->bigInteger('employee_id');
+            $table->bigInteger('company_id');
+            
+            $table->id();
+            $table->string('detail')->nullable();
+            $table->decimal('amount', 14, 2)->default(0);
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+            $table->foreign('company_id')->references('id')->on('companies');
+       
+        });
+
+
     }
 
     /**
@@ -279,5 +297,6 @@ return new class extends Migration {
         Schema::dropIfExists('active_types');
         Schema::dropIfExists('intangible_assets');
         Schema::dropIfExists('employees');
+        Schema::dropIfExists('advances');
     }
 };

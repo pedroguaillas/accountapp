@@ -31,7 +31,7 @@ class IntangibleAssetController extends Controller
         }
 
         // Paginación
-        $intangibleAssetss = $intangibleAssetssQuery->paginate(10);
+        $intangibleAssetss = $intangibleAssetssQuery->paginate(10)->withQueryString();
 
         return Inertia::render('IntangibleAsset/Index', [
             'intangibleAssetss' => $intangibleAssetss,

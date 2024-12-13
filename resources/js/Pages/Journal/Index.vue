@@ -13,7 +13,9 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
-  journals: { type: Array, default: () => [] },
+  journals: { type: Object, default: () => ({}) },
+
+  filters: { type: Object, default: () => ({}) },
 });
 
 const deleteid = ref(0);
@@ -44,35 +46,43 @@ const deletejournarls = () => {
 
 watch(
   search,
+
   async (newQuery) => {
-    const url = route("journal.index"); // Ruta del índice de sucursales
-    loading.value = true; // Activa el indicador de carga
+    const url = route("journal.index");
+    loading.value = true;
 
     try {
-      if (newQuery.length === 0) {
-        // Si el término de búsqueda está vacío, recarga todos los datos
-        await router.get(
-          url,
-          {}, // Sin parámetros de búsqueda
-          { preserveState: true }
-        );
-      } else if (newQuery.length >= 1) {
-        // Realizar búsqueda con el término
-        await router.get(
-          url,
-          { search: newQuery }, // Pasar los parámetros de búsqueda
-          { preserveState: true }
-        );
-      }
+      await router.get(
+        url,
+        { search: newQuery, page: props.journals.current_page }, // Mantener la página actual
+        { preserveState: true }
+      );
     } catch (error) {
-      console.log(error);
+      console.error("Error al filtrar:", error);
     } finally {
-      // Finalizar el estado de carga
       loading.value = false;
     }
   },
   { immediate: false }
 );
+
+// Función para manejar el cambio de página
+const handlePageChange = async (page) => {
+  const url = route("journal.index"); // Ruta hacia el backend
+  loading.value = true;
+
+  try {
+    await router.get(
+      url,
+      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
+      { preserveState: true }
+    );
+  } catch (error) {
+    console.error("Error al paginar:", error);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -96,7 +106,7 @@ watch(
 
     <!-- Card -->
     <div
-      v-for="journal in props.journals"
+      v-for="journal in props.journals.data"
       :key="journal.id"
       class="p-4 bg-white rounded drop-shadow-md mb-3"
     >
@@ -160,7 +170,7 @@ watch(
         </button>
       </div>
     </div>
-    <Paginate :page="props.journals" />
+    <Paginate :page="props.journals" @page-change="handlePageChange" />
   </AdminLayout>
 
   <ConfirmationModal :show="modal">

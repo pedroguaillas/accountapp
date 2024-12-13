@@ -27,6 +27,7 @@ class CostCenterController extends Controller
         // Paginamos los resultados
         $costCenters = $costCenters->paginate(10)->withQueryString(); // Importante usar withQueryString()
 
+
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('CostCenter/Index', [
             'filters' => $request->search,

@@ -32,7 +32,7 @@ class FixedAssetController extends Controller
         }
 
         // Aplicar paginación a activos fijos
-        $fixedAssetss = $fixedAssetssQuery->paginate(10);
+        $fixedAssetss = $fixedAssetssQuery->paginate(10)->withQueryString();
 
         // Retornar la vista con los datos y filtros actuales
         return Inertia::render('FixedAsset/Index', [
