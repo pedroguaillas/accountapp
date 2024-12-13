@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Journal extends Model
 {
-    use HasFactory,  SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'date', // fecha del asiento
@@ -25,11 +25,12 @@ class Journal extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'timestamp',
+            'date' => 'date',
             'is_deductible' => 'boolean',
         ];
     }
-    public function journalentries(){
-        return $this->hasMany(JournalEntry::class);
+    public function journalentries()
+    {
+        return $this->hasMany(JournalEntry::class, 'journal_id');
     }
 }

@@ -20,8 +20,13 @@ class JournalEntry extends Model
     protected function casts(): array
     {
         return [
-            'debit' => 'decimal',
-            'have' => 'decimal',
+            'debit' => 'float',
+            'have' => 'float',
         ];
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
     }
 }

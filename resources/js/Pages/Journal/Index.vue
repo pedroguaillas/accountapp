@@ -1,26 +1,27 @@
 <script setup>
+
 // Imports
 import Table from "@/Components/Table.vue";
-import { ref,watch } from "vue";
+import { ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Paginate from "@/Components/Paginate.vue";
 import TextInput from "@/Components/TextInput.vue";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
-
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 // Props
 const props = defineProps({
-  journals: { type: Array, default: () => [] },
+  journals: { type: Object, default: () => ({ data: [] }) },
+  filters: { type: Object, default: () => ({}) },
 });
 
-const deleteid = ref(0);
+// Refs
+const deleteId = ref(0);
 const modal = ref(false);
-const search = ref(""); // Término de búsqueda
+const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
-
 
 const toggle = () => {
   modal.value = !modal.value;
@@ -28,12 +29,12 @@ const toggle = () => {
 
 const removeJournals = (journalId) => {
   toggle();
-  deleteid.value = journalId;
+  deleteId.value = journalId;
 };
 
 const deletejournarls = () => {
   axios
-    .delete(route("journal.delete", deleteid.value))
+    .delete(route("journal.delete", deleteId.value))
     .then(() => {
       router.visit(route("journal.index")); // Redirige a la ruta deseada
     })
@@ -45,61 +46,59 @@ const deletejournarls = () => {
 watch(
   search,
   async (newQuery) => {
-    const url = route("journal.index"); // Ruta del índice de sucursales
+    if (loading.value) return
     loading.value = true; // Activa el indicador de carga
+    const url = route("journal.index"); // Ruta del índice de sucursales
 
     try {
-      if (newQuery.length === 0) {
-        // Si el término de búsqueda está vacío, recarga todos los datos
-        await router.get(
-          url,
-          {}, // Sin parámetros de búsqueda
-          { preserveState: true }
-        );
-      } else if (newQuery.length >= 1) {
-        // Realizar búsqueda con el término
-        await router.get(
-          url,
-          { search: newQuery }, // Pasar los parámetros de búsqueda
-          { preserveState: true }
-        );
-      }
+      await router.get(
+        url,
+        { search: newQuery, page: props.journals.current_page }, // Sin parámetros de búsqueda
+        { preserveState: true }
+      );
     } catch (error) {
       console.log(error);
     } finally {
-      // Finalizar el estado de carga
       loading.value = false;
     }
   },
   { immediate: false }
 );
+
+// Función para manejar el cambio de página
+const handlePageChange = async (page) => {
+  if (loading.value) return
+  loading.value = true;
+  const url = route("journal.index"); // Ruta hacia el backend
+
+  try {
+    await router.get(
+      url,
+      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
+      { preserveState: true }
+    );
+  } catch (error) {
+    console.error("Error al paginar:", error);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
-  <AdminLayout title="Asientos Contables">
+  <AdminLayout title="Asientos contables">
     <div class="flex justify-end mb-3">
       <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
-        </div>
-      <Link
-        :href="route('journal.create')"
-        class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
-      >
-        +
+        <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
+      </div>
+      <Link :href="route('journal.create')"
+        class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
+      +
       </Link>
     </div>
 
     <!-- Card -->
-    <div
-      v-for="journal in props.journals"
-      :key="journal.id"
-      class="p-4 bg-white rounded drop-shadow-md mb-3"
-    >
+    <div v-for="journal in props.journals.data" :key="journal.id" class="p-4 bg-white rounded drop-shadow-md mb-3">
       <!-- Card Header -->
       <div class="items-center">
         <h2 class="text-sm sm:text-lg">
@@ -123,14 +122,11 @@ watch(
           </tr>
         </thead>
         <tbody class="h-6">
-          <tr
-            v-for="(entry, j) in journal.journal_entries"
-            :key="`journal-${i}-entry-${j}`"
-          >
+          <tr v-for="(entry, j) in journal.journal_entries" :key="`journal-${i}-entry-${j}`">
             <td class="text-left">{{ entry.code }}</td>
             <td class="text-left">{{ entry.name }}</td>
-            <td class="text-right">{{ entry.debit }}</td>
-            <td class="text-right">{{ entry.have }}</td>
+            <td class="text-right">{{ entry.debit.toFixed(2) }}</td>
+            <td class="text-right">{{ entry.have.toFixed(2) }}</td>
           </tr>
         </tbody>
         <tfoot>
@@ -143,33 +139,23 @@ watch(
         </tfoot>
       </Table>
       <div class="flex flex-row justify-end gap-2">
-        
-          <Link
-            :href="route('journal.edit', journal.id)"
-            class="rounded px-2 py-1 bg-blue-500 text-white"
-          >
-            <i class="fa fa-edit"> </i> Modificar
-          </Link>
-    
-
-        <button
-          class="rounded px-2 py-1 bg-red-500 text-white"
-          @click="removeJournals(journal.id)"
-        >
+        <Link :href="route('journal.edit', journal.id)" class="rounded px-2 py-1 bg-blue-500 text-white">
+        <i class="fa fa-edit"> </i> Modificar
+        </Link>
+        <button class="rounded px-2 py-1 bg-red-500 text-white" @click="removeJournals(journal.id)">
           <i class="fa fa-trash"></i> Eliminar
         </button>
       </div>
     </div>
-    <Paginate :page="props.journals" />
+    <Paginate :page="props.journals" @page-change="handlePageChange" />
   </AdminLayout>
 
-  <ConfirmationModal :show="modal">
-    <template #title> ELIMINAR ASIENTOS CONTABLES </template>
+  <ConfirmationModal :show="modal" maxWidth="lg">
+    <template #title>Eliminar asiento contable</template>
     <template #content> Esta seguro de eliminar el asiento contable? </template>
     <template #footer>
-      <PrimaryButton type="button" @click="deletejournarls"
-        >Aceptar</PrimaryButton
-      >
+      <SecondaryButton @click="modal=!modal" class="mr-2">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="deletejournarls">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

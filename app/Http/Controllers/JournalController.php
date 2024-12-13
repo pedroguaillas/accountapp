@@ -15,70 +15,43 @@ class JournalController extends Controller
 {
     public function index(Request $request)
     {
+        $search = $request->input('search', '');
         $company = Company::first();
 
-        // Subconsulta para journals
-        $journal = DB::table("journals")
-            ->selectRaw("id, to_char(date,'DD-MM-YYYY') AS date, description")
-            ->where('company_id', $company->id)
-            ->whereNull('deleted_at');
-
-        // Si hay un término de búsqueda, filtramos por el campo de descripción
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $journal->where('description', 'like', "%{$search}%");
-        }
-
-        // Consulta principal con paginación
-        $journalsRaw = DB::table('journal_entries')
-            ->select(
-                'journals_sub.id as idjournal',
-                'journals_sub.date',
-                'journals_sub.description',
-                'journal_entries.id as entry_id',
-                'accounts.code',
-                'accounts.name',
-                'journal_entries.debit',
-                'journal_entries.have'
-            )
-            ->join('accounts', function ($join) {
-                $join->on('accounts.id', '=', 'journal_entries.account_id') // Relación con accounts
-                    ->where('accounts.is_detail', true); // Filtrar por cuentas donde is_detail es true
+        $journals = Journal::with('journalentries')
+            ->when($search, function ($query, $search) {
+                $query->where('description', 'LIKE', "%$search%"); // Filtro de búsqueda
             })
-            ->joinSub($journal, 'journals_sub', function ($join) {
-                $join->on('journal_entries.journal_id', '=', 'journals_sub.id'); // Relación entre journal_entries y journals
-            })
-            ->whereNull('journal_entries.deleted_at') // Excluir entradas eliminadas
-            ->orderBy('journals_sub.id', 'asc')
-            ->orderBy('journal_entries.id', 'asc')
-            ->paginate(10); // Aquí limitamos a 10 registros por página
+            ->where('company_id', $company->id) // Filtrar por compañía
+            ->paginate(10) // Paginación con 10 registros por página
+            ->withQueryString() // Mantener la Query de search (paramenter)
+            ->through(function ($journal) {
+                return [
+                    'id' => $journal->id,
+                    'date' => $journal->date->format('d-m-Y'),
+                    'description' => $journal->description,
+                    'total' => $journal->journalentries->reduce(function ($sum, $entry) {
+                        return $sum + $entry->debit; // Acumular los valores de debit
+                    }, 0),
+                    'journal_entries' => $journal->journalentries->map(function ($item) {
+                        if ($item->account) { // Verifica si la cuenta está asociada
+                            return [
+                                'debit' => $item->debit ?? 0, // Valor predeterminado si es nulo
+                                'have' => $item->have ?? 0,  // Valor predeterminado si es nulo
+                                'code' => $item->account->code,
+                                'name' => $item->account->name,
+                            ];
+                        }
+                        return null; // Excluye items sin cuentas asociadas
+                    })->filter(), // Filtra los elementos nulos
+                ];
+            });
 
-        // Agrupar los resultados por journal
-        $journals = collect($journalsRaw->items())->groupBy('idjournal')->map(function ($entries, $idjournal) {
-            $journalData = $entries->first(); // Obtener la primera entrada del grupo
-            return [
-                'id' => $idjournal,
-                'date' => $journalData->date,
-                'description' => $journalData->description,
-                'journal_entries' => collect($entries)->map(function ($entry) {
-                    return [
-                        'id' => $entry->entry_id,
-                        'code' => $entry->code,
-                        'name' => $entry->name,
-                        'debit' => $entry->debit,
-                        'have' => $entry->have,
-                    ];
-                }),
-                'total' => collect($entries)->reduce(function ($sum, $entry) {
-                    return $sum + $entry->debit; // Acumular los valores de debit
-                }, 0),
-            ];
-        })->values();
-
-        // Retornar a la vista con los datos procesados y la paginación
-        return Inertia::render('Journal/Index', [
+        return inertia('Journal/Index', [
             'journals' => $journals,
-            'pagination' => $journalsRaw->links(), // Incluye los enlaces de la paginación
+            'filters' => [
+                'search' => $search
+            ], // Mantener los filtros
         ]);
     }
 
@@ -139,7 +112,7 @@ class JournalController extends Controller
         return to_route('journal.index');
     }
 
-    public function edit(int $journal_id)
+    public function edit(int $journalId)
     {
         // Obtén la información del asiento contable
         $company = Company::first();
@@ -153,7 +126,7 @@ class JournalController extends Controller
             document_id,
             cost_center_id
         ")
-            ->where('id', $journal_id)
+            ->where('id', $journalId)
             ->whereNull('deleted_at')
             ->first();
 
@@ -172,7 +145,7 @@ class JournalController extends Controller
                 'debit',
                 'have'
             )
-            ->where('journal_id', $journal_id)
+            ->where('journal_id', $journalId)
             ->whereNull('deleted_at') // Excluir entradas eliminadas
             ->get();
 
