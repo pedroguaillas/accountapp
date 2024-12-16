@@ -258,6 +258,64 @@ return new class extends Migration {
             $table->foreign('company_id')->references('id')->on('companies');
         });
 
+
+        Schema::create('advances', function (Blueprint $table) {
+            $table->bigInteger('employee_id');
+            $table->bigInteger('company_id');
+            
+            $table->id();
+            $table->string('detail')->nullable();
+            $table->decimal('amount', 14, 2)->default(0);
+            $table->date('date');
+            $table->string('type');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+            $table->foreign('company_id')->references('id')->on('companies');
+       
+        });
+
+        Schema::create('payment_roles', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->bigInteger('employee_id');
+
+            $table->string('position');
+            $table->string('sector_code')->nullable();
+            $table->integer('days');
+            $table->decimal('salary', 14, 2)->default(0);
+            
+            $table->integer('overtime'); 
+            $table->integer('ordinary_hours');
+            $table->decimal('advance_utility', 14, 2)->default(0);
+            $table->decimal('remuneration', 14, 2)->default(0);
+            $table->decimal('food_expenses', 14, 2)->default(0);
+            $table->decimal('iess_personal', 14, 2)->default(0);
+            $table->decimal('xiii', 14, 2)->default(0);
+            $table->decimal('xiv', 14, 2)->default(0);
+            $table->decimal('reserve_funds', 14, 2)->default(0);
+
+            $table->decimal('advance_salary', 14, 2)->default(0);
+            $table->decimal('fines', 14, 2)->default(0);
+            $table->decimal('company_loan', 14, 2)->default(0);
+            $table->decimal('iess_patronal', 14, 2)->default(0);
+            $table->decimal('judicial_retention', 14, 2)->default(0);
+            $table->decimal('sri_tax_withholding', 14, 2)->default(0);
+            
+            $table->decimal('salary_receive', 14, 2)->default(0);
+            $table->string('date');
+
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+            $table->foreign('company_id')->references('id')->on('companies');
+       });
+
+
     }
 
     /**
@@ -279,5 +337,7 @@ return new class extends Migration {
         Schema::dropIfExists('active_types');
         Schema::dropIfExists('intangible_assets');
         Schema::dropIfExists('employees');
+        Schema::dropIfExists('advances');
+        Schema::dropIfExists('payment_roles');
     }
 };

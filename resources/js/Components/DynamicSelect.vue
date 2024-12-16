@@ -11,6 +11,10 @@ defineProps({
     type: Array,
     required: true, // Asegura que siempre se pase un array
   },
+  seleccione:{
+    type: Boolean,
+    default: true,
+  },
 });
 
 // Emitir eventos
@@ -40,7 +44,7 @@ defineExpose({
     @change="$emit('update:modelValue', $event.target.value)"
   >
     <!-- Opción predeterminada -->
-    <option value="">Seleccione</option>
+    <option v-if="seleccione" value="">Seleccione</option>
 
     <!-- Generar opciones dinámicas -->
     <option v-for="option in options" :key="option.value" :value="option.value">

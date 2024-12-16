@@ -15,6 +15,9 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 const props = defineProps({
   journals: { type: Object, default: () => ({ data: [] }) },
   filters: { type: Object, default: () => ({}) },
+  journals: { type: Object, default: () => ({}) },
+
+  filters: { type: Object, default: () => ({}) },
 });
 
 // Refs
@@ -45,6 +48,7 @@ const deletejournarls = () => {
 
 watch(
   search,
+
   async (newQuery) => {
     if (loading.value) return
     loading.value = true; // Activa el indicador de carga
@@ -57,7 +61,7 @@ watch(
         { preserveState: true }
       );
     } catch (error) {
-      console.log(error);
+      console.error("Error al filtrar:", error);
     } finally {
       loading.value = false;
     }
