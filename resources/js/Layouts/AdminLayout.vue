@@ -39,7 +39,7 @@ watch(divRef, () => {
         <!-- Main -->
         <div class="w-full h-full">
             <Header :menu="menu" @toggle="toggle" />
-            <div class="h-[calc(100vh-50px)] bg-slate-200 p-4 overflow-y-auto">
+            <div class="h-[calc(100vh-50px)] bg-slate-200 p-4 md:p-8 overflow-y-auto">
                 <slot />
 
             </div>
