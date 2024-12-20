@@ -258,6 +258,108 @@ return new class extends Migration {
             $table->foreign('company_id')->references('id')->on('companies');
         });
 
+
+        Schema::create('advances', function (Blueprint $table) {
+            $table->bigInteger('employee_id');
+            $table->bigInteger('company_id');
+
+            $table->id();
+            $table->string('detail')->nullable();
+            $table->decimal('amount', 14, 2)->default(0);
+            $table->date('date');
+            $table->string('type');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+            $table->foreign('company_id')->references('id')->on('companies');
+
+        });
+
+        Schema::create('role_ingresses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+
+            $table->string('code');
+            $table->string('name');
+            $table->string('type');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
+        Schema::create('role_egresses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+
+            $table->string('code');
+            $table->string('name');
+            $table->string('type');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
+        Schema::create('payment_roles', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->bigInteger('employee_id');
+
+            $table->string('position');
+            $table->string('sector_code')->nullable();
+            $table->integer('days');
+            $table->decimal('salary', 14, 2)->default(0);
+            $table->decimal('salary_receive', 14, 2)->default(0);
+            $table->string('date');
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
+        Schema::create('payment_role_ingresses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->bigInteger('payment_role_id');
+            $table->bigInteger('role_ingress_id');
+
+            $table->decimal('value', 14, 2)->default(0);
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('payment_role_id')->references('id')->on('payment_roles');
+            $table->foreign('role_ingress_id')->references('id')->on('role_ingresses');
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
+
+        Schema::create('payment_role_egresses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->bigInteger('payment_role_id');
+            $table->bigInteger('role_egress_id');
+
+            $table->decimal('value', 14, 2)->default(0);
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('payment_role_id')->references('id')->on('payment_roles');
+            $table->foreign('role_egress_id')->references('id')->on('role_egresses');
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
+
     }
 
     /**
@@ -279,5 +381,7 @@ return new class extends Migration {
         Schema::dropIfExists('active_types');
         Schema::dropIfExists('intangible_assets');
         Schema::dropIfExists('employees');
+        Schema::dropIfExists('advances');
+        Schema::dropIfExists('payment_roles');
     }
 };

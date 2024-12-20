@@ -26,6 +26,8 @@ class BranchController extends Controller
         // Paginamos los resultados y preservamos los filtros en la URL
         $branches = $branches->paginate(10)->withQueryString();
 
+
+      
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Branch/Index', [
             'filters' => $request->search,

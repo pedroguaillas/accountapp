@@ -40,5 +40,10 @@ class Employee extends Model
         'reserve_funds' => 'boolean',
     ];
 
+
+    public function advances(){
+        return $this->hasMany(Advance::class);
+    }
+
 }
 

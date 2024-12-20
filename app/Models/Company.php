@@ -67,8 +67,37 @@ class Company extends Model
         return $this->hasMany(IntangibleAsset::class);
     }
 
-    public function employee()
+    public function employees()
     {
         return $this->hasMany(Employee::class);
+    }
+
+    public function advances()
+    {
+        return $this->hasMany(Advance::class);
+    }
+
+    public function roleingress()
+    {
+        return $this->hasMany(RoleIngress::class);
+    }
+
+    public function roleegress()
+    {
+        return $this->hasMany(RoleEgress::class);
+    }
+
+    public function paymentroles()
+    {
+        return $this->hasMany(PaymentRole::class);
+    }
+    public function paymentroleingresses()
+    {
+        return $this->hasMany(PaymentRoleIngress::class);
+    }
+
+    public function paymentroleegresses()
+    {
+        return $this->hasMany(PaymentRoleEgress::class);
     }
 }

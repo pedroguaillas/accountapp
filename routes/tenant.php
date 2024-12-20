@@ -3,13 +3,15 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\PaymentRoleController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\SettingAccountController;
 use Illuminate\Support\Facades\Route;
@@ -126,11 +128,14 @@ Route::middleware([
 
 
         //adelantos
-        Route::get('adelantos', [EmployeeController::class, 'index'])->name('advances.index');
+        Route::get('adelantos', [AdvanceController::class, 'index'])->name('advances.index');
+        Route::post('advances', [AdvanceController::class, 'store'])->name('advances.store');
+        Route::put('advances/{advance}', [AdvanceController::class, 'update'])->name('advances.update');
+        Route::delete('advances/{advance}', [AdvanceController::class, 'destroy'])->name('advances.delete');
 
         //rples
 
-        Route::get('roles-de-pago', [EmployeeController::class, 'index'])->name('paymentrol.index');
-
+        Route::get('roles-de-pago', [PaymentRoleController::class, 'index'])->name('paymentrol.index');
+        
     });
 });

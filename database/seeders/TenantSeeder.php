@@ -7,6 +7,7 @@ use App\Models\ContributorType;
 use App\Models\EconomicActivity;
 use App\Models\PayMethod;
 use App\Models\ActiveType;
+use App\Models\RoleEgress;
 use Illuminate\Database\Seeder;
 
 class TenantSeeder extends Seeder
@@ -40,12 +41,34 @@ class TenantSeeder extends Seeder
         ActiveType::create(['name' => 'Vehículos', 'depreciation_time' => 5]);
         ActiveType::create(['name' => 'Equipo de computo, tecnológico y otros', 'depreciation_time' => 3]);
 
+
+
+
+
         $company = Company::create([
             'ruc' => '1100167694001',
             'company' => 'EJEMPLO COMPANIA',
             'economic_activity_id' => 1,
             'contributor_type_id' => 1,
         ]);
+
+        $company->roleingress()->createMany([
+            ['name' => "DECIMO TERCERO", 'code' => 'XIII', 'type' => 'fijo'], 
+            ['name' => "DECIMO CUARTO", 'code' => 'XIV', 'type' => 'fijo'],
+            ['name' => "FONDO DE RESERVA", 'code' => 'FDR', 'type' => 'fijo'],
+            ['name' => "HORAS EXTRA", 'code' => 'HE', 'type' => 'fijo'],
+            ['name' => "HORAS ORDINARIAS", 'code' => 'HO', 'type' => 'fijo'],
+            ['name' => "REMUNERACION", 'code' => 'RE', 'type' => 'fijo'],
+
+        ]);
+
+        $company->roleEgress()->createMany([
+            ['name' => "IESS PATRONAL", 'code' => 'IESSPA', 'type' => 'fijo'],
+            ['name' => "IESS PERSONAL", 'code' => 'IESSPE', 'type' => 'fijo'],
+
+        ]);
+
+
 
         // $company->paymethods()->update(['company_id' => $company->id]);
     }

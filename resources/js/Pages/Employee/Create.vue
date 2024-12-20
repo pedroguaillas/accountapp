@@ -64,7 +64,7 @@ const save = () => {
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
       <div class="flex justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold">Registrar empleados</h2>
+        <h2 class="text-sm sm:text-lg font-bold">Registrar empleado</h2>
       </div>
 
       <!-- Formulario -->
