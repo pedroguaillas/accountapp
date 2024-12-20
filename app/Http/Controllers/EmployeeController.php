@@ -65,7 +65,7 @@ class EmployeeController extends Controller
 
         $company = Company::first();
 
-        $company->employee()->create($inputs);
+        $company->employees()->create($inputs);
         return to_route('employee.index');
     }
 

@@ -13,22 +13,22 @@ class PaymentRole extends Model
     protected $fillable = [
         'company_id', // ID de la compañía
         'employee_id', // ID del empleado
-        'cuit', // Cédula
-        'name', // Nombre
         'position', // Cargo
         'sector_code', // Código sectorial
         'days', // Días
         'salary', // Salario
+        
         'overtime', // Horas extras
         'ordinary_hours', // Horas ordinarias
         'advance_utility', // Adelanto de utilidades
         'remuneration', // Remuneración
         'food_expenses', // Gastos de alimentación
-        'advance_salary', // Adelanto de salario
         'iess_personal', // Aporte personal al IESS
         'xiii', // Décimo tercero
         'xiv', // Décimo cuarto
         'reserve_funds', // Fondos de reserva
+
+        'advance_salary', // Adelanto de salario
         'fines', // Multas
         'company_loan', // Préstamos de la compañía
         'iess_patronal', // Aporte patronal al IESS
@@ -71,5 +71,15 @@ class PaymentRole extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function paymentroleingress()
+    {
+        return $this->hasMany(PaymentRoleIngress::class);
+    }
+
+    public function paymentroleegress()
+    {
+        return $this->hasMany(PaymentRoleEgress::class);
     }
 }

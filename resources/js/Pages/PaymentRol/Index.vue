@@ -29,7 +29,7 @@ const loading = ref(false); // Estado de carga
 // Filtros de Año y Mes
 const selectedYear = ref(new Date().getFullYear()); // Año por defecto
 const selectedMonth = ref(new Date().getMonth()); // Mes seleccionado
-
+const checkoptions =ref(false);
 // Generar un arreglo de años (puedes modificar el rango según lo necesites)
 
 const years = [
@@ -206,28 +206,50 @@ watch(
         </div>
       </div>
 
+    <div v-if="checkoptions" >
+      <ul>
+        <li>Editar</li>
+        <li>Eliminar</li>
+        <li>Imprimir</li>
+        <li>Mostrar</li>
+        <li>Enviar</li>
+      </ul>
+
+    </div>
+
       <Table>
         <thead>
           <tr class="[&>th]:py-2">
+            <th></th>
             <th class="w-1">N°</th>
             <th>CEDULA</th>
             <th class="text-left">NOMBRE</th>
             <th class="text-left">CARGO</th>
             <th>DIAS</th>
-            <th class="text-right pr-4">SALARIO</th>
+            <th class="text-right pr-4">INGRESOS FIJOS</th>
+            <th class="text-right pr-4">OTROS INGRESOS</th>
+            <th class="text-right pr-4">EGRESOS FIJOS</th>
+            <th class="text-right pr-4">OTROS EGRESOS</th>
+            <th class="text-right pr-4">SUELDO A RECIBIR</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="min-w-full table-auto">
           <tr
             v-for="(paymentrol, i) in props.paymentroles.data"
             :key="paymentrol.id"
             class="border-t [&>td]:py-2" 
+            
           >
+          <td><input v-model="checkoptions" type="checkbox"/></td>
             <td>{{ i + 1 }}</td>
             <td>{{ paymentrol.cuit }}</td>
             <td class="text-left">{{ paymentrol.name }}</td>
             <td class="text-left">{{ paymentrol.position }}</td>
             <td>{{ paymentrol.days }}</td>
+            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
+            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
+            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
+            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
             <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
           </tr>
         </tbody>

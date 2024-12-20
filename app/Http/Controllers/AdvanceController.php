@@ -58,7 +58,7 @@ class AdvanceController extends Controller
         ]);
         $company = Company::first();
 
-        $company->advance()->create($request->all());
+        $company->advances()->create($request->all());
 
     }
 
