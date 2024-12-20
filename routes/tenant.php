@@ -11,6 +11,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PaymentRoleController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\SettingAccountController;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,9 @@ Route::middleware([
         Route::post('rucs', [CompanyController::class, 'store'])->name('company.store');
         Route::put('rucs/{company}', [CompanyController::class, 'update'])->name('company.update');
         Route::delete('rucs/{companyId}', [CompanyController::class, 'destroy'])->name('company.delete');
+
+        // Ajustes de empresa
+        Route::get('empresa/ajuste/roles', [BusinessController::class, 'roles'])->name('business.setting.roles');
 
         // Centro de costos
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');

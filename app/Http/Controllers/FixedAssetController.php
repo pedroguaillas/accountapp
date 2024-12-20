@@ -6,6 +6,8 @@ use App\Http\Requests\FixedAssetStoreRequest;
 use App\Http\Requests\FixedAssetUpdateRequest;
 use App\Models\Company;
 use App\Models\FixedAsset;
+use App\Models\Journal;
+use App\Models\JournalEntry;
 use App\Models\PayMethod;
 use App\Models\ActiveType;
 use Inertia\Inertia;
@@ -57,7 +59,27 @@ class FixedAssetController extends Controller
     public function store(FixedAssetStoreRequest $fixedAssetStoreRequest)
     {
         $company = Company::first(); // Asegúrate de tener la empresa disponible
+
+        if (Journal::count() === 1) {
+
+            // Sumar los valores de los activos fijos
+            $fixedAsset = FixedAsset::selectRaw('a.id, SUM(value) AS sumAmount')
+                ->join('accounts AS a', 'a.id', 'account_id')
+                ->groupBy('id')->get();
+
+            // Sumar los activos fijos del ASIENTO DE SITUACION INICIAL
+            $journalEntryInitial = JournalEntry::selectRaw('a.id, SUM(debit) AS debit, SUM(have) AS have')
+                ->join('accounts AS a', 'a.id', 'account_id')
+                ->where('a.name', 'LIKE', "ASIENTO DE SITUACION INICIAL")
+                ->groupBy('id')->get();
+        }
+        // En caso que este registrado solo el ASIENTO DE SITUACION INICIAL
+        // Y
+        // La suma de los activos fijos sean <= que la suma de los activos fijos del ASIENTO DE SITUACION INICIAL
+        // Registrar solo el activo fijo
+
         $company->fixedassets()->create($fixedAssetStoreRequest->all());
+        // caso contrario generar ademas el asiento
 
         return to_route('fixedassets.index');
     }

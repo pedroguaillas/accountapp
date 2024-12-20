@@ -9,9 +9,11 @@ import { useFocusNextField } from "@/composables/useFocusNextField";
 
 // Props
 defineProps({
-  employee: { type: Object, default: () => ({}) },
+  paymentRol: { type: Object, default: () => ({}) },
   error: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
+  roleingress: { type: Array, default: () => [] },
+  roleegress: { type: Array, default: () => [] },
 });
 
 const { focusNextField } = useFocusNextField();
@@ -20,122 +22,52 @@ defineEmits(["close", "save"]);
 </script>
 
 <template>
-  <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">
+  <DialogModal :show="show" maxWidth="2xl" @close="$emit('close')">
     <template #title>
-      {{ `${employee.id === undefined ? "Añadir" : "Editar"} empleado` }}
+      Editar rol de {{ paymentRol.cuit }} / {{ paymentRol.name }}
     </template>
     <template #content>
-      <div class="mt-4">
-        <form
-          class="w-2xl grid grid-cols-1 gap-3"
-          @keydown.enter.prevent="focusNextField"
-        >
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="cuit" value="Cedula" />
-            <TextInput
-              v-model="employee.cuit"
-              type="text"
-              class="mt-1 block w-full"
-              minlegth="10"
-              maxlength="13"
-            />
-            <InputError :message="error.cuit" class="mt-2" />
-          </div>
-
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="name" value="Nombre y apellido" />
-            <TextInput
-              v-model="employee.name"
-              type="text"
-              class="mt-1 block w-full"
-              minlength="3"
-              maxlength="300"
-            />
-            <InputError :message="error.name" class="mt-2" />
-          </div>
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="city" value="Código sectorial" />
-            <TextInput
-              v-model="employee.sector_code"
-              type="text"
-              class="mt-1 block w-full"
-              minlength="3"
-              maxlength="300"
-            />
-            <InputError :message="error.sector_code" class="mt-2" />
-          </div>
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="post" value="Cargo" />
-            <TextInput
-              v-model="employee.post"
-              type="text"
-              class="mt-1 block w-full"
-              minlength="3"
-              maxlength="300"
-            />
-            <InputError :message="error.post" class="mt-2" />
-          </div>
-
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="days" value="Dias" />
-            <TextInput
-              v-model="employee.days"
+      <div class="mt-4 flex flex-col sm:flex-row gap-4 w-full">
+        <article class="rounded">
+          <h2 class="text-xl font-bold">Ingresos</h2>
+          <div
+            v-for="ingress in roleingress"
+            :key="ingress.id"
+            class="col-2 flex mt-2"
+          >
+            <span
+              class="w-4/6 px-4 bg-slate-100 flex items-center border rounded-l"
+              >{{ ingress.name }}</span
+            >
+            <input
+              value="0"
               type="number"
-              class="mt-1 block w-full"
-              min="0"
+              placeholder=""
+              class="block w-2/6 border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
             />
-            <InputError :message="error.days" class="mt-2" />
           </div>
+        </article>
 
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="salary" value="Salario" />
-            <TextInput
-              v-model="employee.salary"
+        <article class="">
+          <h2 class="text-xl font-bold">Egresos</h2>
+          <div
+            v-for="egress in roleegress"
+            :key="egress.id"
+            class="col-2 flex mt-2"
+          >
+            <span
+              class="w-4/6 px-4 bg-slate-100 flex items-center border rounded-l"
+              >{{ egress.name }}</span
+            >
+            <input
+              value="0"
               type="number"
-              class="mt-1 block w-full"
-              min="0"
+              placeholder=""
+              class="block w-2/6 border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
+              :disabled="egress.name === 'IESS PATRONAL'"
             />
-            <InputError :message="error.salary" class="mt-2" />
           </div>
-
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel
-              for="porcent_aportation"
-              value="Porcentaje de aportacion"
-            />
-            <TextInput
-              v-model="employee.porcent_aportation"
-              type="number"
-              class="mt-1 block w-full"
-              min="0"
-            />
-            <InputError :message="error.porcent_aportation" class="mt-2" />
-          </div>
-
-          <Checkbox
-            v-model:checked="employee.is_a_parner"
-            label="Es socio o propietario?"
-          />
-          <Checkbox
-            v-model:checked="employee.is_a_qualified_craftsman"
-            label="Es artesano calificado?"
-          />
-          <Checkbox
-            v-model:checked="employee.affiliated_with_spouse"
-            label="Afiliación al cónyuge?"
-          />
-
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="date_start" value="Fecha de inicio" />
-            <TextInput
-              v-model="employee.date_start"
-              type="date"
-              class="mt-1 block w-full"
-              required
-            />
-            <InputError :message="error.date_start" class="mt-2" />
-          </div>
-        </form>
+        </article>
       </div>
     </template>
     <template #footer>

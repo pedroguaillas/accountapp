@@ -11,12 +11,14 @@ import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { PencilIcon, PrinterIcon, EnvelopeIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
   paymentroles: { type: Object, default: () => ({}) },
   filters: { type: String, default: "" },
+  roleingress: { type: Array, default: () => [] },
+  roleegress: { type: Array, default: () => [] },
 });
 
 // Refs
@@ -25,11 +27,12 @@ const modal1 = ref(false);
 const deleteid = ref(0);
 const search = ref(""); // Término de búsqueda
 const loading = ref(false); // Estado de carga
+const hoveredRow = ref(null);
 
 // Filtros de Año y Mes
 const selectedYear = ref(new Date().getFullYear()); // Año por defecto
 const selectedMonth = ref(new Date().getMonth()); // Mes seleccionado
-const checkoptions =ref(false);
+const checkoptions = ref(false);
 // Generar un arreglo de años (puedes modificar el rango según lo necesites)
 
 const years = [
@@ -165,8 +168,8 @@ watch(
   },
   { immediate: false }
 );
-
 </script>
+
 
 <template>
   <AdminLayout title="Roles de pago">
@@ -206,17 +209,6 @@ watch(
         </div>
       </div>
 
-    <div v-if="checkoptions" >
-      <ul>
-        <li>Editar</li>
-        <li>Eliminar</li>
-        <li>Imprimir</li>
-        <li>Mostrar</li>
-        <li>Enviar</li>
-      </ul>
-
-    </div>
-
       <Table>
         <thead>
           <tr class="[&>th]:py-2">
@@ -237,10 +229,11 @@ watch(
           <tr
             v-for="(paymentrol, i) in props.paymentroles.data"
             :key="paymentrol.id"
-            class="border-t [&>td]:py-2" 
-            
+            class="border-t relative [&>td]:py-4 group hover:bg-slate-200"
+            @mouseenter="hoveredRow = paymentrol.id"
+            @mouseleave="hoveredRow = null"
           >
-          <td><input v-model="checkoptions" type="checkbox"/></td>
+            <td><input v-model="checkoptions" type="checkbox" /></td>
             <td>{{ i + 1 }}</td>
             <td>{{ paymentrol.cuit }}</td>
             <td class="text-left">{{ paymentrol.name }}</td>
@@ -251,6 +244,27 @@ watch(
             <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
             <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
             <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
+
+            <!-- Superposición de opciones -->
+            <td
+              v-if="hoveredRow === paymentrol.id"
+              class=" flex justify-center absolute h-12 top-0 right-1/2  bg-white items-center shadow-md border rounded z-10 group-hover:block"
+            >
+              <ul class=" px-4 flex gap-4 rounded items-center justify-center">
+                <li
+                  @click="edit(paymentrol)"
+                  class="m-0 cursor-pointer hover:text-blue-500"
+                >
+                  <PencilIcon class="size-5 text-red" />
+                </li> 
+                <li class="m-0 cursor-pointer hover:text-yellow-500">
+                  <PrinterIcon class="size-5 text-red" />
+                </li>
+                <li class="m-0 cursor-pointer hover:text-purple-500">
+                  <EnvelopeIcon class="size-5 text-red" />
+                </li>
+              </ul>
+            </td>
           </tr>
         </tbody>
       </Table>
@@ -260,19 +274,11 @@ watch(
 
   <FormModal
     :show="modal"
-    :paymentrol="paymentrol"
+    :paymentRol="paymentrol"
+    :roleingress='roleingress'
+    :roleegress='roleegress'
     :error="errorForm"
     @close="toggle"
     @save="save"
   />
-
-  <ConfirmationModal :show="modal1">
-    <template #title> ELIMINAR ROLES DE PAGOS </template>
-    <template #content> Esta seguro de eliminar el rol de pago? </template>
-    <template #footer>
-      <PrimaryButton type="button" @click="deletePaymentRol">
-        Aceptar
-      </PrimaryButton>
-    </template>
-  </ConfirmationModal>
 </template>
