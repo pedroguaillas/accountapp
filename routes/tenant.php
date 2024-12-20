@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
@@ -69,6 +70,9 @@ Route::middleware([
         Route::put('rucs/{company}', [CompanyController::class, 'update'])->name('company.update');
         Route::delete('rucs/{companyId}', [CompanyController::class, 'destroy'])->name('company.delete');
 
+        // Ajustes de empresa
+        Route::get('empresa/ajuste/roles', [BusinessController::class, 'roles'])->name('business.setting.roles');
+
         // Centro de costos
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
         Route::post('costcenters', [CostCenterController::class, 'store'])->name('costCenter.store');
@@ -123,10 +127,10 @@ Route::middleware([
 
         //adelantos
         Route::get('adelantos', [EmployeeController::class, 'index'])->name('advances.index');
-        
+
         //rples
 
         Route::get('roles-de-pago', [EmployeeController::class, 'index'])->name('paymentrol.index');
-        
+
     });
 });

@@ -33,9 +33,8 @@ const initialJournal = {
 };
 
 // Reactives
-const journal = useForm({ ...initialJournal, description: props.countJournals === 0 ? "ASIENTO INICIAL" : "" });
+const journal = useForm({ ...initialJournal, description: props.countJournals === 0 ? "ASIENTO DE SITUACION INICIAL" : "" });
 const errorForm = reactive({});
-
 
 const eliminarCuenta = (index) => {
   journal.journalEntries.splice(index, 1);
