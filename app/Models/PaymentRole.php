@@ -24,7 +24,7 @@ class PaymentRole extends Model
     protected $casts = [
         'days' => 'integer',
         'salary' => 'float',
-        'salary_receive' => 'float',
+        'salary_receive' => 'float',//sala
     ];
 
     // Relación con el modelo Employee
