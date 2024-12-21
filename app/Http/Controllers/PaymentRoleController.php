@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\PaymentRole;
+use App\Models\PaymentRoleIngress;
 use App\Models\RoleIngress;
+use App\Jobs\ProcessPaymenRole;
 use App\Models\RoleEgress;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,6 +19,11 @@ class PaymentRoleController extends Controller
         // Obtener el término de búsqueda desde la solicitud
         $search = $request->input('search', ''); // Usar un valor por defecto vacío si no hay búsqueda
         $company = Company::first(); // Obtener la compañía (puedes ajustar esto según tu lógica)
+
+        $paymentRole= new PaymentRole();
+        $job = new ProcessPaymenRole($paymentRole);
+        $job->handle();
+
 
         // Construir la consulta
         $paymentroles = PaymentRole::query()
@@ -32,7 +39,7 @@ class PaymentRoleController extends Controller
 
         $roleingress = RoleIngress::where('company_id', $company->id)->get();
 
-        $roleegress=RoleEgress::where('company_id', $company->id)->get();
+        $roleegress = RoleEgress::where('company_id', $company->id)->get();
 
         // Retornar la vista con los datos
         return Inertia::render('PaymentRol/Index', [
@@ -40,8 +47,8 @@ class PaymentRoleController extends Controller
                 'search' => $request->search,
             ],
             'paymentroles' => $paymentroles, // Cambiar el nombre para que coincida con Vue
-            'roleingress' =>$roleingress,
-            'roleegress'=>$roleegress,
+            'roleingress' => $roleingress,
+            'roleegress' => $roleegress,
         ]);
     }
 
