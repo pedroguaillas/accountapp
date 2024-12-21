@@ -20,8 +20,7 @@ class PaymentRoleController extends Controller
         $search = $request->input('search', ''); // Usar un valor por defecto vacío si no hay búsqueda
         $company = Company::first(); // Obtener la compañía (puedes ajustar esto según tu lógica)
 
-        $paymentRole= new PaymentRole();
-        $job = new ProcessPaymenRole($paymentRole);
+        $job = new ProcessPaymenRole();
         $job->handle();
 
 
