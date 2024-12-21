@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\PaymentRole;
-use App\Models\PaymentRoleIngress;
 use App\Models\RoleIngress;
 use App\Jobs\ProcessPaymenRole;
 use App\Models\RoleEgress;
@@ -29,7 +28,6 @@ class PaymentRoleController extends Controller
             ->rightJoin('employees as e', 'e.id', '=', 'payment_roles.employee_id') // Relación con empleados
             // ->rightJoin('payment_role_ingresses as pi','pi.payment_role_id','=','payment_roles.id')
             // ->rightJoin('role_ingresses as ri','ri.id','=','pi.payment_role_id')
-
             //->where('payment_roles.company_id', $company->id) // Filtrar por ID de compañía
             ->when($search, function ($query, $search) {
                 $query->where('e.name', 'LIKE', '%' . $search . '%'); // Filtrar por nombre
