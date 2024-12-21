@@ -209,6 +209,17 @@ watch(
         </div>
       </div>
 
+    <div v-if="checkoptions" >
+      <ul>
+        <li>Editar</li>
+        <li>Eliminar</li>
+        <li>Imprimir</li>
+        <li>Mostrar</li>
+        <li>Enviar</li>
+      </ul>
+
+    </div>
+
       <Table>
         <thead>
           <tr class="[&>th]:py-2">
