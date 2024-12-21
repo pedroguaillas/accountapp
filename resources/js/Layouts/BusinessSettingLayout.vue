@@ -3,6 +3,7 @@
 // Imports
 import Header from './admin/Header.vue';
 import Sidebar from './admin/Sidebar.vue';
+import AdminLayout from './AdminLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref, watch, onMounted } from 'vue';
 import { initFlowbite } from "flowbite";

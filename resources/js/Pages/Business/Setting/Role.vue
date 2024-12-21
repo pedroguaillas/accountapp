@@ -1,12 +1,12 @@
 <script setup>
 
 // Imports
-import AdminLayout from "./AdminLayout.vue";
+import BusinessSettingLayout from "@/Layouts/BusinessSettingLayout.vue";
 
 </script>
 
 <template>
-    <AdminLayout title="Negocio ajustes de roles">
+    <BusinessSettingLayout title="Negocio ajustes de roles">
 
         <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
             <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
@@ -64,5 +64,5 @@ import AdminLayout from "./AdminLayout.vue";
             </div>
         </div>
 
-    </AdminLayout>
+    </BusinessSettingLayout>
 </template>
