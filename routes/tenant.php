@@ -101,6 +101,7 @@ Route::middleware([
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
         Route::get('asiento/editar/{journalId}', [JournalController::class, 'edit'])->name('journal.edit');
         Route::delete('journal/{journal}', [JournalController::class, 'destroy'])->name('journal.delete');
+        
         Route::resource('journal', JournalController::class)->only(['store', 'update']);
 
         // fixed assets  //poner las rutas con nombre en plural 

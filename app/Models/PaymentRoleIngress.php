@@ -13,7 +13,7 @@ class PaymentRoleIngress extends Model
     protected $fillable = [
         'company_id', // ID de la compañía
         'payment_role_id', // ID del empleado
-        'payment_role_ingress_id', // ID del empleado
+        'role_ingress_id', // ID del empleado
         'value', // Salario
     ];
 
@@ -27,9 +27,9 @@ class PaymentRoleIngress extends Model
         return $this->belongsTo(PaymentRole::class);
     }
 
-    public function paymentroleingress()
+    public function roleingress()
     {
-        return $this->belongsTo(PaymentRoleIngress::class);
+        return $this->belongsTo(RoleIngress::class);
     }
 
 }
