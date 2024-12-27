@@ -53,20 +53,20 @@ class TenantSeeder extends Seeder
         ]);
 
         $company->roleingress()->createMany([
-            ['name' => "DECIMO TERCERO", 'code' => 'XIII', 'type' => 'fijo'], 
-            ['name' => "DECIMO CUARTO", 'code' => 'XIV', 'type' => 'fijo'],
-            ['name' => "FONDO DE RESERVA", 'code' => 'FDR', 'type' => 'fijo'],
-            ['name' => "HORAS EXTRA", 'code' => 'HE', 'type' => 'fijo'],
-            ['name' => "HORAS ORDINARIAS", 'code' => 'HO', 'type' => 'fijo'],
-            ['name' => "REMUNERACION", 'code' => 'RE', 'type' => 'fijo'],
-            ['name' => "ADELANTO DE UTILIDAD", 'code' => 'AU', 'type' => 'fijo'],
+            ['name' => "Décimo tercero", 'code' => 'XIII', 'type' => 'fijo'], 
+            ['name' => "Décimo cuarto", 'code' => 'XIV', 'type' => 'fijo'],
+            ['name' => "Fondo de reserva", 'code' => 'FDR', 'type' => 'fijo'],
+            ['name' => "Horas extra", 'code' => 'HE', 'type' => 'fijo'],
+            ['name' => "Horas ordinarias", 'code' => 'HO', 'type' => 'fijo'],
+            ['name' => "Remuneración", 'code' => 'RE', 'type' => 'fijo'],
+            ['name' => "Adelanto de utilidad", 'code' => 'AU', 'type' => 'fijo'],
 
         ]);
 
         $company->roleEgress()->createMany([
-            ['name' => "IESS PATRONAL", 'code' => 'IESSPA', 'type' => 'fijo'],
-            ['name' => "IESS PERSONAL", 'code' => 'IESSPE', 'type' => 'fijo'],
-            ['name' => "ADELANTO DE SUELDO", 'code' => 'AS', 'type' => 'fijo'],
+            ['name' => "IESS patronal", 'code' => 'IESSPA', 'type' => 'fijo'],
+            ['name' => "IESS personal", 'code' => 'IESSPE', 'type' => 'fijo'],
+            ['name' => "Adelanto de sueldo", 'code' => 'AS', 'type' => 'fijo'],
         ]);
 
 

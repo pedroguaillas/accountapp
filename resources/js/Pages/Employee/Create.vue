@@ -6,7 +6,6 @@ import { useForm } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 
 // Props

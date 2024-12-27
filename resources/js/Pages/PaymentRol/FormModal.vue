@@ -1,12 +1,6 @@
 <script setup>
 // Imports
 import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import Checkbox from "@/Components/Checkbox.vue";
-import { reactive } from "vue";
-import { useFocusNextField } from "@/composables/useFocusNextField";
 
 // Props
 const props = defineProps({
@@ -15,9 +9,6 @@ const props = defineProps({
   show: { type: Boolean, default: false },
 });
 
-
-const { focusNextField } = useFocusNextField();
-
 // Emits
 defineEmits(["close", "save"]);
 </script>
@@ -25,7 +16,7 @@ defineEmits(["close", "save"]);
 <template>
   <DialogModal :show="show" maxWidth="2xl" @close="$emit('close')">
     <template #title>
-      Editar rol de {{ props.paymentRol.cuit }} / {{ props.paymentRol.name }}
+      {{ props.paymentRol.cuit }} / {{ props.paymentRol.name }}
     </template>
     <template #content>
       <div class="mt-4 flex flex-col sm:flex-row gap-4 w-full">
@@ -40,14 +31,12 @@ defineEmits(["close", "save"]);
               class="w-4/6 px-4 bg-slate-100 flex items-center border rounded-l"
               >{{ ingressrol.name }}</span
             >
-            <div class="col-2 flex mt-2">
-              <input
-                v-model="ingressrol.value"
-                type="number"
-                class="block w-full border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
-                :disabled="ingressrol.name=== 'IESS PATRONAL'"
-              />
-            </div>
+            <input
+              v-model="ingressrol.value"
+              type="number"
+              class="block w-4/6 border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
+              :disabled="ingressrol.name === 'IESS PATRONAL'"
+            />
           </div>
         </article>
 
@@ -64,14 +53,12 @@ defineEmits(["close", "save"]);
               {{ egressrol.name }}
             </span>
 
-            <div class="col-2 flex mt-2">
-              <input
-                v-model="egressrol.value"
-                type="number"
-                class="block w-full border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
-                :disabled="egressrol.name === 'IESS PATRONAL'"
-              />
-            </div>
+            <input
+              v-model="egressrol.value"
+              type="number"
+              class="block w-4/6 border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
+              :disabled="egressrol.name === 'IESS PATRONAL'"
+            />
           </div>
         </article>
       </div>

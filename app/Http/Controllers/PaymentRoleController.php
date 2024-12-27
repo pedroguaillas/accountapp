@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\PaymentRole;
 use App\Models\PaymentRoleIngress;
-use App\Jobs\ProcessPaymenRole;
 use App\Models\PaymentRoleEgress;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -24,7 +23,7 @@ class PaymentRoleController extends Controller
         $month = $request->input('month', $date->month);
         $company = Company::first();
 
-        // $job = new ProcessPaymenRole();
+       // $job = new ProcessPaymenRole();
         //$job->handle();
 
         // Consulta principal con relaciones
@@ -38,10 +37,10 @@ class PaymentRoleController extends Controller
             ->where('company_id', $company->id) // Filtrar por compañía si es necesario
             ->whereRaw("EXTRACT(YEAR FROM \"date\") = ?", [$year]) // Filtrar por año
             ->whereRaw("EXTRACT(MONTH FROM \"date\") = ?", [$month]) // Filtrar por mes
-          
+            ->whereNull('deleted_at')
             ->paginate(10)
             ->withQueryString()
-            
+
             ->through(function ($paymentRole) {
                 $totalIngressF = $paymentRole->paymentroleingresses->filter(function ($ingress) {
                     return $ingress->roleIngress && $ingress->roleIngress->type === 'fijo'; // Verifica que roleIngress no sea null
@@ -92,8 +91,8 @@ class PaymentRoleController extends Controller
                 ];
             });
 
-           //dd($paymentroles);
-    
+        //dd($paymentroles);
+
         return inertia('PaymentRol/Index', [
             'filters' => [
                 'search' => $search,

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\RoleEgress;
 use Illuminate\Http\Request;
-//use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
 class RoleEgressController extends Controller
@@ -16,7 +15,8 @@ class RoleEgressController extends Controller
 
 
         $egresses = RoleEgress::select("*")
-            ->where('company_id', $company->id);
+            ->where('company_id', $company->id)
+            ->whereNull('deleted_at');
 
         $egresses = $egresses->paginate(10)->withQueryString(); // Importante usar withQueryString()
 
@@ -33,9 +33,9 @@ class RoleEgressController extends Controller
         RoleEgress::create([...$request->all(), 'company_id' => $company->id]);
     }
 
-    public function update(Request $request, RoleEgress $roleEgress)
+    public function update(Request $request, RoleEgress $roleegress)
     {
-        $roleEgress->update($request->all());
+        $roleegress->update($request->all());
     }
 
     public function destroy(int $egressId)

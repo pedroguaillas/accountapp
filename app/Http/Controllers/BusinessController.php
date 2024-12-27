@@ -9,6 +9,7 @@ class BusinessController extends Controller
 {
     public function roles()
     {
-        // return inertia('Business/Setting/RoleIngress');
+
+        return inertia('Business/Setting/Role');
     }
 }

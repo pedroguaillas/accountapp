@@ -104,7 +104,6 @@ Route::middleware([
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
         Route::get('asiento/editar/{journalId}', [JournalController::class, 'edit'])->name('journal.edit');
         Route::delete('journal/{journal}', [JournalController::class, 'destroy'])->name('journal.delete');
-
         Route::resource('journal', JournalController::class)->only(['store', 'update']);
 
         // fixed assets  //poner las rutas con nombre en plural 
@@ -130,7 +129,6 @@ Route::middleware([
         Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.delete');
         Route::resource('employee', EmployeeController::class)->only(['store', 'update']);
 
-
         //adelantos
         Route::get('adelantos', [AdvanceController::class, 'index'])->name('advances.index');
         Route::post('advances', [AdvanceController::class, 'store'])->name('advances.store');
@@ -138,25 +136,17 @@ Route::middleware([
         Route::delete('advances/{advance}', [AdvanceController::class, 'destroy'])->name('advances.delete');
 
         //roles
-
         Route::get('roles-de-pago', [PaymentRoleController::class, 'index'])->name('paymentrol.index');
         Route::put('paymentroles/{id}', [PaymentRoleController::class, 'update'])->name('paymentrol.update');
 
-
-
         // ingresos
         Route::get('roles-ingresos', [RoleIngressController::class, 'index'])->name('roleingress.index');
-        Route::post('roleingresses', [RoleIngressController::class, 'store'])->name('roleingress.store');
-        Route::put('roleingresses/{ingresses}', [RoleIngressController::class, 'update'])->name('roleingress.update');
         Route::delete('roleingresses/{ingressId}', [RoleIngressController::class, 'destroy'])->name('roleingress.delete');
+        Route::resource('roleingresses', RoleIngressController::class)->only(['store', 'update']);
 
         // egresos
         Route::get('roles-egresos', [RoleEgressController::class, 'index'])->name('roleegress.index');
-        Route::post('roleegresses', [RoleEgressController::class, 'store'])->name('roleegress.store');
-        Route::put('roleegresses/{egresses}', [RoleEgressController::class, 'update'])->name('roleegress.update');
         Route::delete('roleegresses/{egressId}', [RoleEgressController::class, 'destroy'])->name('roleegress.delete');
-
-
-
+        Route::resource('roleegresses', RoleEgressController::class)->only(['store', 'update']);
     });
 });
