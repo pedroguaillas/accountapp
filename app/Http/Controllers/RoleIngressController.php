@@ -16,11 +16,18 @@ class RoleIngressController extends Controller
         $ingreses = RoleIngress::select("*")
             ->where('company_id', $company->id)
             ->whereNull('deleted_at');
+
+        if ($request->has('search') && !empty($request->search)) {
+            $ingreses->where('code', 'LIKE', '%' . $request->search . '%')
+                ->orWhere('name', 'LIKE', '%' . $request->search . '%');
+        }
+
         $ingreses = $ingreses->paginate(20)->withQueryString(); // Importante usar withQueryString()
 
         // Renderizamos la vista con los datos necesarios
-        return Inertia::render('Business/Setting/RoleIngress', [
+        return inertia('Business/Setting/RoleIngress', [
             'ingresses' => $ingreses,
+            'filters' => $request->search,
         ]);
     }
 
@@ -38,7 +45,7 @@ class RoleIngressController extends Controller
 
     public function destroy(int $ingressId)
     {
-        $ingress =RoleIngress::findOrFail($ingressId);
+        $ingress = RoleIngress::findOrFail($ingressId);
         $ingress->delete(); // Esto usará SoftDeletes
     }
 
