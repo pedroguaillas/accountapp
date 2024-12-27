@@ -15,9 +15,6 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 const props = defineProps({
   journals: { type: Object, default: () => ({ data: [] }) },
   filters: { type: Object, default: () => ({}) },
-  journals: { type: Object, default: () => ({}) },
-
-  filters: { type: Object, default: () => ({}) },
 });
 
 // Refs
@@ -48,12 +45,10 @@ const deletejournarls = () => {
 
 watch(
   search,
-
   async (newQuery) => {
     if (loading.value) return
     loading.value = true; // Activa el indicador de carga
     const url = route("journal.index"); // Ruta del índice de sucursales
-
     try {
       await router.get(
         url,

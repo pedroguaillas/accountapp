@@ -3,20 +3,23 @@
 import BusinessSettingLayout from "@/Layouts/BusinessSettingLayout.vue";
 import ModalEgress from "./ModalEgress.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import axios from "axios";
 import Table from "@/Components/Table.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 const props = defineProps({
   egresses: { type: Object, default: () => ({ data: [] }) },
+  filters: { type: String, default: "" },
 });
 
 // Refs
 const modalegreses = ref(false);
 const deleteid = ref(0);
+const search = ref(props.filters);
 
 // Initial cost center object
 const initialEgress = { name: "", code: "", type: "otro" };
@@ -52,8 +55,8 @@ const save = () => {
   const isUpdate = Boolean(egress.id);
   const routeMethod = isUpdate ? "put" : "post";
   const routeName = isUpdate
-    ? route("roleegress.update", { id: egress.id }) // Asegurarte de que uses el formato correcto
-    : route("roleegress.store");
+    ? route("roleegresses.update", { id: egress.id }) // Asegurarte de que uses el formato correcto
+    : route("roleegresses.store");
 
   // Preparar la solicitud
   egress[routeMethod](routeName, {
@@ -105,12 +108,43 @@ const deleteegress = () => {
       console.error("Error al eliminar egresos", error);
     });
 };
+
+
+const loading = ref(false);
+watch(
+  search,
+  async (newQuery) => {
+    const url = route("roleegress.index");
+    loading.value = true;
+
+    try {
+      await router.get(
+        url,
+        { search: newQuery }, // Mantener la página actual
+        { preserveState: true }
+      );
+    } catch (error) {
+      console.error("Error al filtrar:", error);
+    } finally {
+      loading.value = false;
+    }
+  },
+  { immediate: false }
+);
 </script>
 
 <template>
   <BusinessSettingLayout title="Negocio ajustes de roles">
     <!-- Card Header -->
     <div class="flex flex-col sm:flex-row justify-end items-center">
+      <div class="w-full flex sm:justify-end">
+        <TextInput
+          v-model="search"
+          type="text"
+          class="block sm:mr-2 h-8 w-full"
+          placeholder="Buscar"
+        />
+      </div>
       <button
         @click="newEgress"
         class="sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"

@@ -13,13 +13,13 @@ import { PencilIcon, PrinterIcon, EnvelopeIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
-  paymentroles: { type: Object, default: () => ({}) },
+  paymentroles: { type: Object, default: () => ({data: [] }) },
   filters: { type: Object, default: () => ({}) },
 });
 
 // Refs
 const modal = ref(false);
-const search = ref(""); // Término de búsqueda
+const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
 const hoveredRow = ref(null);
 
@@ -75,6 +75,7 @@ const edit = (paymentrolEdit) => {
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
+  if (loading.value) return
   const url = route("paymentrol.index"); // Ruta hacia el backend
   loading.value = true;
 
@@ -100,9 +101,9 @@ watch(
   [search, selectedYear, selectedMonth], // Las dependencias observadas
   async (newQuery) => {
     // El "newQuery" será el array de los nuevos valores
+    if (loading.value) return
     const url = route("paymentrol.index");
     loading.value = true;
-
     try {
       // Enviar los valores individuales en lugar de todo el array
       await router.get(

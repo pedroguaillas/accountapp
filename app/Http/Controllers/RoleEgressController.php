@@ -17,12 +17,18 @@ class RoleEgressController extends Controller
         $egresses = RoleEgress::select("*")
             ->where('company_id', $company->id)
             ->whereNull('deleted_at');
+        
+        if ($request->has('search') && !empty($request->search)) {
+                $egresses->where('code', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('name', 'LIKE', '%' . $request->search . '%');
+        }
 
         $egresses = $egresses->paginate(10)->withQueryString(); // Importante usar withQueryString()
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Business/Setting/RoleEgress', [
             'egresses' => $egresses,
+            'filters' => $request->search,
         ]);
     }
 

@@ -53,98 +53,7 @@ class JournalController extends Controller
                 'search' => $search
             ], // Mantener los filtros
         ]);
-        // Subconsulta para journals
-        $journal = DB::table("journals")
-            ->selectRaw("id, to_char(date,'DD-MM-YYYY') AS date, description")
-            ->where('company_id', $company->id)
-            ->whereNull('deleted_at');
-
-        // Si hay un término de búsqueda, filtramos por el campo de descripción
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $journal->where('description', 'like', "%{$search}%");
-        }
-
-        // Consulta principal con paginación
-        $journalsRaw = DB::table('journal_entries')
-            ->select(
-                'journals_sub.id as idjournal',
-                'journals_sub.date',
-                'journals_sub.description',
-                'journal_entries.id as entry_id',
-                'accounts.code',
-                'accounts.name',
-                'journal_entries.debit',
-                'journal_entries.have'
-            )
-            ->join('accounts', function ($join) {
-                $join->on('accounts.id', '=', 'journal_entries.account_id')
-                    ->where('accounts.is_detail', true);
-            })
-            ->joinSub($journal, 'journals_sub', function ($join) {
-                $join->on('journal_entries.journal_id', '=', 'journals_sub.id');
-            })
-            ->whereNull('journal_entries.deleted_at')
-            ->orderBy('journals_sub.id', 'asc')
-            ->orderBy('journal_entries.id', 'asc')
-            ->paginate(10)
-            ->withQueryString(); // Mantiene los parámetros de búsqueda en la URL
-
-        // Agrupar los resultados por journal
-        $journals = collect($journalsRaw->items())->groupBy('idjournal')->map(function ($entries, $idjournal) {
-            $journalData = $entries->first(); // Obtener la primera entrada del grupo
-            return [
-                'id' => $idjournal,
-                'date' => $journalData->date,
-                'description' => $journalData->description,
-                'journal_entries' => collect($entries)->map(function ($entry) {
-                    return [
-                        'id' => $entry->entry_id,
-                        'code' => $entry->code,
-                        'name' => $entry->name,
-                        'debit' => $entry->debit,
-                        'have' => $entry->have,
-                    ];
-                }),
-                'total' => collect($entries)->reduce(function ($sum, $entry) {
-                    return $sum + $entry->debit; // Acumular los valores de debit
-                }, 0),
-            ];
-        })->values();
-
-        // Estructura de paginación similar a la que pides
-        $pagination = [
-            'current_page' => $journalsRaw->currentPage(),
-            'data' => $journals,
-            'first_page_url' => $journalsRaw->url(1),
-            'last_page_url' => $journalsRaw->url($journalsRaw->lastPage()),
-            'next_page_url' => $journalsRaw->nextPageUrl(),
-            'prev_page_url' => $journalsRaw->previousPageUrl(),
-            'path' => $journalsRaw->path(),
-            'per_page' => $journalsRaw->perPage(),
-            'total' => $journalsRaw->total(),
-            'links' => $journalsRaw->links(), // Convierte los enlaces a un array
-        ];
-
-        return response()->json([
-            'journals' => $pagination, // Paginación con los datos
-            'filters' => [
-                'search' => $request->search,
-            ],
-        ])
-        ;
-
-        // // Retornar a la vista con los datos procesados y la paginación
-        // return Inertia::render('Journal/Index', [
-        //     'journals' => $pagination, // Paginación con los datos
-        //     'filters' => [
-        //         'search' => $request->search,
-        //     ],
-        // ]);
     }
-
-
-
 
     public function create()
     {
@@ -174,7 +83,6 @@ class JournalController extends Controller
             'journalEntries.*.account_id' => 'required|min:1', // validar que exista esa cuenta 
             'journalEntries.*.debit' => 'required|min:0',
             'journalEntries.*.have' => 'required|min:0',
-            //'is_deductible'=> '',
         ]);
 
         $company = Company::first();
