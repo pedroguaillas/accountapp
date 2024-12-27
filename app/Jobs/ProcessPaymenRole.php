@@ -29,8 +29,9 @@ class ProcessPaymenRole implements ShouldQueue
     {
         $company = Company::first();
 
-        //poner un where para aportacion > cero
-        $employees = Employee::where('company_id', $company->id)->get();
+        $employees = Employee::where('company_id', $company->id)
+            ->where('porcent_aportation', '>', 0)
+            ->get();
 
         $roleingresses = RoleIngress::where('company_id', $company->id)->get();
 

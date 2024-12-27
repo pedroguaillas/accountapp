@@ -3,12 +3,10 @@
 import { ref, reactive, computed, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
-import { router, useForm, Link } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import { PencilIcon, PrinterIcon, EnvelopeIcon } from "@heroicons/vue/24/solid";
@@ -21,8 +19,6 @@ const props = defineProps({
 
 // Refs
 const modal = ref(false);
-const modal1 = ref(false);
-const deleteid = ref(0);
 const search = ref(""); // Término de búsqueda
 const loading = ref(false); // Estado de carga
 const hoveredRow = ref(null);
@@ -30,7 +26,6 @@ const hoveredRow = ref(null);
 // Filtros de Año y Mes
 const selectedYear = ref(props.filters.year); // Año por defecto
 const selectedMonth = ref(props.filters.month); // Mes seleccionado
-const checkoptions = ref(false);
 // Generar un arreglo de años (puedes modificar el rango según lo necesites)
 
 const years = [
@@ -101,7 +96,6 @@ const handlePageChange = async (page) => {
   }
 };
 
-
 watch(
   [search, selectedYear, selectedMonth], // Las dependencias observadas
   async (newQuery) => {
@@ -167,7 +161,7 @@ const save = () => {
       <!-- Card Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Roles de Pago
+          Roles de pagos
         </h2>
         <div class="w-full flex sm:justify-end gap-2">
           <!-- Filtro Año -->
@@ -198,20 +192,9 @@ const save = () => {
         </div>
       </div>
 
-      <div v-if="checkoptions">
-        <ul>
-          <li>Editar</li>
-          <li>Eliminar</li>
-          <li>Imprimir</li>
-          <li>Mostrar</li>
-          <li>Enviar</li>
-        </ul>
-      </div>
-
       <Table>
         <thead>
           <tr class="[&>th]:py-2">
-            <th></th>
             <th class="w-1">N°</th>
             <th>CEDULA</th>
             <th class="text-left">NOMBRE</th>
@@ -232,7 +215,6 @@ const save = () => {
             @mouseenter="hoveredRow = paymentrol.id"
             @mouseleave="hoveredRow = null"
           >
-            <td><input v-model="checkoptions" type="checkbox" /></td>
             <td>{{ i + 1 }}</td>
             <td>{{ paymentrol.cuit }}</td>
             <td class="text-left">{{ paymentrol.name }}</td>
