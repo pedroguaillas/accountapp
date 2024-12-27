@@ -39,12 +39,12 @@ class PaymentRole extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function paymentroleingress()
+    public function paymentroleingresses()
     {
         return $this->hasMany(PaymentRoleIngress::class);
     }
 
-    public function paymentroleegress()
+    public function paymentroleegresses()
     {
         return $this->hasMany(PaymentRoleEgress::class);
     }

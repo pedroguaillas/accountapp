@@ -77,12 +77,12 @@ class Company extends Model
         return $this->hasMany(Advance::class);
     }
 
-    public function roleingress()
+    public function roleIngress()
     {
         return $this->hasMany(RoleIngress::class);
     }
 
-    public function roleegress()
+    public function roleEgress()
     {
         return $this->hasMany(RoleEgress::class);
     }

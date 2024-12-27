@@ -45,5 +45,9 @@ class Employee extends Model
         return $this->hasMany(Advance::class);
     }
 
+    public function paymentroles(){
+        return $this->hasMany(PaymentRole::class);
+    }
+
 }
 

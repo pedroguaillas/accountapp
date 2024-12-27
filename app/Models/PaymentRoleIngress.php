@@ -27,9 +27,9 @@ class PaymentRoleIngress extends Model
         return $this->belongsTo(PaymentRole::class);
     }
 
-    public function roleingress()
+    public function roleIngress()
     {
-        return $this->belongsTo(RoleIngress::class);
+        return $this->belongsTo(RoleIngress::class); // Relación con RoleIngress
     }
 
 }
