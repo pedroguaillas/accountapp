@@ -8,7 +8,7 @@ import BusinessSettingLayout from "@/Layouts/BusinessSettingLayout.vue";
 <template>
     <BusinessSettingLayout title="Negocio ajustes de roles">
 
-        <h1>Si desde Role</h1>
+        <h1>role</h1>
 
     </BusinessSettingLayout>
 </template>

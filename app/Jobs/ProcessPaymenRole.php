@@ -3,16 +3,13 @@
 namespace App\Jobs;
 
 use App\Models\PaymentRole;
-use App\Models\PaymentRoleIngress;
 use App\Models\Employee;
 use App\Models\Company;
 use App\Models\RoleIngress;
+use App\Models\RoleEgress;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Carbon\Carbon; // Importa la clase Carbon
+use Carbon\Carbon;
 
 class ProcessPaymenRole implements ShouldQueue
 {
@@ -30,13 +27,18 @@ class ProcessPaymenRole implements ShouldQueue
      */
     public function handle(): void
     {
-
         $company = Company::first();
-        //if (Carbon::now()->isLastOfMonth()) {
+
+        //poner un where para aportacion > cero
         $employees = Employee::where('company_id', $company->id)->get();
+
         $roleingresses = RoleIngress::where('company_id', $company->id)->get();
 
-        foreach ($employees as $employee) { // Itera correctamente
+        $roleegresses = RoleEgress::where('company_id', $company->id)->get();
+
+        foreach ($employees as $employee) {
+
+            // Crear el rol de pago
             $paymentRole = PaymentRole::create([
                 'company_id' => $company->id,
                 'employee_id' => $employee->id,
@@ -44,50 +46,119 @@ class ProcessPaymenRole implements ShouldQueue
                 'sector_code' => $employee->sector_code,
                 'days' => $employee->days,
                 'salary' => $employee->salary,
-                'salary_receive' => $employee->salary,
-                'date' => "20-12-2024",
-
+                'salary_receive' => $employee->salary, // Inicializamos con el salario base
+                'date' => Carbon::now()->format('Y-m-d'), // Fecha dinámica
             ]);
 
-            //FALTA calculo de horas ordinarias,calculo de horas extras, adelantos como ingrso y egreso fijo ya que ya tenmos la gestion, 
-            $ho = 0;
-            $he = 0;
+
+            // Calcular horas ordinarias, horas extras y adelanto
+            $ho = $this->calcularHorasOrdinarias($employee);
+            $he = $this->calcularHorasExtras($employee);
+            $au = $this->calcularAdelanto($employee);
+            $as = $this->calcularAdelantoS($employee);
             $remuneration = $employee->salary + $ho + $he;
-            //FALTA verificar las fechas de pago anuales de XIII, XIV Y FONDOS DE RESERVA y hacer lo mismo para lso egresos
+
+            // Ingresos (para todos los roles de ingresos)
             $inputpaymentroleingress = [];
+            $totalIngresos = 0;  // Para sumar los ingresos
             foreach ($roleingresses as $roleingress) {
-                $call = 0;
-                if ($roleingress->code === 'HO') {
-                    $call = $ho;
-                }
-                if ($roleingress->code === 'HE') {
-                    $call = $he;
-                }
-                if ($roleingress->code === 'RE') {
-                    $call = $remuneration;
-                }
-                if ($roleingress->code === 'XIII') {
-                    $call = $employee->xiii ? 0 : $remuneration / 12;
-                }
-                if ($roleingress->code === 'XV') {
-                    $call = $employee->xiv ? 0 : (38.33 * 30) / $employee->days;
-                }
-                if ($roleingress->code === 'FDR') {
-                    $call = $employee->reserve_funds ? 0 : $remuneration * 0.083333;
-                }
+                $call = $this->calcularIngreso($roleingress, $employee, $ho, $he, $remuneration, $au);
+                $totalIngresos += $call;  // Acumulamos el total de ingresos
                 $inputpaymentroleingress[] = [
                     'company_id' => $company->id,
-                    // 'payment_role_id' =>$paymentRole->id ,
                     'role_ingress_id' => $roleingress->id,
                     'value' => $call,
                 ];
-
             }
-            $paymentRole->paymentroleingress()->createMany($inputpaymentroleingress);
+
+            // Egresos (para todos los roles de egresos)
+            $inputpaymentroleegress = [];
+            $totalEgresos = 0;  // Para sumar los egresos
+            foreach ($roleegresses as $roleegress) {
+                $call = $this->calcularEgreso($roleegress, $remuneration, $as);
+                $totalEgresos += $call;  // Acumulamos el total de egresos
+                $inputpaymentroleegress[] = [
+                    'company_id' => $company->id,
+                    'role_egress_id' => $roleegress->id,
+                    'value' => $call,
+                ];
+            }
+
+            // Calcular salary_receive
+            $salaryReceive = $totalIngresos - $totalEgresos;
+
+            // Actualizar el campo 'salary_receive' en el PaymentRole
+            $paymentRole->update([
+                'salary_receive' => $salaryReceive
+            ]);
+            // Crear las relaciones de ingresos y egresos para el rol de pago
+            $paymentRole->paymentroleingresses()->createMany($inputpaymentroleingress);
+            $paymentRole->paymentroleegresses()->createMany($inputpaymentroleegress);
 
         }
-        // }
+
     }
 
 
+    private function calcularIngreso($roleingress, $employee, $ho, $he, $remuneration, $au)
+    {
+        switch ($roleingress->code) {
+            case 'HO':
+                return $ho;
+            case 'HE':
+                return $he;
+            case 'RE':
+                return $remuneration;
+            case 'XIII':
+                return $employee->xiii ? 0 : $remuneration / 12;
+            case 'XV':
+                return $employee->xiv ? 0 : (38.33 * 30) / $employee->days;
+            case 'FDR':
+                return $employee->reserve_funds ? 0 : $remuneration * 0.083333;
+            case 'AU':
+                return $au;
+            default:
+                return 0;
+        }
+    }
+
+
+
+    private function calcularEgreso($roleegress, $remuneration, $as)
+    {
+        switch ($roleegress->code) {
+            case 'IESSPA':
+                return $remuneration * 0.0935; // ejemplo
+            case 'IESSPE':
+                return $remuneration * 0.0935; // ejemplo
+            case 'AS':
+                return $as; // ejemplo
+            default:
+                return 0;
+        }
+    }
+
+    private function calcularHorasOrdinarias($employee)
+    {
+        // Lógica para calcular horas ordinarias
+        return 0; // Ejemplo
+    }
+
+    private function calcularHorasExtras($employee)
+    {
+        // Lógica para calcular horas extras
+        return 0; // Ejemplo
+    }
+
+    private function calcularAdelanto($employee)
+    {
+        // Lógica para calcular adelanto
+        return 0; // Ejemplo
+    }
+
+    private function calcularAdelantoS($employee)
+    {
+        // Lógica para calcular adelanto
+        return 0; // Ejemplo
+    }
 }

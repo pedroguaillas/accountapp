@@ -5,18 +5,19 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import Checkbox from "@/Components/Checkbox.vue";
+import { reactive } from "vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 
 // Props
-defineProps({
+const props = defineProps({
   paymentRol: { type: Object, default: () => ({}) },
   error: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
-  roleingress: { type: Array, default: () => [] },
-  roleegress: { type: Array, default: () => [] },
 });
 
+
 const { focusNextField } = useFocusNextField();
+
 // Emits
 defineEmits(["close", "save"]);
 </script>
@@ -24,52 +25,58 @@ defineEmits(["close", "save"]);
 <template>
   <DialogModal :show="show" maxWidth="2xl" @close="$emit('close')">
     <template #title>
-      Editar rol de {{ paymentRol.cuit }} / {{ paymentRol.name }}
+      Editar rol de {{ props.paymentRol.cuit }} / {{ props.paymentRol.name }}
     </template>
     <template #content>
       <div class="mt-4 flex flex-col sm:flex-row gap-4 w-full">
         <article class="rounded">
           <h2 class="text-xl font-bold">Ingresos</h2>
           <div
-            v-for="ingress in roleingress"
-            :key="ingress.id"
+            v-for="ingressrol in props.paymentRol.ingresses"
+            :key="ingressrol.id"
             class="col-2 flex mt-2"
           >
             <span
               class="w-4/6 px-4 bg-slate-100 flex items-center border rounded-l"
-              >{{ ingress.name }}</span
+              >{{ ingressrol.name }}</span
             >
-            <input
-              value="0"
-              type="number"
-              placeholder=""
-              class="block w-2/6 border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
-            />
+            <div class="col-2 flex mt-2">
+              <input
+                v-model="ingressrol.value"
+                type="number"
+                class="block w-full border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
+                :disabled="ingressrol.name=== 'IESS PATRONAL'"
+              />
+            </div>
           </div>
         </article>
 
-        <article class="">
+        <article>
           <h2 class="text-xl font-bold">Egresos</h2>
           <div
-            v-for="egress in roleegress"
-            :key="egress.id"
+            v-for="egressrol in props.paymentRol.egresses"
+            :key="egressrol.id"
             class="col-2 flex mt-2"
           >
             <span
               class="w-4/6 px-4 bg-slate-100 flex items-center border rounded-l"
-              >{{ egress.name }}</span
             >
-            <input
-              value="0"
-              type="number"
-              placeholder=""
-              class="block w-2/6 border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
-              :disabled="egress.name === 'IESS PATRONAL'"
-            />
+              {{ egressrol.name }}
+            </span>
+
+            <div class="col-2 flex mt-2">
+              <input
+                v-model="egressrol.value"
+                type="number"
+                class="block w-full border border-gray-300 px-4 py-1 focus:outline-none text-right rounded-r"
+                :disabled="egressrol.name === 'IESS PATRONAL'"
+              />
+            </div>
           </div>
         </article>
       </div>
     </template>
+
     <template #footer>
       <button
         @click="$emit('save')"

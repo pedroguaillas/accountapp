@@ -16,9 +16,7 @@ import { PencilIcon, PrinterIcon, EnvelopeIcon } from "@heroicons/vue/24/solid";
 // Props
 const props = defineProps({
   paymentroles: { type: Object, default: () => ({}) },
-  filters: { type: String, default: "" },
-  roleingress: { type: Array, default: () => [] },
-  roleegress: { type: Array, default: () => [] },
+  filters: { type: Object, default: () => ({}) },
 });
 
 // Refs
@@ -30,8 +28,8 @@ const loading = ref(false); // Estado de carga
 const hoveredRow = ref(null);
 
 // Filtros de Año y Mes
-const selectedYear = ref(new Date().getFullYear()); // Año por defecto
-const selectedMonth = ref(new Date().getMonth()); // Mes seleccionado
+const selectedYear = ref(props.filters.year); // Año por defecto
+const selectedMonth = ref(props.filters.month); // Mes seleccionado
 const checkoptions = ref(false);
 // Generar un arreglo de años (puedes modificar el rango según lo necesites)
 
@@ -58,44 +56,12 @@ const months = computed(() => {
   ];
 });
 
-// Función para aplicar los filtros de Año y Mes
-const filterDataByYearAndMonth = () => {
-  const year = selectedYear.value;
-  const month = selectedMonth.value;
-
-  // Filtra los datos según el año y mes seleccionados
-  // Este es un ejemplo, asegúrate de tener acceso a los datos adecuados para filtrarlos
-  axios
-    .get(route("paymentrol.index"), {
-      params: {
-        year,
-        month,
-      },
-    })
-    .then((response) => {
-      // Actualizar los roles de pago con los datos filtrados
-      props.paymentroles = response.data;
-    })
-    .catch((error) => {
-      console.error("Error al filtrar los roles de pago:", error);
-    });
-};
-
 // Inicializador de objetos
 const initialPaymentRol = {};
 
 // Reactives
-const paymentrol = useForm({ ...initialPaymentRol });
+const paymentrol = reactive({ ...initialPaymentRol });
 const errorForm = reactive({});
-
-const newPaymentRol = () => {
-  if (paymentrol.id !== undefined) {
-    delete paymentrol.id;
-  }
-  Object.assign(paymentrol, initialPaymentRol);
-  Object.assign(errorForm, { ...initialPaymentRol });
-  toggle();
-};
 
 const resetErrorForm = () => {
   Object.assign(errorForm, initialPaymentRol);
@@ -108,25 +74,8 @@ const toggle = () => {
 const edit = (paymentrolEdit) => {
   resetErrorForm();
   Object.assign(paymentrol, { ...initialPaymentRol, ...paymentrolEdit });
-  Object.assign(errorForm, { ...initialPaymentRol, date_start: "" });
+  Object.assign(errorForm, { ...initialPaymentRol });
   toggle();
-};
-
-const removePaymentRol = (paymentrolId) => {
-  toggle1();
-  deleteid.value = paymentrolId;
-};
-
-const deletePaymentRol = () => {
-  axios
-    .delete(route("paymentrol.delete", deleteid.value)) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("paymentrol.index"));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar el rol", error);
-    });
 };
 
 // Función para manejar el cambio de página
@@ -137,7 +86,12 @@ const handlePageChange = async (page) => {
   try {
     await router.get(
       url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
+      {
+        page,
+        search: search.value,
+        year: selectedYear.value,
+        month: selectedMonth.value,
+      }, // Incluye tanto la página como el término de búsqueda
       { preserveState: true }
     );
   } catch (error) {
@@ -147,17 +101,24 @@ const handlePageChange = async (page) => {
   }
 };
 
-// Función para manejar la búsqueda
+
 watch(
-  search,
+  [search, selectedYear, selectedMonth], // Las dependencias observadas
   async (newQuery) => {
+    // El "newQuery" será el array de los nuevos valores
     const url = route("paymentrol.index");
     loading.value = true;
 
     try {
+      // Enviar los valores individuales en lugar de todo el array
       await router.get(
         url,
-        { search: newQuery, page: props.paymentroles.current_page }, // Mantener la página actual
+        {
+          search: newQuery[0], // Primer valor de la query, 'search'
+          year: newQuery[1], // Segundo valor de la query, 'selectedYear'
+          month: newQuery[2], // Tercer valor de la query, 'selectedMonth'
+          page: props.paymentroles.current_page,
+        },
         { preserveState: true }
       );
     } catch (error) {
@@ -168,6 +129,34 @@ watch(
   },
   { immediate: false }
 );
+
+const save = () => {
+  // Crear un objeto con los datos a actualizar
+  const updatedData = {
+    ingresses: paymentrol.ingresses.map((ingress) => ({
+      id: ingress.id,
+      value: ingress.value,
+    })),
+    egresses: paymentrol.egresses.map((egress) => ({
+      id: egress.id,
+      value: egress.value,
+    })),
+  };
+
+  // Enviar la solicitud de actualización al backend
+  axios
+    .put(route("paymentrol.update", paymentrol.id), updatedData)
+    .then((response) => {
+      if (response.data.success) {
+        // Notificar éxito o actualizar el UI según sea necesario
+        toggle(); // Cerrar la modal después de guardar
+        router.reload(["paymentroles"]);
+      }
+    })
+    .catch((error) => {
+      console.error("Error al actualizar:", error);
+    });
+};
 </script>
 
 
@@ -209,16 +198,15 @@ watch(
         </div>
       </div>
 
-    <div v-if="checkoptions" >
-      <ul>
-        <li>Editar</li>
-        <li>Eliminar</li>
-        <li>Imprimir</li>
-        <li>Mostrar</li>
-        <li>Enviar</li>
-      </ul>
-
-    </div>
+      <div v-if="checkoptions">
+        <ul>
+          <li>Editar</li>
+          <li>Eliminar</li>
+          <li>Imprimir</li>
+          <li>Mostrar</li>
+          <li>Enviar</li>
+        </ul>
+      </div>
 
       <Table>
         <thead>
@@ -250,24 +238,34 @@ watch(
             <td class="text-left">{{ paymentrol.name }}</td>
             <td class="text-left">{{ paymentrol.position }}</td>
             <td>{{ paymentrol.days }}</td>
-            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
-            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
-            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
-            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
-            <td class="text-right pr-4">{{ paymentrol.salary.toFixed(2) }}</td>
+            <td class="text-right pr-4">
+              {{ paymentrol.total_ingress_f.toFixed(2) }}
+            </td>
+            <td class="text-right pr-4">
+              {{ paymentrol.total_ingress_o.toFixed(2) }}
+            </td>
+            <td class="text-right pr-4">
+              {{ paymentrol.total_egress_f.toFixed(2) }}
+            </td>
+            <td class="text-right pr-4">
+              {{ paymentrol.total_egress_o.toFixed(2) }}
+            </td>
+            <td class="text-right pr-4">
+              {{ paymentrol.salary_receive.toFixed(2) }}
+            </td>
 
             <!-- Superposición de opciones -->
             <td
               v-if="hoveredRow === paymentrol.id"
-              class=" flex justify-center absolute h-12 top-0 right-1/2  bg-white items-center shadow-md border rounded z-10 group-hover:block"
+              class="flex justify-center absolute h-12 top-0 right-1/2 bg-white items-center shadow-md border rounded z-10 group-hover:block"
             >
-              <ul class=" px-4 flex gap-4 rounded items-center justify-center">
+              <ul class="px-4 flex gap-4 rounded items-center justify-center">
                 <li
                   @click="edit(paymentrol)"
                   class="m-0 cursor-pointer hover:text-blue-500"
                 >
                   <PencilIcon class="size-5 text-red" />
-                </li> 
+                </li>
                 <li class="m-0 cursor-pointer hover:text-yellow-500">
                   <PrinterIcon class="size-5 text-red" />
                 </li>
@@ -286,8 +284,6 @@ watch(
   <FormModal
     :show="modal"
     :paymentRol="paymentrol"
-    :roleingress='roleingress'
-    :roleegress='roleegress'
     :error="errorForm"
     @close="toggle"
     @save="save"

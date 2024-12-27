@@ -131,8 +131,8 @@ class JournalController extends Controller
             'filters' => [
                 'search' => $request->search,
             ],
-            ])
-            ;
+        ])
+        ;
 
         // // Retornar a la vista con los datos procesados y la paginación
         // return Inertia::render('Journal/Index', [

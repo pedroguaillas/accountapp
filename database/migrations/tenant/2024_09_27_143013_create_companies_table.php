@@ -315,7 +315,7 @@ return new class extends Migration {
             $table->integer('days');
             $table->decimal('salary', 14, 2)->default(0);
             $table->decimal('salary_receive', 14, 2)->default(0);
-            $table->string('date');
+            $table->date('date');
 
             $table->timestamps();
             $table->softDeletes();

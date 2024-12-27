@@ -14,7 +14,7 @@ class PaymentRoleEgress extends Model
     protected $fillable = [
         'company_id', // ID de la compañía
         'payment_role_id', // ID del empleado
-        'payment_role_egress_id', // ID del empleado
+        'role_egress_id', // ID del empleado
         'value', // Salario
     ];
 
@@ -28,8 +28,8 @@ class PaymentRoleEgress extends Model
         return $this->belongsTo(PaymentRole::class);
     }
 
-    public function paymentroleegress()
+    public function roleEgress()
     {
-        return $this->belongsTo(PaymentRoleEgress::class);
+        return $this->belongsTo(RoleEgress::class); // Relación con RoleEgress
     }
 }

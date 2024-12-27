@@ -33,19 +33,15 @@ defineProps({
                             General</button>
                         </li>
                         <li class="me-2">
-                            <button
+                            <Link :href="route('roleingress.index')"
                                 class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                                type="button">Correo</button>
+                                type="button">Ingresos</Link>
                         </li>
-                        <li class="me-2">
-                            <button
-                                class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                                type="button" >Masividad</button>
-                        </li>
+
                         <li>
-                            <button
+                            <Link :href="route('roleegress.index')"
                                 class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300"
-                                type="button">Contactos</button>
+                                type="button">Egresos</Link>
                         </li>
                     </ul>
                 </div>
