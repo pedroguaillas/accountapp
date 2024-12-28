@@ -37,7 +37,7 @@ class TenantSeeder extends Seeder
         ActiveType::create(['name' => 'Terrenos', 'depreciation_time' => 0]);
         ActiveType::create(['name' => 'Edificios', 'depreciation_time' => 20]);
         ActiveType::create(['name' => 'Maquinaria, equipo e instalaciones', 'depreciation_time' => 10]);
-        ActiveType::create(['name' => 'Muebles enseres y equipos de oficina ', 'depreciation_time' => 10]);
+        ActiveType::create(['name' => 'Muebles enseres y equipos de oficina', 'depreciation_time' => 10]);
         ActiveType::create(['name' => 'Vehículos', 'depreciation_time' => 5]);
         ActiveType::create(['name' => 'Equipo de computo, tecnológico y otros', 'depreciation_time' => 3]);
 

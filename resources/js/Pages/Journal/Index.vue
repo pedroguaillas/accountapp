@@ -14,6 +14,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 // Props
 const props = defineProps({
   journals: { type: Object, default: () => ({ data: [] }) },
+  validateFixedAsset: { type: Boolean, default: () => (false) },
   filters: { type: Object, default: () => ({}) },
 });
 
@@ -86,6 +87,15 @@ const handlePageChange = async (page) => {
 
 <template>
   <AdminLayout title="Asientos contables">
+
+    <div v-if="!validateFixedAsset" class="flex mb-3 bg-red-200 p-4 rounded">
+      <p>Ajuste los Activos Fijos
+        <Link :href="route('fixedassets.index')" class="text-blue-800">
+        aqui
+        </Link>
+      </p>
+    </div>
+
     <div class="flex justify-end mb-3">
       <div class="w-full flex sm:justify-end">
         <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
@@ -153,7 +163,7 @@ const handlePageChange = async (page) => {
     <template #title>Eliminar asiento contable</template>
     <template #content> Esta seguro de eliminar el asiento contable? </template>
     <template #footer>
-      <SecondaryButton @click="modal=!modal" class="mr-2">Cancelar</SecondaryButton>
+      <SecondaryButton @click="modal = !modal" class="mr-2">Cancelar</SecondaryButton>
       <PrimaryButton type="button" @click="deletejournarls">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>

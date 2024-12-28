@@ -1,4 +1,5 @@
 <script setup>
+
 // Imports
 import { reactive, computed, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
@@ -111,50 +112,35 @@ const calculofecha = computed(() => {
 
   return fixedAsset.date_end;
 });
+
 const activeTypeOptions = Array.isArray(props.activeTypes)
   ? props.activeTypes.map((activeType) => ({
-      value: activeType.id,
-      label: activeType.name,
-    }))
+    value: activeType.id,
+    label: activeType.name,
+  }))
   : [];
 
 const payMethodOptions = Array.isArray(props.payMethods)
   ? props.payMethods.map((payMethod) => ({
-      value: payMethod.id,
-      label: payMethod.name,
-    }))
+    value: payMethod.id,
+    label: payMethod.name,
+  }))
   : [];
 
 watch(
   () => fixedAsset.active_type_id, // Observa cambios en el ID
   (newTypeId) => {
-    if (!Array.isArray(props.activeTypes)) {
-      console.error(
-        "props.activeTypes no es un array válido:",
-        props.activeTypes
-      );
-      return;
-    }
-    console.log("props.activeTypes:", props.activeTypes);
-    console.log("ID buscado (newTypeId):", newTypeId);
+    if (!Array.isArray(props.activeTypes)) return;
 
     const selectedType = props.activeTypes.find(
       (type) => String(type.id) === String(newTypeId) // Comparación flexible
     );
 
     if (selectedType) {
-      console.log("Tipo seleccionado encontrado:", selectedType);
       fixedAsset.period = selectedType.depreciation_time ?? "";
     } else {
-      console.warn(`No se encontró ningún tipo activo con el ID: ${newTypeId}`);
-      console.log(
-        "IDs disponibles en props.activeTypes:",
-        props.activeTypes.map((type) => type.id)
-      );
       fixedAsset.period = ""; // Limpia si no se encuentra
     }
-
-    console.log("Periodo actualizado del activo fijo:", fixedAsset.period);
   }
 );
 
@@ -219,82 +205,47 @@ watch(
         <div class="grid grid-cols-1 gap-4">
           <!--  primera columna dentro de la columna primera-->
           <div class="col-span-6 sm:col-span-4">
-            <Checkbox
-              v-model:checked="fixedAsset.is_depretation_a"
-              label="¿Posee depreciación acelerada?"
-            />
+            <Checkbox v-model:checked="fixedAsset.is_depretation_a" label="¿Posee depreciación acelerada?" />
           </div>
 
           <!--  segunda columna dentro de la columna primera-->
           <div class="col-span-6 sm:col-span-4">
-            <Checkbox
-              v-model:checked="fixedAsset.is_legal"
-              label="¿Tiene sustento legal de compra?"
-            />
+            <Checkbox v-model:checked="fixedAsset.is_legal" label="¿Tiene sustento legal de compra?" />
           </div>
 
           <!--  tercera columna dentro de la columna primera-->
-          <div
-            :hidden="fixedAsset.is_legal !== true"
-            class="col-span-6 sm:col-span-4"
-          >
+          <div :hidden="fixedAsset.is_legal !== true" class="col-span-6 sm:col-span-4">
             <InputLabel for="is_legal" value="Número de documento" />
-            <TextInput
-              v-model="fixedAsset.vaucher"
-              type="text"
-              class="mt-1 block w-full"
-              placeholder="001-001-098765432"
-              maxlength="17"
-            />
+            <TextInput v-model="fixedAsset.vaucher" type="text" class="mt-1 block w-full"
+              placeholder="001-001-098765432" maxlength="17" />
             <InputError :message="errorForm.vaucher" class="mt-2" />
           </div>
 
           <!--  cuarto columna dentro de la columna primera-->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="date_acquisition" value="Fecha de adquisición" />
-            <TextInput
-              v-model="fixedAsset.date_acquisition"
-              type="date"
-              class="mt-1 block w-full"
-              required
-            />
+            <TextInput v-model="fixedAsset.date_acquisition" type="date" class="mt-1 block w-full" required />
             <InputError :message="errorForm.date_acquisition" class="mt-2" />
           </div>
 
           <!--  quinta columna dentro de la columna primera-->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="detail" value="Detalle" />
-            <TextInput
-              v-model="fixedAsset.detail"
-              type="text"
-              class="mt-1 block w-full"
-              maxlength="300"
-              required
-            />
+            <TextInput v-model="fixedAsset.detail" type="text" class="mt-1 block w-full" maxlength="300" required />
             <InputError :message="errorForm.detail" class="mt-2" />
           </div>
 
           <!--  sexta columna dentro de la columna primera-->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="code" value="Código" />
-            <TextInput
-              v-model="fixedAsset.code"
-              type="text"
-              class="mt-1 block w-full"
-              maxlength="50"
-              required
-            />
+            <TextInput v-model="fixedAsset.code" type="text" class="mt-1 block w-full" maxlength="50" required />
             <InputError :message="errorForm.code" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="active_type_id" value="Tipo de activo fijo" />
-            <DynamicSelect
-              class="mt-1 block w-full"
-              v-model="fixedAsset.active_type_id"
-              :options="activeTypeOptions"
-              autofocus
-            />
+            <DynamicSelect class="mt-1 block w-full" v-model="fixedAsset.active_type_id" :options="activeTypeOptions"
+              autofocus />
             <InputError :message="errorForm.activeType" class="mt-2" />
           </div>
         </div>
@@ -304,96 +255,55 @@ watch(
           <!-- primera columna de la segunda columna -->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="adress" value="Dirección del activo fijo" />
-            <TextInput
-              v-model="fixedAsset.address"
-              type="text"
-              class="mt-1 block w-full"
-              maxlength="300"
-              required
-            />
+            <TextInput v-model="fixedAsset.address" type="text" class="mt-1 block w-full" maxlength="300" required />
             <InputError :message="errorForm.address" class="mt-2" />
           </div>
 
           <!-- Campo Periodo de Depreciación (Años) -->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="period" value="Periodo de depreciación (años)" />
-            <TextInput
-              v-model="fixedAsset.period"
-              type="number"
-              class="mt-1 block w-full"
-              :disabled="!fixedAsset.is_depretation_a"
-            />
+            <TextInput v-model="fixedAsset.period" type="number" class="mt-1 block w-full"
+              :disabled="!fixedAsset.is_depretation_a" />
           </div>
 
           <!-- Campo Periodo de Depreciación (Meses) -->
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel
-              for="period-months"
-              value="Periodo de depreciación (meses)"
-            />
-            <TextInput
-              v-model="fixedAsset.periodMonths"
-              type="number"
-              class="mt-1 block w-full"
-              :disabled="!fixedAsset.is_depretation_a"
-            />
+            <InputLabel for="period-months" value="Periodo de depreciación (meses)" />
+            <TextInput v-model="fixedAsset.periodMonths" type="number" class="mt-1 block w-full"
+              :disabled="!fixedAsset.is_depretation_a" />
             <InputError :message="errorForm.period" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="value" value="Valor del activo fijo" />
-            <TextInput
-              v-model="fixedAsset.value"
-              type="number"
-              class="mt-1 block w-full"
-              min="0"
-            />
+            <TextInput v-model="fixedAsset.value" type="number" class="mt-1 block w-full" min="0" />
             <InputError :message="errorForm.value" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="residual_value" value="Valor residual" />
-            <TextInput
-              v-model="fixedAsset.residual_value"
-              type="number"
-              class="mt-1 block w-full"
-              min="0"
-              :max="fixedAsset.value"
-              :disabled="parseInt(fixedAsset.period, 10) === 0"
-            />
+            <TextInput v-model="fixedAsset.residual_value" type="number" class="mt-1 block w-full" min="0"
+              :max="fixedAsset.value" :disabled="parseInt(fixedAsset.period, 10) === 0" />
             <InputError :message="errorForm.residual_value" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="date_end" value="Fecha final de depreciación" />
-            <TextInput
-              :value="calculofecha"
-              v-model="fixedAsset.date_end"
-              type="date"
-              class="mt-1 block w-full"
-              disabled
-            />
+            <TextInput :value="calculofecha" v-model="fixedAsset.date_end" type="date" class="mt-1 block w-full"
+              disabled />
             <InputError :message="errorForm.date_end" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="pay_method_id" value="Método de pago" />
-            <DynamicSelect
-              class="mt-1 block w-full"
-              v-model="fixedAsset.pay_method_id"
-              :options="payMethodOptions"
-              autofocus
-            />
+            <DynamicSelect class="mt-1 block w-full" v-model="fixedAsset.pay_method_id" :options="payMethodOptions"
+              autofocus />
             <InputError :message="errorForm.pay_method_id" class="mt-2" />
           </div>
         </div>
       </div>
       <div class="mt-4 text-right">
-        <button
-          @click="save"
-          class="px-4 py-2 bg-blue-500 text-white rounded"
-          :disabled="fixedAsset.processing"
-        >
+        <button @click="save" class="px-4 py-2 bg-blue-500 text-white rounded" :disabled="fixedAsset.processing">
           Guardar
         </button>
       </div>

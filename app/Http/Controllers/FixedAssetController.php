@@ -10,13 +10,13 @@ use App\Models\Journal;
 use App\Models\JournalEntry;
 use App\Models\PayMethod;
 use App\Models\ActiveType;
+use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class FixedAssetController extends Controller
 {
-
     public function index(Request $request)
     {
         // Obtener la compañía actual
@@ -47,8 +47,37 @@ class FixedAssetController extends Controller
 
     public function create()
     {
+        $company = Company::first();
+        if (!$company) {
+            return redirect()->back()->with('error', 'No company found.');
+        }
+
         $payMethods = PayMethod::all();
-        $activeTypes = ActiveType::all();
+
+        // Base query for ActiveType
+        $activeTypeQueryAll = ActiveType::select('active_types.*');
+
+        // Check the journal count
+        $journalCount = Journal::where('company_id', $company->id)->count();
+
+        $activeTypes = collect(); // Initialize empty collection
+
+        if ($journalCount === 1) {
+            // Build query with joins and conditions
+            $activeTypeQuery = $activeTypeQueryAll->where('company_id', $company->id)
+                ->join('accounts AS a', 'a.id', '=', 'active_types.account_id')
+                ->join('journal_entries AS je', 'a.id', '=', 'je.account_id')
+                ->groupBy('active_types.id', 'active_types.name')
+                ->havingRaw("(SELECT COALESCE(SUM(value), 0) FROM fixed_assets WHERE active_types.id = active_type_id) < COALESCE(SUM(je.debit), 0)");
+
+            // Fetch results with join
+            $activeTypes = $activeTypeQuery->get();
+        }
+
+        // Fallback: if $activeTypes is empty, fetch only base ActiveType data
+        if ($activeTypes->isEmpty()) {
+            $activeTypes = ActiveType::all();
+        }
 
         return Inertia::render('FixedAsset/Create', [
             'payMethods' => $payMethods,
@@ -60,26 +89,41 @@ class FixedAssetController extends Controller
     {
         $company = Company::first(); // Asegúrate de tener la empresa disponible
 
-        if (Journal::count() === 1) {
+        // Registro del Activo Fijo
+        $fixedAsset = $company->fixedassets()->create($fixedAssetStoreRequest->all());
 
-            // Sumar los valores de los activos fijos
-            $fixedAsset = FixedAsset::selectRaw('a.id, SUM(value) AS sumAmount')
-                ->join('accounts AS a', 'a.id', 'account_id')
-                ->groupBy('id')->get();
+        // Siempre journalCount > 0 porque registra antes
+        $sumFixedAssetValue = FixedAsset::where('company_id', $company->id)->sum('value');
+        $sumJournalItemDebit = JournalEntry::join('accounts AS a', 'a.id', 'account_id')
+            ->where('a.code', 'LIKE', '1.2.1%')
+            ->where('company_id', $company->id)->sum('debit');
 
-            // Sumar los activos fijos del ASIENTO DE SITUACION INICIAL
-            $journalEntryInitial = JournalEntry::selectRaw('a.id, SUM(debit) AS debit, SUM(have) AS have')
-                ->join('accounts AS a', 'a.id', 'account_id')
-                ->where('a.name', 'LIKE', "ASIENTO DE SITUACION INICIAL")
-                ->groupBy('id')->get();
+        // En este caso se genera el Asiento Contable
+        if ($sumFixedAssetValue > $sumJournalItemDebit) {
+            $journal = $company->journals()->create([
+                'date' => Carbon::now()->toDateString(),
+                'description' => 'Compra de ' . $fixedAssetStoreRequest->detail,
+                'is_deductible' => true,
+                'document_id' => $fixedAsset->id,
+                'table' => $fixedAsset->getTable(),
+                'user_id' => auth()->user()->id,
+            ]);
+
+            $activeType = ActiveType::find($fixedAssetStoreRequest->active_type_id);
+            $journal->journalentries()->createMany([
+                [
+                    'account_id' => $activeType->account_id,
+                    'debit' => $fixedAssetStoreRequest->value,
+                    'have' => 0,
+                ],
+                [
+                    // FALTA: analizar el vinculo de las Cuentas Por Pagar
+                    'account_id' => 58,
+                    'debit' => 0,
+                    'have' => $fixedAssetStoreRequest->value,
+                ],
+            ]);
         }
-        // En caso que este registrado solo el ASIENTO DE SITUACION INICIAL
-        // Y
-        // La suma de los activos fijos sean <= que la suma de los activos fijos del ASIENTO DE SITUACION INICIAL
-        // Registrar solo el activo fijo
-
-        $company->fixedassets()->create($fixedAssetStoreRequest->all());
-        // caso contrario generar ademas el asiento
 
         return to_route('fixedassets.index');
     }

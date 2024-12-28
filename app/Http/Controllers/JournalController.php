@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FixedAsset;
 use App\Models\Journal;
 use App\Models\Company;
 use App\Models\Account;
@@ -17,6 +18,20 @@ class JournalController extends Controller
     {
         $search = $request->input('search', '');
         $company = Company::first();
+
+        // Si tiene solo un Asiento validar que este cuadrado los Activos Fijos
+        $validateFixedAsset = true;
+        $journalCount = Journal::where('company_id', $company->id)->count();
+
+        if ($journalCount === 1) {
+            $sumFixedAssetValue = FixedAsset::where('company_id', $company->id)->sum('value');
+            $sumJournalItemDebit = JournalEntry::join('accounts AS a', 'a.id', 'account_id')
+                ->where('a.code', 'LIKE', '1.2.1%')
+                ->where('company_id', $company->id)->sum('debit');
+            if ($sumFixedAssetValue < $sumJournalItemDebit) {
+                $validateFixedAsset = false;
+            }
+        }
 
         $journals = Journal::with('journalentries')
             ->when($search, function ($query, $search) {
@@ -49,6 +64,7 @@ class JournalController extends Controller
 
         return inertia('Journal/Index', [
             'journals' => $journals,
+            'validateFixedAsset' => $validateFixedAsset,
             'filters' => [
                 'search' => $search
             ], // Mantener los filtros

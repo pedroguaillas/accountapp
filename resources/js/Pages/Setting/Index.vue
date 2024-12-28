@@ -12,7 +12,6 @@ import { ref } from "vue";
 const props = defineProps({
     activeTypes: { type: Array, default: () => ([]) },
     accounts: { type: Array, default: () => ([]) },
-    payMethods: { type: Array, default: () => ([]) },
 });
 
 // Refs
@@ -90,34 +89,8 @@ const selectAccount = (accountId) => {
                 </tbody>
             </Table>
 
-            <h3 class="mt-2">Métodos de pago</h3>
-            <hr />
-
-            <Table>
-                <thead>
-                    <tr>
-                        <th class="w-10">N.</th>
-                        <th class="text-left">DESCRIPCION</th>
-                        <th>CUENTA</th>
-                    </tr>
-                </thead>
-                <tbody class="h-6">
-                    <tr v-for="(payMethod, i) in props.payMethods" :key="`payMethod-${i}`">
-                        <td>{{ i + 1 }}</td>
-                        <td class="text-left">{{ payMethod.name }}</td>
-                        <td>
-                            <div class="flex h-8">
-                                <input type="text"
-                                    class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" />
-                                <button @click="editPayMethod(payMethod.id)"
-                                    class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
-                                    <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </Table>
+            <!-- <h3 class="mt-2">Métodos de pago</h3>
+            <hr /> -->
         </div>
     </AdminLayout>
     <ModalSelectAccount :show="modal" :accounts="accounts" @close="toggle" @selectAccount="selectAccount" />
