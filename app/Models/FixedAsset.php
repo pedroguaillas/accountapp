@@ -25,6 +25,7 @@ class FixedAsset extends Model
         'residual_value',   //valor residual del af
         'date_end',         //fecha de finalizacion de la depreciacion
     ];
+
     protected $casts = [
         'is_depretation_a' => 'boolean',
         'is_legal' => 'boolean',
@@ -34,6 +35,12 @@ class FixedAsset extends Model
         'residual_value' => 'float',
         'date_end' => 'date',
     ];
+
+    public function depreciations()
+    {
+        return $this->hasMany(Depreciation::class);
+    }
+
     public function paymethod()
     {
         return $this->belongsTo(PayMethod::class);

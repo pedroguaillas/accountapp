@@ -51,7 +51,6 @@ class ProcessPaymenRole implements ShouldQueue
                 'date' => Carbon::now()->format('Y-m-d'), // Fecha dinámica
             ]);
 
-
             // Calcular horas ordinarias, horas extras y adelanto
             $ho = $this->calcularHorasOrdinarias($employee);
             $he = $this->calcularHorasExtras($employee);
@@ -95,11 +94,8 @@ class ProcessPaymenRole implements ShouldQueue
             // Crear las relaciones de ingresos y egresos para el rol de pago
             $paymentRole->paymentroleingresses()->createMany($inputpaymentroleingress);
             $paymentRole->paymentroleegresses()->createMany($inputpaymentroleegress);
-
         }
-
     }
-
 
     private function calcularIngreso($roleingress, $employee, $ho, $he, $remuneration, $au)
     {
@@ -122,8 +118,6 @@ class ProcessPaymenRole implements ShouldQueue
                 return 0;
         }
     }
-
-
 
     private function calcularEgreso($roleegress, $remuneration, $as)
     {

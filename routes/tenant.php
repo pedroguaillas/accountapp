@@ -7,6 +7,7 @@ use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
+use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PaymentRoleController;
 use App\Http\Controllers\FixedAssetController;
@@ -96,8 +97,8 @@ Route::middleware([
         Route::resource('account', AccountController::class)->only(['store', 'update', 'delete']);
 
         // Emparejamiento de cuentas
-        Route::get('vinculacion-contable', [SettingAccountController::class, 'index'])->name(name: 'index');
-        Route::put('settingaccount/update/{activeType}', [SettingAccountController::class, 'update'])->name('settingaccount.update');
+        Route::get('vinculacion-contable', [SettingAccountController::class, 'index'])->name('setting.account.index');
+        Route::put('settingaccount/update/{activeType}', [SettingAccountController::class, 'updateActiveTypeAccount'])->name('settingaccount.update');
 
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
@@ -113,6 +114,9 @@ Route::middleware([
         Route::get('activos-fijos/editar/{fixedAssetId}', [FixedAssetController::class, 'edit'])->name('fixedassets.edit');
         Route::put('fixedassets/{fixedAsset}', [FixedAssetController::class, 'update'])->name('fixedassets.update');
         Route::delete('fixedassets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('fixedassets.delete');
+
+        // Depreciaciones
+        Route::get('depreciaciones', [DepreciationController::class, 'index'])->name('depreciations.index');
 
         // intngible assets  //poner las rutas con nombre en plural 
         Route::get('activos-intangibles', [IntangibleAssetController::class, 'index'])->name('intangibleassets.index');

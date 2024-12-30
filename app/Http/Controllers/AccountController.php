@@ -48,5 +48,7 @@ class AccountController extends Controller
 
         // Importar el archivo Excel a la tabla 'accounts'
         Excel::import(new AccountsImport, $request->file('file'));
+
+        return to_route('setting.account.index');
     }
 }

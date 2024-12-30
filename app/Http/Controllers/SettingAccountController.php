@@ -14,14 +14,23 @@ class SettingAccountController extends Controller
     {
         $company = Company::first();
 
-        $activeTypes = ActiveType::selectRaw("active_types.*, accounts.code || ' - ' || accounts.name AS account_info")
-            ->leftJoin('accounts', 'active_types.account_id', '=', 'accounts.id')
+        $activeTypes = ActiveType::selectRaw(
+            "active_types.*," .
+            "a.code || ' - ' || a.name AS a_info," .
+            "ad.code || ' - ' || ad.name AS ad_info," .
+            "ads.code || ' - ' || ads.name AS ads_info"
+        )
+            ->leftJoin('accounts AS a', 'account_id', '=', 'a.id')
+            ->leftJoin('accounts AS ad', 'account_dep_id', '=', 'ad.id')
+            ->leftJoin('accounts AS ads', 'account_dep_spent_id', '=', 'ads.id')
+            ->where('active_types.company_id', $company->id)
             ->orderBy('id')
             ->get();
 
         $accounts = Account::select('id', 'code', 'name')
             ->where('is_detail', true)
-            ->where('company_id', $company->id)->get();
+            ->where('company_id', $company->id)
+            ->get();
 
         return Inertia::render('Setting/Index', [
             'activeTypes' => $activeTypes,
@@ -29,10 +38,8 @@ class SettingAccountController extends Controller
         ]);
     }
 
-    public function update(Request $request, ActiveType $activeType)
+    public function updateActiveTypeAccount(Request $request, ActiveType $activeType)
     {
-        $activeType->update([
-            'account_id' => $request->account_id
-        ]);
+        $activeType->update([$request->name => $request->account_id]);
     }
 }

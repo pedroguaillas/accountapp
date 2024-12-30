@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class IntangibleAssetController extends Controller
 {
-
-
     public function index(Request $request)
     {
         $company = Company::first();
@@ -30,7 +28,6 @@ class IntangibleAssetController extends Controller
             $intangibleAssetssQuery->where('code', 'LIKE', '%' . $search . '%');
         }
 
-        // Paginación
         $intangibleAssetss = $intangibleAssetssQuery->paginate(10)->withQueryString();
 
         return Inertia::render('IntangibleAsset/Index', [
@@ -42,7 +39,6 @@ class IntangibleAssetController extends Controller
     public function create()
     {
         $payMethods = PayMethod::all();
-
 
         return Inertia::render('IntangibleAsset/Create', [
             'payMethods' => $payMethods,
@@ -88,15 +84,12 @@ class IntangibleAssetController extends Controller
             ->where('id', $intangibleAsset_id)
             ->first();
 
-        //dd($intangibleAsset);
-
         $payMethods = PayMethod::all();
 
         return Inertia::render('IntangibleAsset/Edit', [
             'intangibleAsset' => $intangibleAsset,
             'payMethods' => $payMethods,
         ]);
-
     }
 
     public function update(Request $request, IntangibleAsset $intangibleasset)
@@ -121,7 +114,6 @@ class IntangibleAssetController extends Controller
         return redirect()->route('intangibleassets.index')->with('success', 'Activo intangible actualizado exitosamente.');
     }
 
-
     public function destroy(int $intangibleassetId)
     {
         $intangibleasset = IntangibleAsset::findOrFail($intangibleassetId);
@@ -132,5 +124,4 @@ class IntangibleAssetController extends Controller
             'message' => 'Activo fijo eliminado correctamente.',
         ]);
     }
-
 }

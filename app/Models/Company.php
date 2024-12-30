@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Company extends Model
 {
-    use HasFactory,  SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'ruc',
@@ -38,6 +38,11 @@ class Company extends Model
         ];
     }
 
+    public function activeTypes()
+    {
+        return $this->hasMany(ActiveType::class);//relacion muchos a muchos 
+    }
+
     public function paymethods()
     {
         return $this->hasMany(PayMethod::class);//relacion muchos a muchos 
@@ -47,6 +52,7 @@ class Company extends Model
     {
         return $this->hasMany(Branch::class);//relacion muchos a muchos 
     }
+
     public function accounts()
     {
         return $this->hasMany(Account::class);
@@ -91,6 +97,7 @@ class Company extends Model
     {
         return $this->hasMany(PaymentRole::class);
     }
+    
     public function paymentroleingresses()
     {
         return $this->hasMany(PaymentRoleIngress::class);

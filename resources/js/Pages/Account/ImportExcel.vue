@@ -18,9 +18,6 @@ const handleFileChange = (event) => {
 
 const submit = (file) => {
     router.post(`accounts/import`, { file }, {
-        onSuccess: () => {
-            console.log('Bien')
-        },
         onError: (err) => {
             alert(err)
         }

@@ -64,7 +64,7 @@ class FixedAssetController extends Controller
 
         if ($journalCount === 1) {
             // Build query with joins and conditions
-            $activeTypeQuery = $activeTypeQueryAll->where('company_id', $company->id)
+            $activeTypeQuery = $activeTypeQueryAll->where('active_types.company_id', $company->id)
                 ->join('accounts AS a', 'a.id', '=', 'active_types.account_id')
                 ->join('journal_entries AS je', 'a.id', '=', 'je.account_id')
                 ->groupBy('active_types.id', 'active_types.name')
