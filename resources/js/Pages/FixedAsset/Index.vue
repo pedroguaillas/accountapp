@@ -10,7 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { TrashIcon, PencilIcon, ArrowTrendingDownIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
@@ -138,6 +138,9 @@ const handlePageChange = async (page) => {
                   </button>
                   <Link class="rounded px-2 py-1 bg-blue-500 text-white" :href="route('fixedassets.edit', fixe.id)">
                   <PencilIcon class="size-4 text-white" />
+                  </Link>
+                  <Link class="rounded px-2 pt-1 pb-0 bg-blue-800 text-white" :href="route('depreciations.index', fixe.id)">
+                  <ArrowTrendingDownIcon class="size-4 text-white" />
                   </Link>
                 </div>
               </td>

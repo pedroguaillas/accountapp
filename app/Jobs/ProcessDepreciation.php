@@ -33,9 +33,12 @@ class ProcessDepreciation implements ShouldQueue
         $userId = auth()->user()->id;
 
         // Extraer cada Activo Fijo
-        $fixedAssets = FixedAsset::where('company_id', $company->id)
+        $fixedAssets = FixedAsset::selectRaw("fixed_assets.id,fixed_assets.value,residual_value,period,date_acquisition,SUM(d.accumulated) AS sum_accumulated")
+            ->leftJoin('depreciations AS d', 'fixed_asset_id', 'fixed_assets.id')
+            ->where('company_id', $company->id)
             ->where('is_depretation_a', true)
             ->where('period', '>', 0)
+            ->groupBy('fixed_assets.id', 'fixed_assets.value', 'residual_value', 'period', 'date_acquisition')
             ->get();
 
         // Determinar el valor a Depreciar y Registrar
@@ -45,27 +48,32 @@ class ProcessDepreciation implements ShouldQueue
             $baseMonths = $fixedAsset->period * 12;
             $valueDepreciation = $base / $baseMonths;
 
+            if ($fixedAsset->sum_accumulated !== null) {
+                $valueDepreciation = ($valueDepreciation / 30) * $this->calDays($fixedAsset->date_acquisition);
+            }
+
             $fixedAsset->depreciations()->create([
                 'date' => $date,
                 'percentage' => 20.0,
                 'amount' => $base,
                 'value' => $valueDepreciation,
-                'acumulation' => $valueDepreciation,
+                'accumulated' => $valueDepreciation + $fixedAsset->sum_accumulated,
             ]);
         }
 
         // De las Depreciaciones extraer agrupado por Tipo de Activo para Registrar el Asiento Contable
-        $activeTypes = ActiveType::selectRaw('active_types.id,account_id,name,SUM(d.value) AS value_depreciation')
+        $activeTypes = ActiveType::selectRaw('active_types.*,SUM(d.value) AS value_depreciation')
             ->join('fixed_assets AS fa', 'active_type_id', 'active_types.id')
-            ->join('depreciations AS d', 'fixed_asset_id', 'fixed_assets.id')
-            ->where('date')
-            ->groupBy('id', 'account_id', 'name')
+            ->join('depreciations AS d', 'fixed_asset_id', 'fa.id')
+            ->where("d.date", $date)
+            ->groupBy('active_types.id')
             ->get();
 
         foreach ($activeTypes as $activeType) {
             $journal = $company->journals()->create([
                 'date' => $date,
-                'description' => 'DEP MENSUAL ' . $activeType->name,
+                'description' => 'Dep Mensual ' . $activeType->name,
+                // NOTA preguntar si es deducible
                 'is_deductible' => true,
                 'user_id' => $userId,
             ]);
@@ -83,5 +91,12 @@ class ProcessDepreciation implements ShouldQueue
                 ],
             ]);
         }
+    }
+
+    private function calDays($date)
+    {
+        $diasDelMesActual = Carbon::now()->daysInMonth;
+
+        return $diasDelMesActual - $date->day;
     }
 }

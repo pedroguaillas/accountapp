@@ -116,7 +116,7 @@ Route::middleware([
         Route::delete('fixedassets/{fixedAsset}', [FixedAssetController::class, 'destroy'])->name('fixedassets.delete');
 
         // Depreciaciones
-        Route::get('depreciaciones', [DepreciationController::class, 'index'])->name('depreciations.index');
+        Route::get('depreciaciones/{fixedAsset}', [DepreciationController::class, 'index'])->name('depreciations.index');
 
         // intngible assets  //poner las rutas con nombre en plural 
         Route::get('activos-intangibles', [IntangibleAssetController::class, 'index'])->name('intangibleassets.index');

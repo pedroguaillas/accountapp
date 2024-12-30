@@ -17,4 +17,14 @@ class Depreciation extends Model
         'value',
         'accumulated',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'date' => 'date',
+            'percentage' => 'float',
+            'amount' => 'float',
+            'accumulated' => 'float',
+        ];
+    }
 }
