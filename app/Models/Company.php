@@ -107,4 +107,10 @@ class Company extends Model
     {
         return $this->hasMany(PaymentRoleEgress::class);
     }
+
+    public function hours()
+    {
+        return $this->hasMany(Hour::class);
+    }
+
 }

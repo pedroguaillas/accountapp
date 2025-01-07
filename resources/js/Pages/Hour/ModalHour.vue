@@ -9,7 +9,7 @@ import { useFocusNextField } from "@/composables/useFocusNextField";
 
 // Props
 const props = defineProps({
-  advance: { type: Object, default: () => ({}) },
+  hour: { type: Object, default: () => ({}) },
   error: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
   employees: { type: Array, default: () => [] },
@@ -29,21 +29,21 @@ const employeesOptions = props.employees.map((employee) => ({
 }));
 
 const typeOptions = [
-  { value: "utilidad", label: "UTILIDAD" },
-  { value: "salario", label: "SALARIO" },
+  { value: "extra", label: "EXTRA" },
+  { value: "normal", label: "NORMAL" },
 ];
 
 // Establecer la fecha actual si no está definida en advance.date
-if (!props.advance.date) {
+if (!props.hour.date) {
   const currentDate = new Date().toISOString().split("T")[0]; // Obtener la fecha actual en formato YYYY-MM-DD
-  props.advance.date = currentDate;
+  props.hour.date = currentDate;
 }
 </script>
 
 
 <template>
   <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">
-    <template #title> Ingreso de adelantos </template>
+    <template #title> Ingreso de horas </template>
     <template #content>
       <div class="mt-4">
         <form
@@ -54,7 +54,7 @@ if (!props.advance.date) {
             <InputLabel for="employee_id" value="Empleado" />
             <DynamicSelect
               class="mt-1 block w-full"
-              v-model="advance.employee_id"
+              v-model="hour.employee_id"
               :options="employeesOptions"
               autofocus
             />
@@ -64,7 +64,7 @@ if (!props.advance.date) {
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="detail" value="Detalle" />
             <TextInput
-              v-model="advance.detail"
+              v-model="hour.detail"
               type="text"
               class="mt-1 block w-full"
               minlength="3"
@@ -75,9 +75,9 @@ if (!props.advance.date) {
           </div>
 
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="amount" value="Monto" />
+            <InputLabel for="amount" value="Cantidad" />
             <TextInput
-              v-model="advance.amount"
+              v-model="hour.amount"
               type="number"
               class="mt-1 block w-full"
               minlength="3"
@@ -88,10 +88,10 @@ if (!props.advance.date) {
           </div>
 
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="active_type_id" value="Tipo de avance" />
+            <InputLabel for="active_type_id" value="Tipo de horas" />
             <DynamicSelect
               class="mt-1 block w-full"
-              v-model="advance.type"
+              v-model="hour.type"
               :options="typeOptions"
               autofocus
             />
@@ -101,7 +101,7 @@ if (!props.advance.date) {
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="date" value="Fecha" />
             <TextInput
-              v-model="advance.date"
+              v-model="hour.date"
               type="date"
               class="mt-1 block w-full"
             />

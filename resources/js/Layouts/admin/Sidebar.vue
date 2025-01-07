@@ -125,6 +125,12 @@ const user = computed(() => page.props.auth.user);
                   class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
                 Adelantos</Link>
               </li>
+
+              <li>
+                <Link :href="route('hours.index')"
+                  class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">
+                Horas Extra-Normales</Link>
+              </li>
               <li>
                 <Link :href="route('paymentrol.index')"
                   class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700">

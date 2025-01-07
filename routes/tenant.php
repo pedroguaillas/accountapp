@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdvanceController;
+use App\Http\Controllers\HourController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CostCenterController;
@@ -152,5 +153,12 @@ Route::middleware([
         Route::get('roles-egresos', [RoleEgressController::class, 'index'])->name('roleegress.index');
         Route::delete('roleegresses/{egressId}', [RoleEgressController::class, 'destroy'])->name('roleegress.delete');
         Route::resource('roleegresses', RoleEgressController::class)->only(['store', 'update']);
+    
+            //horas
+        Route::get('horas', [HourController::class, 'index'])->name('hours.index');
+        Route::post('hours', [HourController::class, 'store'])->name('hours.store');
+        Route::put('hours/{hour}', [HourController::class, 'update'])->name('hours.update');
+        Route::delete('hours/{hour}', [HourController::class, 'destroy'])->name('hours.delete');
+
     });
 });
