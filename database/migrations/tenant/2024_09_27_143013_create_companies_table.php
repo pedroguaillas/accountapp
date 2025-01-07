@@ -351,6 +351,21 @@ return new class extends Migration {
             $table->foreign('role_egress_id')->references('id')->on('role_egresses');
             $table->foreign('company_id')->references('id')->on('companies');
         });
+
+        Schema::create('hours', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('employee_id');
+            $table->bigInteger('company_id');
+            $table->string('detail')->nullable();
+            $table->decimal('amount', 14, 2)->default(0);
+            $table->date('date');
+            $table->string('type');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
     }
 
     /**
@@ -374,5 +389,6 @@ return new class extends Migration {
         Schema::dropIfExists('employees');
         Schema::dropIfExists('advances');
         Schema::dropIfExists('payment_roles');
+        Schema::dropIfExists('hours');
     }
 };

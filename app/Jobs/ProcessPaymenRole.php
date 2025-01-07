@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Models\PaymentRole;
 use App\Models\Employee;
+use App\Models\Hour;
+use App\Models\Advance;
 use App\Models\Company;
 use App\Models\RoleIngress;
 use App\Models\RoleEgress;
@@ -20,6 +22,7 @@ class ProcessPaymenRole implements ShouldQueue
      */
     public function __construct()
     {
+        ProcessPaymenRole::dispatch();
     }
 
     /**
@@ -135,25 +138,56 @@ class ProcessPaymenRole implements ShouldQueue
 
     private function calcularHorasOrdinarias($employee)
     {
-        // Lógica para calcular horas ordinarias
-        return 0; // Ejemplo
+        $mesActual = Carbon::now()->month;
+        $anioActual = Carbon::now()->year;
+
+        // Sumar horas ordinarias del mes y año actual
+        return Hour::where('employee_id', $employee->id)
+            ->where('type', 'normal') // Tipo de hora ordinaria
+            ->whereMonth('date', $mesActual)
+            ->whereYear('date', $anioActual)
+            ->sum('amount');
+
     }
 
     private function calcularHorasExtras($employee)
     {
-        // Lógica para calcular horas extras
-        return 0; // Ejemplo
+        $mesActual = Carbon::now()->month;
+        $anioActual = Carbon::now()->year;
+
+        // Sumar horas extras del mes y año actual
+        return Hour::where('employee_id', $employee->id)
+            ->where('type', 'extra') // Tipo de hora extra
+            ->whereMonth('date', $mesActual)
+            ->whereYear('date', $anioActual)
+            ->sum('amount');
     }
 
     private function calcularAdelanto($employee)
     {
-        // Lógica para calcular adelanto
-        return 0; // Ejemplo
+        $mesActual = Carbon::now()->month;
+        $anioActual = Carbon::now()->year;
+
+        // Sumar adelantos de tipo 'salario' para el empleado en el mes y año actuales
+        return Advance::where('employee_id', $employee->id)
+            ->where('type', 'salario') // Tipo de adelanto: salario
+            ->whereMonth('date', $mesActual)
+            ->whereYear('date', $anioActual)
+            ->sum('amount');
     }
 
     private function calcularAdelantoS($employee)
     {
-        // Lógica para calcular adelanto
-        return 0; // Ejemplo
+        $mesActual = Carbon::now()->month;
+        $anioActual = Carbon::now()->year;
+
+        // Sumar adelantos de tipo 'utilidad' para el empleado en el mes y año actuales
+        return Advance::where('employee_id', $employee->id)
+            ->where('type', 'utilidad') // Tipo de adelanto: utilidad
+            ->whereMonth('date', $mesActual)
+            ->whereYear('date', $anioActual)
+            ->sum('amount');
     }
+
+
 }
