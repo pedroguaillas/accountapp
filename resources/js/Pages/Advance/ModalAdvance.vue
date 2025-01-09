@@ -15,8 +15,6 @@ const props = defineProps({
   employees: { type: Array, default: () => [] },
 });
 
-
-
 const { focusNextField } = useFocusNextField();
 
 // Emits
@@ -33,13 +31,17 @@ const typeOptions = [
   { value: "salario", label: "SALARIO" },
 ];
 
+const paymethodOptions = [
+  { value: "banco", label: "CHEQUE O TRANSFERENCIA" },
+  { value: "caja", label: "CAJA O EFECTIVO" },
+];
+
 // Establecer la fecha actual si no está definida en advance.date
 if (!props.advance.date) {
   const currentDate = new Date().toISOString().split("T")[0]; // Obtener la fecha actual en formato YYYY-MM-DD
   props.advance.date = currentDate;
 }
 </script>
-
 
 <template>
   <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">
@@ -96,6 +98,20 @@ if (!props.advance.date) {
               autofocus
             />
             <InputError :message="error.type" class="mt-2" />
+          </div>
+
+          <!-- Mostrar el campo de métodos de pago solo si el tipo es "salario" -->
+          <div
+            v-if="advance.type === 'salario'"
+            class="col-span-6 sm:col-span-4"
+          >
+            <InputLabel for="payment_type" value="Tipo de pago" />
+            <DynamicSelect
+              class="mt-1 block w-full"
+              v-model="advance.payment_type"
+              :options="paymethodOptions"
+            />
+            <InputError :message="error.payment_type" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">

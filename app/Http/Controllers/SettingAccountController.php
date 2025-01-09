@@ -30,9 +30,14 @@ class SettingAccountController extends Controller
         $accounts = Account::select('id', 'code', 'name')
             ->where('is_detail', true)
             ->where('company_id', $company->id)
+            ->where(function ($query) {
+                $query->where('code', 'like', '1%')
+                    ->orWhere('code', 'like', '5%');
+            })
+            ->orderBy("code")
             ->get();
 
-        return Inertia::render('Setting/Index', [
+        return Inertia::render('Business/AccountLink/Setting/Index', [
             'activeTypes' => $activeTypes,
             'accounts' => $accounts,
         ]);

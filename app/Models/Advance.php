@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Advance extends Model
 {
-    use HasFactory,  SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'detail',                 // Categoria del activo fijo
@@ -16,6 +16,7 @@ class Advance extends Model
         'employee_id',           // Vinculo con el empleado
         'company_id',//cinculo con la compania
         'type',//tipo sea salario o utilidad
+        'payment_type',//tipo de pago
         'date',//fecha del anticipo
 
     ];

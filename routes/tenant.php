@@ -11,6 +11,7 @@ use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PaymentRoleController;
+use App\Http\Controllers\AccountLinkController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
 use App\Http\Controllers\RoleIngressController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\RoleEgressController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\SettingAccountController;
+use App\Http\Controllers\SettingRolController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -97,10 +99,6 @@ Route::middleware([
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
         Route::resource('account', AccountController::class)->only(['store', 'update', 'delete']);
 
-        // Emparejamiento de cuentas
-        Route::get('vinculacion-contable', [SettingAccountController::class, 'index'])->name('setting.account.index');
-        Route::put('settingaccount/update/{activeType}', [SettingAccountController::class, 'updateActiveTypeAccount'])->name('settingaccount.update');
-
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
@@ -153,12 +151,23 @@ Route::middleware([
         Route::get('roles-egresos', [RoleEgressController::class, 'index'])->name('roleegress.index');
         Route::delete('roleegresses/{egressId}', [RoleEgressController::class, 'destroy'])->name('roleegress.delete');
         Route::resource('roleegresses', RoleEgressController::class)->only(['store', 'update']);
-    
-            //horas
+
+        //horas
         Route::get('horas', [HourController::class, 'index'])->name('hours.index');
         Route::post('hours', [HourController::class, 'store'])->name('hours.store');
         Route::put('hours/{hour}', [HourController::class, 'update'])->name('hours.update');
         Route::delete('hours/{hour}', [HourController::class, 'destroy'])->name('hours.delete');
 
+        // Vinculacion general de cuentas
+        Route::get('empresa/ajuste/vinculacioncuentas', [AccountLinkController::class, 'roles'])->name('business.setting.roles');
+        Route::get('settingsaccountlink', [AccountLinkController::class, 'roles'])->name('business.setting.roles');
+
+        // Emparejamiento de cuentas activo fijo
+        Route::get('vinculacion-contable/activos-fijos', [SettingAccountController::class, 'index'])->name('setting.account.index');
+        Route::put('settingaccount/update/{activeType}', [SettingAccountController::class, 'updateActiveTypeAccount'])->name('settingaccount.update');
+
+        // Emparejamiento de cuentas roles
+        Route::get('vinculacion-contable/roles', [SettingRolController::class, 'index'])->name('setting.account.rol.index');
+        Route::put('settingaccountrol/update/{id}', [SettingRolController::class, 'updateRoleAccount'])->name('settingaccount.rol.update');
     });
 });

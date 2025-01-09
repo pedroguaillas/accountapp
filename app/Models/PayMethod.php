@@ -14,6 +14,7 @@ class PayMethod extends Model
         'account_id',   // Vinculo con la cuenta contable
         'code',         // Codigo del metodo de pago
         'name',         // Nombre del method de pago
+        
     ];
 
     protected $casts = [

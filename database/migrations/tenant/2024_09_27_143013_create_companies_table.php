@@ -107,6 +107,7 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign("company_id")->references("id")->on("companies");
+            $table->unique(['company_id', 'code']);
         });
 
         Schema::create('accounts', function (Blueprint $table) {
@@ -122,6 +123,7 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign("company_id")->references("id")->on("companies");
+            $table->unique(['company_id', 'code']);
         });
 
         Schema::create('active_types', function (Blueprint $table) {
@@ -192,6 +194,7 @@ return new class extends Migration {
             $table->foreign('pay_method_id')->references('id')->on('pay_methods');
             $table->foreign('company_id')->references('id')->on('companies');
             $table->foreign('active_type_id')->references('id')->on('active_types');
+            $table->unique(['company_id', 'code']);
         });
 
         Schema::create('depreciations', function (Blueprint $table) {
@@ -226,6 +229,7 @@ return new class extends Migration {
 
             $table->foreign('pay_method_id')->references('id')->on('pay_methods');
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->unique(['company_id', 'code']);
         });
 
         Schema::create('amortizations', function (Blueprint $table) {
@@ -264,8 +268,8 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->unique(['company_id', 'cuit']);
         });
-
 
         Schema::create('advances', function (Blueprint $table) {
             $table->id();
@@ -275,6 +279,7 @@ return new class extends Migration {
             $table->decimal('amount', 14, 2)->default(0);
             $table->date('date');
             $table->string('type');
+            $table->string('payment_type')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
@@ -288,10 +293,15 @@ return new class extends Migration {
             $table->string('code');
             $table->string('name');
             $table->string('type');
+            $table->bigInteger('account_active_id')->nullable();
+            $table->bigInteger('account_pasive_id')->nullable();
+            $table->bigInteger('account_spent_id')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->unique(['company_id', 'code']);
         });
 
         Schema::create('role_egresses', function (Blueprint $table) {
@@ -300,10 +310,15 @@ return new class extends Migration {
             $table->string('code');
             $table->string('name');
             $table->string('type');
+            $table->bigInteger('account_active_id')->nullable();
+            $table->bigInteger('account_pasive_id')->nullable();
+            $table->bigInteger('account_spent_id')->nullable();
+            
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('company_id')->references('id')->on('companies');
+            $table->unique(['company_id', 'code']);
         });
 
         Schema::create('payment_roles', function (Blueprint $table) {
@@ -316,6 +331,7 @@ return new class extends Migration {
             $table->decimal('salary', 14, 2)->default(0);
             $table->decimal('salary_receive', 14, 2)->default(0);
             $table->date('date');
+            $table->string('state')->default("CREADO");;
             $table->timestamps();
             $table->softDeletes();
 
@@ -336,7 +352,6 @@ return new class extends Migration {
             $table->foreign('role_ingress_id')->references('id')->on('role_ingresses');
             $table->foreign('company_id')->references('id')->on('companies');
         });
-
 
         Schema::create('payment_role_egresses', function (Blueprint $table) {
             $table->id();
