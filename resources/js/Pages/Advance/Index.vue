@@ -32,6 +32,7 @@ const initialAdvance = {
   amount: "",
   employee_id: "",
   type: "",
+  payment_type: "",
   date,
 };
 

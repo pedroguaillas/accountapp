@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\PaymentRole;
 use App\Models\PaymentRoleIngress;
 use App\Models\PaymentRoleEgress;
+use App\Jobs\ProcessPaymenRole;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -23,9 +24,8 @@ class PaymentRoleController extends Controller
         $month = $request->input('month', $date->month);
         $company = Company::first();
 
-       // $job = new ProcessPaymenRole();
-        //$job->handle();
-
+        $job = new ProcessPaymenRole();
+        $job->handle();
         // Consulta principal con relaciones
         $paymentroles = PaymentRole::with(['employee', 'paymentroleingresses.roleIngress', 'paymentroleegresses.roleEgress'])
             ->when($search, function ($query, $search) {

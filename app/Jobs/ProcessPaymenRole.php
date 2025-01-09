@@ -22,7 +22,7 @@ class ProcessPaymenRole implements ShouldQueue
      */
     public function __construct()
     {
-        ProcessPaymenRole::dispatch();
+      
     }
 
     /**
@@ -57,8 +57,8 @@ class ProcessPaymenRole implements ShouldQueue
             // Calcular horas ordinarias, horas extras y adelanto
             $ho = $this->calcularHorasOrdinarias($employee);
             $he = $this->calcularHorasExtras($employee);
-            $au = $this->calcularAdelanto($employee);
-            $as = $this->calcularAdelantoS($employee);
+            $as = $this->calcularAdelanto($employee);
+            $au = $this->calcularAdelantoS($employee);
             $remuneration = $employee->salary + $ho + $he;
 
             // Ingresos (para todos los roles de ingresos)
@@ -141,6 +141,7 @@ class ProcessPaymenRole implements ShouldQueue
         $mesActual = Carbon::now()->month;
         $anioActual = Carbon::now()->year;
 
+
         // Sumar horas ordinarias del mes y año actual
         return Hour::where('employee_id', $employee->id)
             ->where('type', 'normal') // Tipo de hora ordinaria
@@ -168,6 +169,7 @@ class ProcessPaymenRole implements ShouldQueue
         $mesActual = Carbon::now()->month;
         $anioActual = Carbon::now()->year;
 
+
         // Sumar adelantos de tipo 'salario' para el empleado en el mes y año actuales
         return Advance::where('employee_id', $employee->id)
             ->where('type', 'salario') // Tipo de adelanto: salario
@@ -180,6 +182,7 @@ class ProcessPaymenRole implements ShouldQueue
     {
         $mesActual = Carbon::now()->month;
         $anioActual = Carbon::now()->year;
+      
 
         // Sumar adelantos de tipo 'utilidad' para el empleado en el mes y año actuales
         return Advance::where('employee_id', $employee->id)

@@ -31,6 +31,7 @@ const selectedMonth = ref(props.filters.month); // Mes seleccionado
 const years = [
   { value: "2023", label: "2023" },
   { value: "2024", label: "2024" },
+  { value: "2025", label: "2025" },
 ];
 
 // Generar un arreglo de meses
