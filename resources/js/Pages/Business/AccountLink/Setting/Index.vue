@@ -6,6 +6,10 @@ import ModalSelectAccount from "../ModalSelectAccount.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import { Link, router } from "@inertiajs/vue3";
 import { ref } from "vue";
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/outline";
 
 // Props
 const props = defineProps({
@@ -15,12 +19,17 @@ const props = defineProps({
 
 // Refs
 const modal = ref(true);
+const modaldelete = ref(true);
 const activeTypeId = ref(0);
 const activeTypeName = ref("");
 const accounts = ref(props.accounts);
 
 const toggle = () => {
   modal.value = !modal.value;
+};
+
+const toggle1 = () => {
+  modaldelete.value = !modaldelete.value;
 };
 
 const editActiveType = (activeTypeIdEdit, activeTypeNameEdit) => {
@@ -43,6 +52,28 @@ const selectAccount = (accountId) => {
     { preserveState: true }
   );
   toggle();
+};
+
+const removeVinculation = (activeTypeIdD, activeTypeNameD) => {
+  activeTypeId.value = activeTypeIdD;
+  activeTypeName.value = activeTypeNameD;
+  toggle1();
+};
+
+const handleInputChange = () => {
+  axios
+    .put(
+      route("settingaccount.update", activeTypeId.value),
+      { name: activeTypeName.value, account_id: null },
+      { preserveState: true }
+    ) // Eliminar centro de costos
+    .then(() => {
+      // Después de eliminar el centro de costos, redirigir a la ruta deseada
+      router.visit(route("setting.account.index"));
+    })
+    .catch((error) => {
+      console.error("Error al eliminar la vinculacion", error);
+    });
 };
 </script>
 
@@ -71,7 +102,15 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="activeType.a_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
+
+              <button
+                class=" px-1 py-1 border border-red-400"
+                @click="removeVinculation(activeType.id, 'account_id')"
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
               <button
                 @click="editActiveType(activeType.id, 'account_id')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
@@ -86,7 +125,15 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="activeType.ad_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
+
+              <button
+                class=" px-1 py-1 border border-red-400"
+                @click="removeVinculation(activeType.id, 'account_dep_id')"
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
               <button
                 @click="editActiveType(activeType.id, 'account_dep_id')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
@@ -101,7 +148,17 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="activeType.ads_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
+              <button
+                class=" px-1 py-1 border border-red-400"
+                @click="
+                  removeVinculation(activeType.id, 'account_dep_spent_id')
+                "
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
+
               <button
                 @click="editActiveType(activeType.id, 'account_dep_spent_id')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
@@ -121,4 +178,19 @@ const selectAccount = (accountId) => {
     @close="toggle"
     @selectAccount="selectAccount"
   />
+
+  <ConfirmationModal :show="modaldelete">
+    <template #title> ELIMINAR VINCULACION </template>
+    <template #content>
+      Esta seguro de eliminar la vinculación de la cuenta?
+    </template>
+    <template #footer>
+      <SecondaryButton class="mr-2" type="button" @click="toggle1()"
+        >Cancelar</SecondaryButton
+      >
+      <PrimaryButton type="button" @click="handleInputChange()"
+        >Aceptar</PrimaryButton
+      >
+    </template>
+  </ConfirmationModal>
 </template>

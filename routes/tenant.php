@@ -141,6 +141,7 @@ Route::middleware([
         //roles
         Route::get('roles-de-pago', [PaymentRoleController::class, 'index'])->name('paymentrol.index');
         Route::put('paymentroles/{id}', [PaymentRoleController::class, 'update'])->name('paymentrol.update');
+        Route::get('paymentroles/export', [PaymentRoleController::class, 'export'])->name('paymentrol.export');
 
         // ingresos
         Route::get('roles-ingresos', [RoleIngressController::class, 'index'])->name('roleingress.index');

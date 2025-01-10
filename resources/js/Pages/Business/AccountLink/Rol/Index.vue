@@ -4,8 +4,13 @@ import Table from "@/Components/Table.vue";
 import AccountLinkLayout from "@/Layouts/AccountLinkLayout.vue";
 import ModalSelectAccount from "../ModalSelectAccount.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { Link, router } from "@inertiajs/vue3";
 import { ref } from "vue";
+import axios from "axios";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/outline";
 
 // Props
 const props = defineProps({
@@ -16,32 +21,38 @@ const props = defineProps({
 
 // Refs
 const modal = ref(true);
+const modaldelete = ref(true);
 const roleId = ref(0);
 const roleName = ref("");
-const type=ref("");
+const type = ref("");
 const accounts = ref(props.accounts);
 
 const toggle = () => {
   modal.value = !modal.value;
 };
 
+const toggle1 = () => {
+  modaldelete.value = !modaldelete.value;
+};
+
 const editRole = (roleIdEdit, roleNameEdit, typeEdit) => {
   // Filtrar cuentas según el roleName
   accounts.value = Array.isArray(props.accounts)
     ? props.accounts.filter((acc) => {
-        const prefix = roleNameEdit === "account_spent_id"
-          ? "5"
-          : roleNameEdit === "account_pasive_id"
-          ? "2"
-          : "1";
+        const prefix =
+          roleNameEdit === "account_spent_id"
+            ? "5"
+            : roleNameEdit === "account_pasive_id"
+            ? "2"
+            : "1";
         return acc.code.startsWith(prefix);
       })
     : [];
 
   // Actualizar los valores según el tipo
-  roleId.value= roleIdEdit;
+  roleId.value = roleIdEdit;
   roleName.value = roleNameEdit;
-  type.value=typeEdit;
+  type.value = typeEdit;
 
   // Alternar el estado de la modal
   toggle();
@@ -50,13 +61,34 @@ const editRole = (roleIdEdit, roleNameEdit, typeEdit) => {
 const selectAccount = (accountId) => {
   router.put(
     route("settingaccount.rol.update", roleId.value),
-    { name: roleName.value, account_id: accountId,type: type.value },
+    { name: roleName.value, account_id: accountId, type: type.value },
     { preserveState: true }
   );
   toggle();
 };
 
+const removeVinculation = (roleIdD, roleNameD, typeD) => {
+  roleId.value = roleIdD;
+  roleName.value = roleNameD;
+  type.value = typeD;
+  toggle1();
+};
 
+const handleInputChange = () => {
+  axios
+    .put(
+      route("settingaccount.rol.update", roleId.value),
+      { name: roleName.value, account_id: null, type: type.value },
+      { preserveState: true }
+    ) // Eliminar centro de costos
+    .then(() => {
+      // Después de eliminar el centro de costos, redirigir a la ruta deseada
+      router.visit(route("setting.account.rol.index"));
+    })
+    .catch((error) => {
+      console.error("Error al eliminar la vinculacion", error);
+    });
+};
 </script>
 
 <template>
@@ -85,9 +117,24 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="roleIngress.aa_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
               <button
-                @click="editRole(roleIngress.id, 'account_active_id','ingress')"
+                class=" px-1 py-1 border border-red-400"
+                @click="
+                  removeVinculation(
+                    roleIngress.id,
+                    'account_active_id',
+                    'ingress'
+                  )
+                "
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
+              <button
+                @click="
+                  editRole(roleIngress.id, 'account_active_id', 'ingress')
+                "
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -100,9 +147,25 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="roleIngress.ap_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
+
               <button
-                @click="editRole(roleIngress.id, 'account_pasive_id','ingress')"
+                class=" px-1 py-1 border border-red-400"
+                @click="
+                  removeVinculation(
+                    roleIngress.id,
+                    'account_pasive_id',
+                    'ingress'
+                  )
+                "
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
+              <button
+                @click="
+                  editRole(roleIngress.id, 'account_pasive_id', 'ingress')
+                "
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -115,9 +178,22 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="roleIngress.ass_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
               <button
-                @click="editRole(roleIngress.id, 'account_spent_id','ingress')"
+                class=" px-1 py-1 border border-red-400"
+                @click="
+                  removeVinculation(
+                    roleIngress.id,
+                    'account_spent_id',
+                    'ingress'
+                  )
+                "
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
+              <button
+                @click="editRole(roleIngress.id, 'account_spent_id', 'ingress')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -153,9 +229,22 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="roleEgress.aa_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
               <button
-                @click="editRole(roleEgress.id, 'account_active_id','egress')"
+                class=" px-1 py-1 border border-red-400"
+                @click="
+                  removeVinculation(
+                    roleEgress.id,
+                    'account_active_id',
+                    'egress'
+                  )
+                "
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
+              <button
+                @click="editRole(roleEgress.id, 'account_active_id', 'egress')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -168,9 +257,22 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="roleEgress.ap_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
               <button
-                @click="editRole(roleEgress.id, 'account_pasive_id','egress')"
+                class=" px-1 py-1 border border-red-400"
+                @click="
+                  removeVinculation(
+                    roleEgress.id,
+                    'account_pasive_id',
+                    'egress'
+                  )
+                "
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
+              <button
+                @click="editRole(roleEgress.id, 'account_pasive_id', 'egress')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -183,9 +285,18 @@ const selectAccount = (accountId) => {
                 type="text"
                 :value="roleEgress.ass_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
+                disabled
               />
               <button
-                @click="editRole(roleEgress.id, 'account_spent_id','egress')"
+                class=" px-1 py-1 border border-red-400"
+                @click="
+                  removeVinculation(roleEgress.id, 'account_spent_id', 'egress')
+                "
+              >
+                <TrashIcon class="size-6 text-red-400" />
+              </button>
+              <button
+                @click="editRole(roleEgress.id, 'account_spent_id', 'egress')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -198,10 +309,24 @@ const selectAccount = (accountId) => {
   </AccountLinkLayout>
 
   <ModalSelectAccount
-  :show="modal"
-  :filteredAccountsFromMain="accounts"
-  @close="toggle"
-  @selectAccount="selectAccount"
-/>
+    :show="modal"
+    :filteredAccountsFromMain="accounts"
+    @close="toggle"
+    @selectAccount="selectAccount"
+  />
 
+  <ConfirmationModal :show="modaldelete">
+    <template #title> ELIMINAR VINCULACION </template>
+    <template #content>
+      Esta seguro de eliminar la vinculación de la cuenta?
+    </template>
+    <template #footer>
+      <SecondaryButton class="mr-2" type="button" @click="toggle1()"
+        >Cancelar</SecondaryButton
+      >
+      <PrimaryButton type="button" @click="handleInputChange()"
+        >Aceptar</PrimaryButton
+      >
+    </template>
+  </ConfirmationModal>
 </template>
