@@ -11,21 +11,26 @@ use App\Jobs\ProcessPaymenRole;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use App\Exports\PaymentRolesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 class PaymentRoleController extends Controller
 {
     public function index(Request $request)
     {
-        $date = Carbon::now();
+        $date = Carbon::now(); // Fecha actual
+        if (!$date->isLastOfMonth()) { // Verifica si no es el último día del mes
+            $date = $date->subMonth(); // Resta un mes
+        }
         $search = $request->input('search', '');
         $year = $request->input('year', $date->year);
-        //dd($year);
         $month = $request->input('month', $date->month);
         $company = Company::first();
 
-        $job = new ProcessPaymenRole();
-        $job->handle();
+
+        // $job = new ProcessPaymenRole();
+        // $job->handle();
         // Consulta principal con relaciones
         $paymentroles = PaymentRole::with(['employee', 'paymentroleingresses.roleIngress', 'paymentroleegresses.roleEgress'])
             ->when($search, function ($query, $search) {
@@ -129,6 +134,17 @@ class PaymentRoleController extends Controller
             'message' => 'Pago actualizado correctamente',
             'paymentRole' => $paymentRole->load(['paymentroleingresses', 'paymentroleegresses']),
         ]);
+    }
+
+    public function export(Request $request)
+    {
+
+        $search = $request->input('search');
+        $year = $request->input('year');
+        $month = $request->input('month');
+    
+        // Pasar los filtros al exportador
+        return Excel::download(new PaymentRolesExport($search, $year, $month), 'payment_roles.xlsx');
     }
 
 

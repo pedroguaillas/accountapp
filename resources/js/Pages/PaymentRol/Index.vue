@@ -9,11 +9,16 @@ import Table from "@/Components/Table.vue";
 import axios from "axios";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
-import { PencilIcon, PrinterIcon, EnvelopeIcon } from "@heroicons/vue/24/solid";
+import {
+  PencilIcon,
+  PrinterIcon,
+  EnvelopeIcon,
+  DocumentArrowDownIcon,
+} from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
-  paymentroles: { type: Object, default: () => ({data: [] }) },
+  paymentroles: { type: Object, default: () => ({ data: [] }) },
   filters: { type: Object, default: () => ({}) },
 });
 
@@ -25,9 +30,9 @@ const hoveredRow = ref(null);
 
 // Filtros de Año y Mes
 const selectedYear = ref(props.filters.year); // Año por defecto
-const selectedMonth = ref(props.filters.month); // Mes seleccionado
-// Generar un arreglo de años (puedes modificar el rango según lo necesites)
+const selectedMonth = ref(props.filters.month); // Mes actual por defecto
 
+// Generar un arreglo de años (puedes modificar el rango según lo necesites)
 const years = [
   { value: "2023", label: "2023" },
   { value: "2024", label: "2024" },
@@ -37,15 +42,15 @@ const years = [
 // Generar un arreglo de meses
 const months = computed(() => {
   return [
-    { value: "01", label: "Enero" },
-    { value: "02", label: "Febrero" },
-    { value: "03", label: "Marzo" },
-    { value: "04", label: "Abril" },
-    { value: "05", label: "Mayo" },
-    { value: "06", label: "Junio" },
-    { value: "07", label: "Julio" },
-    { value: "08", label: "Agosto" },
-    { value: "09", label: "Septiembre" },
+    { value: "1", label: "Enero" },
+    { value: "2", label: "Febrero" },
+    { value: "3", label: "Marzo" },
+    { value: "4", label: "Abril" },
+    { value: "5", label: "Mayo" },
+    { value: "6", label: "Junio" },
+    { value: "7", label: "Julio" },
+    { value: "8", label: "Agosto" },
+    { value: "9", label: "Septiembre" },
     { value: "10", label: "Octubre" },
     { value: "11", label: "Noviembre" },
     { value: "12", label: "Diciembre" },
@@ -76,7 +81,7 @@ const edit = (paymentrolEdit) => {
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
-  if (loading.value) return
+  if (loading.value) return;
   const url = route("paymentrol.index"); // Ruta hacia el backend
   loading.value = true;
 
@@ -101,18 +106,16 @@ const handlePageChange = async (page) => {
 watch(
   [search, selectedYear, selectedMonth], // Las dependencias observadas
   async (newQuery) => {
-    // El "newQuery" será el array de los nuevos valores
-    if (loading.value) return
+    if (loading.value) return;
     const url = route("paymentrol.index");
     loading.value = true;
     try {
-      // Enviar los valores individuales en lugar de todo el array
       await router.get(
         url,
         {
-          search: newQuery[0], // Primer valor de la query, 'search'
-          year: newQuery[1], // Segundo valor de la query, 'selectedYear'
-          month: newQuery[2], // Tercer valor de la query, 'selectedMonth'
+          search: newQuery[0],
+          year: newQuery[1],
+          month: newQuery[2],
           page: props.paymentroles.current_page,
         },
         { preserveState: true }
@@ -127,7 +130,6 @@ watch(
 );
 
 const save = () => {
-  // Crear un objeto con los datos a actualizar
   const updatedData = {
     ingresses: paymentrol.ingresses.map((ingress) => ({
       id: ingress.id,
@@ -139,12 +141,10 @@ const save = () => {
     })),
   };
 
-  // Enviar la solicitud de actualización al backend
   axios
     .put(route("paymentrol.update", paymentrol.id), updatedData)
     .then((response) => {
       if (response.data.success) {
-        // Notificar éxito o actualizar el UI según sea necesario
         toggle(); // Cerrar la modal después de guardar
         router.reload(["paymentroles"]);
       }
@@ -152,6 +152,17 @@ const save = () => {
     .catch((error) => {
       console.error("Error al actualizar:", error);
     });
+};
+
+const exportToExcel = () => {
+  const url = route("paymentrol.export", {
+    search: search.value,
+    year: selectedYear.value,
+    month: selectedMonth.value,
+  });
+
+  // Redirigir a la URL para descargar el archivo
+  window.location.href = url;
 };
 </script>
 
@@ -168,7 +179,7 @@ const save = () => {
         <div class="w-full flex sm:justify-end gap-2">
           <!-- Filtro Año -->
           <DynamicSelect
-            class="mt-1 block w-full"
+            class="block w-full"
             v-model="selectedYear"
             :options="years"
             :seleccione="false"
@@ -178,7 +189,7 @@ const save = () => {
           <!-- Filtro Mes -->
 
           <DynamicSelect
-            class="mt-1 block w-full"
+            class="block w-full"
             v-model="selectedMonth"
             :options="months"
             :seleccione="false"
@@ -188,9 +199,16 @@ const save = () => {
           <TextInput
             v-model="search"
             type="search"
-            class="block sm:mr-2 w-full"
+            class="block w-full"
             placeholder="Buscar ..."
           />
+
+          <button v-if="props.paymentroles.data.length > 0"
+            @click="exportToExcel"
+            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+          >
+            <DocumentArrowDownIcon class="size-6 text-red" />
+          </button>
         </div>
       </div>
 
