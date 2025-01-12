@@ -142,7 +142,8 @@ Route::middleware([
         Route::get('roles-de-pago', [PaymentRoleController::class, 'index'])->name('paymentrol.index');
         Route::put('paymentroles/{id}', [PaymentRoleController::class, 'update'])->name('paymentrol.update');
         Route::get('paymentroles/export', [PaymentRoleController::class, 'export'])->name('paymentrol.export');
-
+        Route::post('generaterolesjournals', [PaymentRoleController::class, 'generate'])->name('paymentrol.journal.generate');
+        
         // ingresos
         Route::get('roles-ingresos', [RoleIngressController::class, 'index'])->name('roleingress.index');
         Route::delete('roleingresses/{ingressId}', [RoleIngressController::class, 'destroy'])->name('roleingress.delete');

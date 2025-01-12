@@ -331,7 +331,7 @@ return new class extends Migration {
             $table->decimal('salary', 14, 2)->default(0);
             $table->decimal('salary_receive', 14, 2)->default(0);
             $table->date('date');
-            $table->string('state')->default("CREADO");;
+            $table->string('state')->default("CREADO");
             $table->timestamps();
             $table->softDeletes();
 

@@ -77,6 +77,7 @@ class PaymentRoleController extends Controller
                     'total_egress_f' => $totalEgressF,
                     'total_egress_o' => $totalEgressO,
                     'salary_receive' => $paymentRole->salary_receive,
+                    'state' => $paymentRole->state,
                     'ingresses' => $paymentRole->paymentroleingresses->map(function ($ingress) {
                         return [
                             'id' => $ingress->id,
@@ -142,10 +143,63 @@ class PaymentRoleController extends Controller
         $search = $request->input('search');
         $year = $request->input('year');
         $month = $request->input('month');
-    
+
         // Pasar los filtros al exportador
         return Excel::download(new PaymentRolesExport($search, $year, $month), 'payment_roles.xlsx');
     }
 
+    public function generate(Request $request)
+    {
+        $rolesIds = $request->selectedIds;
+        $company = Company::first();
+        $user = auth()->user();
+        $date = Carbon::now();
+
+        $paymentroles = PaymentRole::with(['employee', 'paymentroleingresses.roleIngress', 'paymentroleegresses.roleEgress'])
+            ->whereIn('payment_roles.id', $rolesIds)->get(); // Obtén los resultados como una colección
+
+        // Mapea los resultados para transformarlos
+        $paymentroles->map(function ($paymentRole) use ($company, $user, $date) {
+            // Mapear los ingresos
+            $ingressData = $paymentRole->paymentroleingresses->mapWithKeys(function ($ingress) {
+                return [$ingress->roleIngress->id=> $ingress->value];
+            });
+
+            $egressData = $paymentRole->paymentroleegresses->mapWithKeys(function ($egress) {
+                return [$egress->roleEgress->id => $egress->value];
+            });
+
+            $inputs = [
+                'description' => "Rol de pagos " . $paymentRole->employee->cuit . " " . $paymentRole->employee->name,
+                'date' => $date,
+                'user_id' => $user->id,
+            ];
+
+            $journal = $company->journals()->create($inputs);
+
+            $journalEntries = [];
+
+            $journalEntries[] = [
+                // 'account_id' => $journalEntry['account_id'],
+                // 'debit' => $journalEntry['debit'],
+                // 'have' => $journalEntry['have'],
+            ];
+
+            $journal->journalentries()->createMany($journalEntries);
+
+            // // Combinar los valores fijos con los ingresos dinámicos
+            // return array_merge([
+            //     'cuit' => $paymentRole->employee->cuit,
+            //     'name' => $paymentRole->employee->name,
+            //     'position' => $paymentRole->employee->position,
+            //     'sector_code' => $paymentRole->employee->sector_code,
+            //     'days' => $paymentRole->employee->days,
+            //     'salary' => $paymentRole->employee->salary,
+            //     'state'=>$paymentRole->state,
+            // ], $ingressData->toArray(), $egressData->toArray(), ['salary_receive' => $paymentRole->salary_receive,]); // Agregar los ingresos mapeados
+        });
+
+
+    }
 
 }
