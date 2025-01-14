@@ -25,6 +25,7 @@ class SettingRolController extends Controller
             ->leftJoin('accounts AS ap', 'account_pasive_id', '=', 'ap.id')
             ->leftJoin('accounts AS ass', 'account_spent_id', '=', 'ass.id')
             ->where('role_ingresses.company_id', $company->id)
+            ->where('role_ingresses.type','fijo')
             ->orderBy('id')
             ->get();
 
@@ -39,6 +40,7 @@ class SettingRolController extends Controller
             ->leftJoin('accounts AS ass', 'account_spent_id', '=', 'ass.id')
             ->where('role_egresses.company_id', $company->id)
             ->orderBy('id')
+            ->where('role_egresses.type','fijo')
             ->get();
 
         $accounts = Account::select('id', 'code', 'name')
