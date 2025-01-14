@@ -191,14 +191,21 @@ watch(
 const generateJournals = () => {
   router.post(
     route("paymentrol.journal.generate"),
-    { selectedIds:selectedIds.value},
+    { selectedIds: selectedIds.value },
     {
       onError: (errors) => {
-        console.log(errors);
+        if (errors.response && errors.response.status === 412) {
+          // Capturar el mensaje de error enviado desde el backend
+          console.log(errors.response.data.error); // "Debe generar el ASIENTO DE SITUACION INICIAL"
+          alert(errors.response.data.error); // Mostrarlo como alerta (o usa tu propia notificación)
+        } else {
+          console.log("Error inesperado:", errors);
+        }
       },
     }
   );
 };
+
 </script>
 
 
