@@ -19,6 +19,7 @@ class PaymentRole extends Model
         'salary', // Salario
         'salary_receive', // Salario
         'date',//fecha de generacion del rol
+        'state',//estado
     ];
 
     protected $casts = [

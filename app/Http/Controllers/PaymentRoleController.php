@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Company;
+use App\Models\Journal;
 use App\Models\PaymentRole;
 use App\Models\PaymentRoleIngress;
 use App\Models\PaymentRoleEgress;
@@ -77,6 +78,7 @@ class PaymentRoleController extends Controller
                     'total_egress_f' => $totalEgressF,
                     'total_egress_o' => $totalEgressO,
                     'salary_receive' => $paymentRole->salary_receive,
+                    'state' => $paymentRole->state,
                     'ingresses' => $paymentRole->paymentroleingresses->map(function ($ingress) {
                         return [
                             'id' => $ingress->id,
@@ -142,10 +144,133 @@ class PaymentRoleController extends Controller
         $search = $request->input('search');
         $year = $request->input('year');
         $month = $request->input('month');
-    
+
         // Pasar los filtros al exportador
         return Excel::download(new PaymentRolesExport($search, $year, $month), 'payment_roles.xlsx');
     }
 
+    public function generate(Request $request)
+    {
+        $journal=Journal::where('description','ASIENTO DE SITUACION INICIAL')->first();
+        if (!$journal) {
+            return response()->json(['error' => "Debe generar el ASIENTO DE SITUACION INICIAL"], 412);
+        }
+        
 
+        $rolesIds = $request->selectedIds;
+        
+
+        $company = Company::first();
+        $user = auth()->user();
+        $date = Carbon::now();
+
+        $paymentroles = PaymentRole::with(['employee', 'paymentroleingresses.roleIngress', 'paymentroleegresses.roleEgress'])
+            ->whereIn('payment_roles.id', $rolesIds)->get(); // Obtén los resultados como una colección
+
+        // Mapea los resultados para transformarlos
+        $paymentroles->map(function ($paymentRole) use ($company, $user, $date) {
+            // Mapear los ingresos
+            // Mapear los ingresos (solo de tipo Fijo)
+            $ingressData = $paymentRole->paymentroleingresses
+                ->filter(function ($ingress) {
+                    return $ingress->type === 'Fijo'; // Ajusta el campo 'type' según tu modelo
+                })
+                ->mapWithKeys(function ($ingress) {
+                    return [$ingress->roleIngress->id => $ingress->value];
+                });
+
+            // Mapear los egresos (solo de tipo Fijo)
+            $egressData = $paymentRole->paymentroleegresses
+                ->filter(function ($egress) {
+                    return $egress->type === 'Fijo'; // Ajusta el campo 'type' según tu modelo
+                })
+                ->mapWithKeys(function ($egress) {
+                    return [$egress->roleEgress->id => $egress->value];
+                });
+
+            $sumDebit = 0; 
+            $sumHave = 0;  
+            // Crear el diario
+            $inputs = [
+                'description' => "Rol de pagos " . $paymentRole->employee->cuit . " " . $paymentRole->employee->name,
+                'date' => $date,
+                'user_id' => $user->id,
+            ];
+           
+
+            $journal = $company->journals()->create($inputs);
+            
+            // Crear las entradas en el diario
+            $journalEntries = [];
+
+            foreach ($ingressData as $account_spent_id => $value) {
+                $journalEntries[] = [
+                    'account_id' => $account_spent_id,  
+                    'debit' => $value['amount'],                           
+                    'have' => 0,      
+                ];
+                $sumDebit += $value['amount'];
+
+            }
+
+            foreach ($ingressData as $account_active_id => $value) {
+
+                if ($value['code'] === 'AU') {
+                    $journalEntries[] = [
+                        'account_id' => $account_active_id,  
+                        'debit' => $value['amount'],                         
+                        'have' => 0,    
+                    ];
+                }
+                $sumDebit += $value['amount'];
+
+            }
+
+            foreach ($ingressData as $account_pasive_id => $value) {
+
+                if ($value['code'] === 'HE') {
+                    $journalEntries[] = [
+                        'account_id' => $account_pasive_id,
+                        'debit' => 0,
+                        'have' => $value['amount'],
+                    ];
+                } elseif ($value['code'] === 'HO') {
+                    $journalEntries[] = [
+                        'account_id' => $account_pasive_id,  
+                        'debit' => 0,                        
+                        'have' => $value['amount'],          
+                    ];
+                } elseif ($value['code'] === 'FDR') {
+                    $journalEntries[] = [
+                        'account_id' => $account_pasive_id,  
+                        'debit' => 0,        
+                        'have' => $value['amount'],         
+                    ];
+                }
+                $sumHave += $value['amount'];
+            }
+
+            // Procesar los egresos
+            foreach ($egressData as $account_pasive_id => $value) {
+                $journalEntries[] = [
+                    'account_id' => $account_pasive_id, 
+                    'debit' => 0,               
+                    'have' => $value,           
+                ];
+                $sumHave += $value['amount'];
+            }
+
+            $salary = $sumDebit - $sumHave;
+            $journalEntries[] = [
+                'account_id' => '2.1.6.1', 
+                'debit' => 0,                
+                'have' => $salary,          
+            ];
+
+            // Guardar las entradas en el diario
+            $journal->journalentries()->createMany($journalEntries);
+
+            $paymentRole->update(['state' => 'GENERADO']); 
+        });
+    }
 }

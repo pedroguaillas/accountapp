@@ -3,12 +3,13 @@
 import { ref, reactive, computed, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
-import { router } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
+
 import {
   PencilIcon,
   PrinterIcon,
@@ -164,6 +165,47 @@ const exportToExcel = () => {
   // Redirigir a la URL para descargar el archivo
   window.location.href = url;
 };
+
+const selectAll = ref(false); // Estado del checkbox principal
+const selectedIds = ref([]); // IDs seleccionados
+
+// Función para seleccionar/deseleccionar todos
+const toggleSelectAll = () => {
+  // Actualiza los elementos secundarios según el estado actual de selectAll
+  if (selectAll.value) {
+    selectedIds.value = props.paymentroles.data.map((item) => item.id);
+  } else {
+    selectedIds.value = [];
+  }
+};
+
+// Watcher para sincronizar el checkbox principal con los secundarios
+watch(
+  selectedIds,
+  (newValue) => {
+    selectAll.value = newValue.length === props.paymentroles.data.length;
+  },
+  { deep: true }
+);
+
+const generateJournals = () => {
+  router.post(
+    route("paymentrol.journal.generate"),
+    { selectedIds: selectedIds.value },
+    {
+      onError: (errors) => {
+        if (errors.response && errors.response.status === 412) {
+          // Capturar el mensaje de error enviado desde el backend
+          console.log(errors.response.data.error); // "Debe generar el ASIENTO DE SITUACION INICIAL"
+          alert(errors.response.data.error); // Mostrarlo como alerta (o usa tu propia notificación)
+        } else {
+          console.log("Error inesperado:", errors);
+        }
+      },
+    }
+  );
+};
+
 </script>
 
 
@@ -203,11 +245,19 @@ const exportToExcel = () => {
             placeholder="Buscar ..."
           />
 
-          <button v-if="props.paymentroles.data.length > 0"
+          <button
+            v-if="props.paymentroles.data.length > 0"
             @click="exportToExcel"
             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
           >
             <DocumentArrowDownIcon class="size-6 text-red" />
+          </button>
+
+          <button
+            class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+            @click="generateJournals"
+          >
+            GENERAR
           </button>
         </div>
       </div>
@@ -215,6 +265,13 @@ const exportToExcel = () => {
       <Table>
         <thead>
           <tr class="[&>th]:py-2">
+            <th>
+              <input
+                type="checkbox"
+                v-model="selectAll"
+                @change="toggleSelectAll"
+              />
+            </th>
             <th class="w-1">N°</th>
             <th>CEDULA</th>
             <th class="text-left">NOMBRE</th>
@@ -225,6 +282,7 @@ const exportToExcel = () => {
             <th class="text-right pr-4">EGRESOS FIJOS</th>
             <th class="text-right pr-4">OTROS EGRESOS</th>
             <th class="text-right pr-4">SUELDO A RECIBIR</th>
+            <th class="text-right pr-4">ESTADO</th>
           </tr>
         </thead>
         <tbody class="min-w-full table-auto">
@@ -235,6 +293,13 @@ const exportToExcel = () => {
             @mouseenter="hoveredRow = paymentrol.id"
             @mouseleave="hoveredRow = null"
           >
+            <td>
+              <input
+                type="checkbox"
+                v-model="selectedIds"
+                :value="paymentrol.id"
+              />
+            </td>
             <td>{{ i + 1 }}</td>
             <td>{{ paymentrol.cuit }}</td>
             <td class="text-left">{{ paymentrol.name }}</td>
@@ -255,6 +320,9 @@ const exportToExcel = () => {
             <td class="text-right pr-4">
               {{ paymentrol.salary_receive.toFixed(2) }}
             </td>
+            <td class="text-right pr-4">
+              {{ paymentrol.state }}
+            </td>
 
             <!-- Superposición de opciones -->
             <td
@@ -268,10 +336,26 @@ const exportToExcel = () => {
                 >
                   <PencilIcon class="size-5 text-red" />
                 </li>
-                <li class="m-0 cursor-pointer hover:text-yellow-500">
+                <li
+                  :class="{
+                    'cursor-not-allowed text-gray-400':
+                      paymentrol.state === 'CREADO',
+                    'hover:text-yellow-500 cursor-pointer':
+                      paymentrol.state !== 'CREADO',
+                  }"
+                  @click="paymentrol.state !== 'CREADO' && printAction()"
+                >
                   <PrinterIcon class="size-5 text-red" />
                 </li>
-                <li class="m-0 cursor-pointer hover:text-purple-500">
+                <li
+                  :class="{
+                    'cursor-not-allowed text-gray-400':
+                      paymentrol.state === 'CREADO',
+                    'hover:text-purple-500 cursor-pointer':
+                      paymentrol.state !== 'CREADO',
+                  }"
+                  @click="paymentrol.state !== 'CREADO' && envelopeAction()"
+                >
                   <EnvelopeIcon class="size-5 text-red" />
                 </li>
               </ul>

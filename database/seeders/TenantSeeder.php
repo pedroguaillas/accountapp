@@ -53,12 +53,17 @@ class TenantSeeder extends Seeder
             ['name' => "Horas ordinarias", 'code' => 'HO', 'type' => 'fijo'],
             ['name' => "Remuneración", 'code' => 'RE', 'type' => 'fijo'],
             ['name' => "Adelanto de utilidad", 'code' => 'AU', 'type' => 'fijo'],
+            ['name' => "Vacaciones", 'code' => 'VC', 'type' => 'fijo'],
+            ['name' => "Alimentación", 'code' => 'AL', 'type' => 'fijo'],
+            ['name' => "Otros ingresos", 'code' => 'OI', 'type' => 'fijo'],
         ]);
 
         $company->roleEgress()->createMany([
             ['name' => "IESS patronal", 'code' => 'IESSPA', 'type' => 'fijo'],
             ['name' => "IESS personal", 'code' => 'IESSPE', 'type' => 'fijo'],
             ['name' => "Adelanto de sueldo", 'code' => 'AS', 'type' => 'fijo'],
+            ['name' => "Sueldo a pagar", 'code' => 'SP', 'type' => 'fijo'],
+            ['name' => "Otros egresos", 'code' => 'OE', 'type' => 'fijo'],
         ]);
     }
 }
