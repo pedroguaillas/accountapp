@@ -23,7 +23,7 @@ defineEmits(["close", "save"]);
   <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">
     <template #title>
       {{
-        `${ingress.id === undefined ? "Añadir" : "Editar"}Ingresos`
+        `${ingress.id === undefined ? "Añadir" : "Editar"} ingreso`
       }}
     </template>
     <template #content>

@@ -27,7 +27,7 @@ const stateOptions = [
   <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">
     <template #title>
       {{
-        `${egress.id === undefined ? "Añadir" : "Editar"} Egresos`
+        `${egress.id === undefined ? "Añadir" : "Editar"} egreso`
       }}
     </template>
     <template #content>

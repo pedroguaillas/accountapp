@@ -5,7 +5,6 @@ import DialogModal from "@/Components/DialogModal.vue";
 // Props
 const props = defineProps({
   paymentRol: { type: Object, default: () => ({}) },
-  error: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
 });
 
