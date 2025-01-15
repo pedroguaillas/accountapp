@@ -1,11 +1,30 @@
 <script setup>
 // Imports
 import DialogModal from "@/Components/DialogModal.vue";
+import Table from "@/Components/Table.vue";
+import { ref, computed } from "vue";
+import TextInput from "@/Components/TextInput.vue";
 
 // Props
 defineProps({
   accounts: { type: Array, default: () => [] },
   show: { type: Boolean, default: false },
+});
+
+// Variables reactivas
+const search = ref("");
+
+// Computed para filtrar cuentas combinando filtro principal y búsqueda local
+const filteredAccounts = computed(() => {
+  const mainFiltered = props.accounts; // Filtro desde el principal
+  if (!search.value) {
+    return mainFiltered;
+  }
+  return mainFiltered.filter(
+    (acc) =>
+      acc.code.toLowerCase().includes(search.value.toLowerCase()) || // Filtrar por código
+      acc.name.toLowerCase().includes(search.value.toLowerCase()) // Filtrar por nombre
+  );
 });
 
 // Método para seleccionar cuenta
@@ -20,15 +39,22 @@ const emit = defineEmits(["close", "selectAccount"]);
 
 <template>
   <DialogModal :show="show" maxWidth="lg" @close="close">
-    <template #title>Seleccionar cuenta</template>
+    <template #title>
+      <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
+        Seleccionar cuenta
+      </h2>
+      <div class="w-full flex sm:justify-end">
+        <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
+      </div>
+    </template>
     <template #content>
       <div class="max-h-[300px] overflow-y-auto">
-        <table class="mt-4 text-xs sm:text-sm table-auto w-full text-center text-gray-700">
+        <Table class="text-xs sm:text-sm table-auto w-full text-center text-gray-700">
           <thead>
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
-              <th>Cuenta</th>
-              <th class="text-left">Descripción</th>
+              <th>CUENTA</th>
+              <th class="text-left">DESCRIPCION</th>
             </tr>
           </thead>
           <tbody>
@@ -39,7 +65,7 @@ const emit = defineEmits(["close", "selectAccount"]);
               <td class="text-left">{{ account.name }}</td>
             </tr>
           </tbody>
-        </table>
+        </Table>
       </div>
     </template>
   </DialogModal>
