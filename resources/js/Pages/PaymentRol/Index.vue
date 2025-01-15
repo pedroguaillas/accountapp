@@ -23,6 +23,54 @@ const props = defineProps({
   filters: { type: Object, default: () => ({}) },
 });
 
+// Inicializador de objetos
+const initialPaymentRol = {};
+
+// Reactives
+const paymentrol = reactive({ ...initialPaymentRol });
+
+const toggle = () => {
+  modal.value = !modal.value;
+};
+
+const edit = (paymentrolEdit) => {
+  Object.assign(paymentrol, { ...initialPaymentRol, ...paymentrolEdit });
+  toggle();
+};
+
+const save = () => {
+  console.log(paymentrol.ingresses);
+
+  if (!Array.isArray(paymentrol.ingresses)) {
+    paymentrol.ingresses = Object.values(paymentrol.ingresses);
+  }
+  if (!Array.isArray(paymentrol.egresses)) {
+    paymentrol.egresses = Object.values(paymentrol.egresses);
+  }
+
+  const updatedData = {
+    ingresses: paymentrol.ingresses.map((ingress) => ({
+      id: ingress.id,
+      value: ingress.value,
+    })),
+    egresses: paymentrol.egresses.map((egress) => ({
+      id: egress.id,
+      value: egress.value,
+    })),
+  };
+
+  axios
+    .put(route("paymentrol.update", paymentrol.id), updatedData)
+    .then((response) => {
+      if (response.data.success) {
+        toggle(); // Cerrar la modal después de guardar
+        router.reload(["paymentroles"]);
+      }
+    })
+    .catch((error) => {
+      console.error("Error al actualizar:", error);
+    });
+};
 // Refs
 const modal = ref(false);
 const search = ref(props.filters.search); // Término de búsqueda
@@ -57,28 +105,6 @@ const months = computed(() => {
     { value: "12", label: "Diciembre" },
   ];
 });
-
-// Inicializador de objetos
-const initialPaymentRol = {};
-
-// Reactives
-const paymentrol = reactive({ ...initialPaymentRol });
-const errorForm = reactive({});
-
-const resetErrorForm = () => {
-  Object.assign(errorForm, initialPaymentRol);
-};
-
-const toggle = () => {
-  modal.value = !modal.value;
-};
-
-const edit = (paymentrolEdit) => {
-  resetErrorForm();
-  Object.assign(paymentrol, { ...initialPaymentRol, ...paymentrolEdit });
-  Object.assign(errorForm, { ...initialPaymentRol });
-  toggle();
-};
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
@@ -130,31 +156,6 @@ watch(
   { immediate: false }
 );
 
-const save = () => {
-  const updatedData = {
-    ingresses: paymentrol.ingresses.map((ingress) => ({
-      id: ingress.id,
-      value: ingress.value,
-    })),
-    egresses: paymentrol.egresses.map((egress) => ({
-      id: egress.id,
-      value: egress.value,
-    })),
-  };
-
-  axios
-    .put(route("paymentrol.update", paymentrol.id), updatedData)
-    .then((response) => {
-      if (response.data.success) {
-        toggle(); // Cerrar la modal después de guardar
-        router.reload(["paymentroles"]);
-      }
-    })
-    .catch((error) => {
-      console.error("Error al actualizar:", error);
-    });
-};
-
 const exportToExcel = () => {
   const url = route("paymentrol.export", {
     search: search.value,
@@ -205,7 +206,6 @@ const generateJournals = () => {
     }
   );
 };
-
 </script>
 
 
@@ -331,8 +331,13 @@ const generateJournals = () => {
             >
               <ul class="px-4 flex gap-4 rounded items-center justify-center">
                 <li
-                  @click="edit(paymentrol)"
-                  class="m-0 cursor-pointer hover:text-blue-500"
+                  @click="paymentrol.state !== 'GENERADO' && edit(paymentrol)"
+                  :class="{
+                    'cursor-not-allowed text-gray-400':
+                      paymentrol.state === 'GENERADO',
+                    'hover:text-yellow-500 cursor-pointer':
+                      paymentrol.state !== 'GENERADO',
+                  }"
                 >
                   <PencilIcon class="size-5 text-red" />
                 </li>
@@ -370,7 +375,6 @@ const generateJournals = () => {
   <FormModal
     :show="modal"
     :paymentRol="paymentrol"
-    :error="errorForm"
     @close="toggle"
     @save="save"
   />
