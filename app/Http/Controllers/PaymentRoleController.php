@@ -122,7 +122,7 @@ class PaymentRoleController extends Controller
     {
         // Encuentra el PaymentRole por su ID
         $paymentRole = PaymentRole::findOrFail($id);
-        
+
         // Actualiza los valores de los ingresos
         foreach ($request->input('ingresses') as $ingress) {
             $paymentRoleIngress = PaymentRoleIngress::findOrFail($ingress['id']);
@@ -197,8 +197,11 @@ class PaymentRoleController extends Controller
                     return $ingress->roleIngress->type === 'otro';// Asegúrate de que 'type' sea el campo correcto en tu modelo
                 })
                 ->sum(function ($ingress) {
-                    return $ingress->amount; // Ajusta 'amount' según el campo en tu modelo
+                    // Convierte 'amount' a float
+                    return floatval($ingress->value);
                 });
+            ;
+
 
             // Mapear los egresos (solo de tipo Fijo)
             $egressData = $paymentRole->paymentroleegresses
@@ -222,7 +225,8 @@ class PaymentRoleController extends Controller
                     return $egress->roleEgress->type === 'otro'; // Asegúrate de que 'type' sea el campo correcto en tu modelo
                 })
                 ->sum(function ($egress) {
-                    return $egress->amount; // Ajusta 'amount' según el campo en tu modelo
+                    // Convierte 'amount' a float
+                    return floatval($egress->value);
                 });
 
             $sumDebit = 0;
