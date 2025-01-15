@@ -200,8 +200,6 @@ class PaymentRoleController extends Controller
                     // Convierte 'amount' a float
                     return floatval($ingress->value);
                 });
-            ;
-
 
             // Mapear los egresos (solo de tipo Fijo)
             $egressData = $paymentRole->paymentroleegresses
