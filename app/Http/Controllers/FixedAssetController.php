@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Monolog\Formatter\ElasticsearchFormatter;
 
 class FixedAssetController extends Controller
 {
@@ -48,9 +49,22 @@ class FixedAssetController extends Controller
     public function create()
     {
         $company = Company::first();
-        if (!$company) {
-            return redirect()->back()->with('error', 'No company found.');
+        $journal = Journal::where('company_id', $company->id)
+            ->where('description', 'ASIENTO DE SITUACION INICIAL')
+            ->first();
+
+        if ($journal === null) {
+            return to_route('journal.create');
         }
+
+        $activeTypes = ActiveType::where('company_id', $company->id)
+            ->whereNotNull('account_id')
+            ->pluck('account_id');
+
+        if ($activeTypes->count() === 0) {
+            return to_route('setting.account.index');
+        }
+
 
         $payMethods = PayMethod::all();
 
@@ -89,17 +103,29 @@ class FixedAssetController extends Controller
     {
         $company = Company::first(); // Asegúrate de tener la empresa disponible
 
-        // Registro del Activo Fijo
-        $fixedAsset = $company->fixedassets()->create($fixedAssetStoreRequest->all());
+        //trae id de la cuenta correspondiente al plan de cuentas
+        $activeAccountId = ActiveType::where('id', $fixedAssetStoreRequest->active_type_id)
+            ->pluck('account_id')
+            ->first();
 
-        // Siempre journalCount > 0 porque registra antes
-        $sumFixedAssetValue = FixedAsset::where('company_id', $company->id)->sum('value');
-        $sumJournalItemDebit = JournalEntry::join('accounts AS a', 'a.id', 'account_id')
-            ->where('a.code', 'LIKE', '1.2.1%')
-            ->where('company_id', $company->id)->sum('debit');
+        //trae el jorunal del estado de situacion inicial
+        $journal = Journal::where('company_id', $company->id)
+            ->where('description', 'ASIENTO DE SITUACION INICIAL')->first();
 
-        // En este caso se genera el Asiento Contable
-        if ($sumFixedAssetValue > $sumJournalItemDebit) {
+        //trae el valor del activo fijo del estado situacion inicial
+        $debitValues = JournalEntry::where('journal_id', $journal->id)
+            ->where('account_id', $activeAccountId)
+            ->pluck('debit')
+            ->first();
+
+        //suma de la tabla de activos fijos  correspondientes a la cuenta que se quiere ingresar
+        $fixedsSum = FixedAsset::whereHas('activetype', function ($query) use ($activeAccountId) {
+            $query->where('account_id', $activeAccountId);
+        })->sum('value');
+
+        if ($debitValues <= $fixedsSum) {
+            $fixedAsset = $company->fixedassets()->create($fixedAssetStoreRequest->all());
+            //validar q se ajuste al valor del aiento inicial 
             $journal = $company->journals()->create([
                 'date' => Carbon::now()->toDateString(),
                 'description' => 'Compra de ' . $fixedAssetStoreRequest->detail,
@@ -123,8 +149,30 @@ class FixedAssetController extends Controller
                     'have' => $fixedAssetStoreRequest->value,
                 ],
             ]);
-        }
+        } else {
+            //valor restante de la cuenta del activo fijo en el estado de situacion inicial
+            $valueres = $debitValues - $fixedsSum;
 
+            if ($valueres >= $fixedAssetStoreRequest->value) {
+                // Registro del Activo Fijo
+                $fixedAsset = $company->fixedassets()->create($fixedAssetStoreRequest->all());
+            } else {
+                // return Inertia::render('FixedAsset/Create', [
+                //     'error' => "El monto del activo fijo supera al del ESTADO DE SITUACION INICIAL"
+                // ])->with('status', 'error'); }
+
+                // return Inertia::render('FixedAssets/Create', [
+                //     'errors' => [
+                //         'value' => 'Monto superado'
+                //     ]
+                // ]);
+                // return response()->json(['errors' => ['value'=>"Debe generar el ASIENTO DE SITUACION INICIAL"]], 200);
+
+                return redirect()->route('fixedassets.create')->withErrors([
+                    'value' => 'Debe generar el ASIENTO DE SITUACION INICIAL'
+                ]);
+            }
+        }
         return to_route('fixedassets.index');
     }
 

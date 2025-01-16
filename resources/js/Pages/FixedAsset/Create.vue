@@ -46,12 +46,23 @@ const resetErrorForm = () => {
 const submit = () => {
   fixedAsset.post(route("fixedassets.store"), {
     onError: (errors) => {
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = errors[key];
-      });
+      console.log(errors.value);
+      // Si el error tiene una respuesta estructurada (es decir, Inertia)
+      if (errors.response && errors.response.data.errors) {
+        // Extraemos los errores del backend, que están en la estructura de errors
+        const errorMessage = errors.response.data.errors.value
+          ? errors.response.data.errors.value[0]
+          : 'Error desconocido';
+        
+        // Puedes asignarlo a una variable para mostrarlo en el UI
+        console.error(errorMessage); // O mostrarlo según tu lógica
+        errorForm['fixed_asset'] = errorMessage; // Asignamos el mensaje al campo correspondiente
+      }
     },
   });
 };
+
+
 
 const calculofecha = computed(() => {
   // Si no hay fecha de adquisición o periodo, no calculamos la fecha final
@@ -143,6 +154,9 @@ watch(
       <!-- Card Header -->
       <div class="flex justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold">Registro activo fijo</h2>
+        <div v-if="errorForm.fixed_asset" class="alert alert-danger">
+          {{ errorForm.fixed_asset }}
+        </div>
       </div>
 
       <!-- Formulario -->
@@ -281,7 +295,7 @@ watch(
                 v-model="fixedAsset.value"
                 type="number"
                 class="mt-1 block w-full"
-                min="0"
+                min="0,00"
                 required
               />
               <InputError :message="errorForm.value" class="mt-2" />
@@ -293,7 +307,7 @@ watch(
                 v-model="fixedAsset.residual_value"
                 type="number"
                 class="mt-1 block w-full"
-                min="0"
+                min="0,00"
                 :max="fixedAsset.value"
                 :disabled="parseInt(fixedAsset.period, 10) === 0"
               />

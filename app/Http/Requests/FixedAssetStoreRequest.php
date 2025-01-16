@@ -30,7 +30,7 @@ class FixedAssetStoreRequest extends FormRequest
             'date_acquisition' => 'required|date',
             'detail' => 'nullable|string|max:300',
             'code' => 'required|string|max:20',
-            'address' => 'required|string|max:255',
+            'address' => 'required|string|min:3|max:255',
             'period' => 'nullable|integer|min:0',
             'value' => 'required|numeric|min:0',
             'residual_value' => 'nullable|numeric|min:0',
