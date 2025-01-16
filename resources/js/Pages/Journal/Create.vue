@@ -145,7 +145,7 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
         <h3 class="font-bold mt-4">Cuentas</h3>
         <SearchAccount :accounts="accounts" :journal="journal" @addJournalEntry="handleAddJournalEntry" />
 
-        <!-- Tabla -->
+        <!--Component Table -->
         <Table>
           <thead>
             <tr>
