@@ -217,7 +217,7 @@ watch(
                 v-model="fixedAsset.value"
                 type="number"
                 class="mt-1 block w-full"
-                min="0"
+                min="0,00"
               />
               <InputError :message="errorForm.value" class="mt-2" />
             </div>
@@ -228,7 +228,7 @@ watch(
                 v-model="fixedAsset.residual_value"
                 type="number"
                 class="mt-1 block w-full"
-                min="0"
+                min="0,00"
                 :max="fixedAsset.value"
               />
               <InputError :message="errorForm.residual_value" class="mt-2" />
