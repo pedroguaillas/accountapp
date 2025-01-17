@@ -46,23 +46,16 @@ const resetErrorForm = () => {
 const submit = () => {
   fixedAsset.post(route("fixedassets.store"), {
     onError: (errors) => {
-      console.log(errors.value);
-      // Si el error tiene una respuesta estructurada (es decir, Inertia)
-      if (errors.response && errors.response.data.errors) {
-        // Extraemos los errores del backend, que están en la estructura de errors
-        const errorMessage = errors.response.data.errors.value
-          ? errors.response.data.errors.value[0]
-          : 'Error desconocido';
-        
-        // Puedes asignarlo a una variable para mostrarlo en el UI
-        console.error(errorMessage); // O mostrarlo según tu lógica
-        errorForm['fixed_asset'] = errorMessage; // Asignamos el mensaje al campo correspondiente
+      if (errors.type !== undefined && errors.type === "MAXIMO") {
+        errorForm["value"] = errors.value;
+      } else {
+        Object.keys(errors).forEach((key) => {
+          errorForm[key] = errors[key];
+        });
       }
     },
   });
 };
-
-
 
 const calculofecha = computed(() => {
   // Si no hay fecha de adquisición o periodo, no calculamos la fecha final
