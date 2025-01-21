@@ -39,16 +39,19 @@ class CostCenterController extends Controller
     public function store(Request $request)
     {
         $company = Company::first();
+        //crear el costcenter
         CostCenter::create([...$request->all(), 'company_id' => $company->id]);
     }
 
     public function update(Request $request, CostCenter $costCenter)
     {
+        //actualizar constcenter
         $costCenter->update($request->all());
     }
 
     public function destroy(int $costCenterId)
     {
+        //eleiminar el costcenter
         $costCenter = CostCenter::findOrFail($costCenterId);
         $costCenter->delete(); // Esto usará SoftDeletes
 

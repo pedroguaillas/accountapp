@@ -148,7 +148,7 @@ class PaymentRoleController extends Controller
 
     public function export(Request $request)
     {
-
+        //funcion para exportar excel cojiendo los filtros por el request 
         $search = $request->input('search');
         $year = $request->input('year');
         $month = $request->input('month');
@@ -169,6 +169,7 @@ class PaymentRoleController extends Controller
             return to_route('journal.create');
         }
 
+        //traer las cuentas del role ingress
         $roleIngress = RoleIngress::where('company_id', $company->id)
             ->whereNotNull('account_active_id')
             ->whereNotNull('account_pasive_id')
@@ -179,10 +180,9 @@ class PaymentRoleController extends Controller
             return to_route('setting.account.rol.index');
         }
 
+        //traer las cuentas del role egress
         $roleEgress = RoleEgress::where('company_id', $company->id)
-            ->whereNotNull('account_active_id')
             ->whereNotNull('account_pasive_id')
-            ->whereNotNull('account_spent_id')
             ->get();
 
         if ($roleEgress->count() === 0) {
@@ -191,7 +191,9 @@ class PaymentRoleController extends Controller
 
         $rolesIds = $request->selectedIds;
 
+        // usuario autentificado
         $user = auth()->user();
+        //fecha actual
         $date = Carbon::now();
 
         $paymentroles = PaymentRole::with(['employee', 'paymentroleingresses.roleIngress', 'paymentroleegresses.roleEgress'])

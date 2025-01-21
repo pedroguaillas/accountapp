@@ -14,7 +14,7 @@ class RoleEgressController extends Controller
     {
         $company = Company::first();
 
-
+        //lista de egresos
         $egresses = RoleEgress::select("*")
             ->where('company_id', $company->id)
             ->whereNull('deleted_at');

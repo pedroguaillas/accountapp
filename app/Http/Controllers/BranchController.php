@@ -27,7 +27,7 @@ class BranchController extends Controller
         $branches = $branches->paginate(10)->withQueryString();
 
 
-      
+
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Branch/Index', [
             'filters' => $request->search,
@@ -38,6 +38,7 @@ class BranchController extends Controller
 
     public function store(Request $request)
     {
+        //validacion de datos
         $request->validate([
             'number' => 'required|min:1|max:999',
             'name' => 'nullable|min:3|max:300',
@@ -47,9 +48,10 @@ class BranchController extends Controller
             'enviroment_type' => 'required',
 
         ]);
-
+        //llamada a la compania
         $company = Company::first();
 
+        //creacion de los estableicmientos 
         $company->branches()->create($request->all());
 
     }
@@ -64,12 +66,15 @@ class BranchController extends Controller
             //'is_matriz' => '',
             'enviroment_type' => 'required',
         ]);
+
+        //actualizar si esta ya esta seleccionado la matriz las otras se colocan sucursales
         if ($request->is_matriz) {
             $company = Company::first();
 
             $company->branches()->update(['is_matriz' => false]);
         }
 
+        //actulizar los establecimientos
         $branch->update($request->all());
     }
 

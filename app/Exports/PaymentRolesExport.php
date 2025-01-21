@@ -104,6 +104,7 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
             ->unique()
             ->toArray();
 
+        // Encabezados dinámicos de egresos
         $dynamicHeadingss = PaymentRole::with('paymentroleegresses.roleEgress')
             ->get()
             ->pluck('paymentroleegresses.*.roleEgress.name')
@@ -120,6 +121,8 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
     public function styles(Worksheet $sheet)
     {
         $company = Company::first();
+
+        //vector meses para la seleccion del mes que se utiliza en la parte de abajo
         $meses = [
             'ENERO',
             'FEBRERO',
@@ -134,21 +137,21 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
             'NOVIEMBRE',
             'DICIEMBRE'
         ];
-    
+
         // Inserta una fila antes de los encabezados
         $sheet->insertNewRowBefore(1, 2); // Inserta dos filas al principio (para el nuevo título y el encabezado)
-        
+
         // Establece el nuevo título en la celda A1
         $sheet->setCellValue('A1', $company->company); // Reemplaza por el título que desees
-    
+
         // Establece el título del rol de pagos en la celda A2
         $sheet->setCellValue('A2', 'ROL DE PAGOS ' . $meses[$this->month - 1] . ' ' . $this->year);
-    
+
         // Combina las celdas de la fila de título
         $highestColumn = $sheet->getHighestColumn();
         $sheet->mergeCells("A1:{$highestColumn}1");
         $sheet->mergeCells("A2:{$highestColumn}2");
-    
+
         // Estilo para la fila del nuevo título
         $sheet->getStyle('A1')->applyFromArray([
             'font' => [
@@ -160,7 +163,7 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
                 'vertical' => 'center',
             ],
         ]);
-    
+
         // Estilo para la fila de "ROL DE PAGOS"
         $sheet->getStyle('A2')->applyFromArray([
             'font' => [
@@ -172,11 +175,11 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
                 'vertical' => 'center',
             ],
         ]);
-    
+
         // Aplica estilos a todas las celdas de la tabla
         $highestRow = $sheet->getHighestRow();
         $range = "A3:{$highestColumn}{$highestRow}";
-    
+
         $sheet->getStyle($range)->applyFromArray([
             'borders' => [
                 'allBorders' => [
@@ -189,7 +192,7 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
                 'wrapText' => true, // Ajustar texto
             ],
         ]);
-    
+
         // Estilo para los encabezados (ahora en la fila 3)
         $sheet->getStyle("A3:{$highestColumn}3")->applyFromArray([
             'font' => ['bold' => true],
@@ -198,9 +201,9 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
                 'vertical' => 'center',  // Centrado vertical
             ],
         ]);
-    
+
         return [];
     }
-    
+
 
 }

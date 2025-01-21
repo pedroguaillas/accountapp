@@ -51,6 +51,7 @@ class HourController extends Controller
 
     public function store(Request $request)
     {
+        //poner el campo requerido
         $request->validate([
             'amount' => 'required|min:1',
         ]);

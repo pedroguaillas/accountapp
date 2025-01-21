@@ -28,6 +28,7 @@ class IntangibleAssetController extends Controller
             $intangibleAssetssQuery->where('code', 'LIKE', '%' . $search . '%');
         }
 
+        //paginacion de los activos intangibles
         $intangibleAssetss = $intangibleAssetssQuery->paginate(10)->withQueryString();
 
         return Inertia::render('IntangibleAsset/Index', [
