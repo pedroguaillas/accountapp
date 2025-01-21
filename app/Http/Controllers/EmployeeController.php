@@ -61,11 +61,14 @@ class EmployeeController extends Controller
             'cuit' => 'required|min:10|max:13',
         ]);
 
+        //crear un vector inputs para ingresar 
         $inputs = [...$request->all(), 'salary' => $request->salary ?? 0, 'days' => $request->days ?? 0, 'porcent_aportation' => $request->porcent_aportation ?? 0];
 
         $company = Company::first();
 
         $company->employees()->create($inputs);
+
+        //retorno de ruta directo por la ruta del tenant
         return to_route('employee.index');
     }
 

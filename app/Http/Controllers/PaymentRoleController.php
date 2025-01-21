@@ -9,6 +9,8 @@ use App\Models\PaymentRole;
 use App\Models\PaymentRoleIngress;
 use App\Models\PaymentRoleEgress;
 use App\Jobs\ProcessPaymenRole;
+use App\Models\RoleIngress;
+use App\Models\RoleEgress;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -28,7 +30,6 @@ class PaymentRoleController extends Controller
         $year = $request->input('year', $date->year);
         $month = $request->input('month', $date->month);
         $company = Company::first();
-
 
         //$job = new ProcessPaymenRole();
         //$job->handle();
@@ -147,7 +148,7 @@ class PaymentRoleController extends Controller
 
     public function export(Request $request)
     {
-
+        //funcion para exportar excel cojiendo los filtros por el request 
         $search = $request->input('search');
         $year = $request->input('year');
         $month = $request->input('month');
@@ -158,15 +159,41 @@ class PaymentRoleController extends Controller
 
     public function generate(Request $request)
     {
+        $company = Company::first();
 
-        $journal = Journal::where('description', 'ASIENTO DE SITUACION INICIAL')->first();
-        if (!$journal) {
-            return response()->json(['error' => "Debe generar el ASIENTO DE SITUACION INICIAL"], 412);
+        $journal = Journal::where('description', 'ASIENTO DE SITUACION INICIAL')
+            ->where('company_id', $company->id)
+            ->first();
+
+        if ($journal === null) {
+            return to_route('journal.create');
+        }
+
+        //traer las cuentas del role ingress
+        $roleIngress = RoleIngress::where('company_id', $company->id)
+            ->whereNotNull('account_active_id')
+            ->whereNotNull('account_pasive_id')
+            ->whereNotNull('account_spent_id')
+            ->get();
+
+        if ($roleIngress->count() === 0) {
+            return to_route('setting.account.rol.index');
+        }
+
+        //traer las cuentas del role egress
+        $roleEgress = RoleEgress::where('company_id', $company->id)
+            ->whereNotNull('account_pasive_id')
+            ->get();
+
+        if ($roleEgress->count() === 0) {
+            return to_route('ssetting.account.rol.index');
         }
 
         $rolesIds = $request->selectedIds;
-        $company = Company::first();
+
+        // usuario autentificado
         $user = auth()->user();
+        //fecha actual
         $date = Carbon::now();
 
         $paymentroles = PaymentRole::with(['employee', 'paymentroleingresses.roleIngress', 'paymentroleegresses.roleEgress'])

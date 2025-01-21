@@ -13,7 +13,7 @@ class RoleIngressController extends Controller
     public function index(Request $request)
     {
         $company = Company::first();
-        // Construimos la consulta base
+        // Construimos la consulta base para los ingresos
         $ingreses = RoleIngress::select("*")
             ->where('company_id', $company->id)
             ->whereNull('deleted_at');

@@ -15,6 +15,7 @@ class SettingRolController extends Controller
     {
         $company = Company::first();
 
+        //traer los role ingres para la vinculacion de cuentas 
         $roleIngresses = RoleIngress::selectRaw(
             "role_ingresses.*," .
             "aa.code || ' - ' || aa.name AS aa_info," .

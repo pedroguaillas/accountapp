@@ -49,6 +49,7 @@ class CompanyController extends Controller
             
         ]);
 
+        //crear las companias
         Company::create($request->all());
     }
 

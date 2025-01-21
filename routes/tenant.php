@@ -97,8 +97,10 @@ Route::middleware([
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
-        Route::resource('account', AccountController::class)->only(['store', 'update', 'delete']);
-
+        Route::resource('accounts', AccountController::class)->only(['store', 'update', 'destroy']);
+       // Route::post('accounts', [AccountController::class, 'store'])->name('accounts.store');
+        Route::get('accounts/create/{account}', [AccountController::class, 'create'])->name('accounts.create');
+      
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
@@ -143,7 +145,7 @@ Route::middleware([
         Route::put('paymentroles/{id}', [PaymentRoleController::class, 'update'])->name('paymentrol.update');
         Route::get('paymentroles/export', [PaymentRoleController::class, 'export'])->name('paymentrol.export');
         Route::post('generaterolesjournals', [PaymentRoleController::class, 'generate'])->name('paymentrol.journal.generate');
-        
+
         // ingresos
         Route::get('roles-ingresos', [RoleIngressController::class, 'index'])->name('roleingress.index');
         Route::delete('roleingresses/{ingressId}', [RoleIngressController::class, 'destroy'])->name('roleingress.delete');

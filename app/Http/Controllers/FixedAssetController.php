@@ -125,7 +125,7 @@ class FixedAssetController extends Controller
 
         if ($debitValues <= $fixedsSum) {
             $fixedAsset = $company->fixedassets()->create($fixedAssetStoreRequest->all());
-            //validar q se ajuste al valor del aiento inicial 
+            //validar q se ajuste al valor del asiento inicial 
             $journal = $company->journals()->create([
                 'date' => Carbon::now()->toDateString(),
                 'description' => 'Compra de ' . $fixedAssetStoreRequest->detail,
@@ -157,19 +157,9 @@ class FixedAssetController extends Controller
                 // Registro del Activo Fijo
                 $fixedAsset = $company->fixedassets()->create($fixedAssetStoreRequest->all());
             } else {
-                // return Inertia::render('FixedAsset/Create', [
-                //     'error' => "El monto del activo fijo supera al del ESTADO DE SITUACION INICIAL"
-                // ])->with('status', 'error'); }
-
-                // return Inertia::render('FixedAssets/Create', [
-                //     'errors' => [
-                //         'value' => 'Monto superado'
-                //     ]
-                // ]);
-                // return response()->json(['errors' => ['value'=>"Debe generar el ASIENTO DE SITUACION INICIAL"]], 200);
-
                 return redirect()->route('fixedassets.create')->withErrors([
-                    'value' => 'Debe generar el ASIENTO DE SITUACION INICIAL'
+                    'value' => 'El monto máximo permitido es ' . number_format($valueres, 2,'.',''),
+                    'type' => 'MAXIMO'
                 ]);
             }
         }
