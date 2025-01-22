@@ -10,6 +10,7 @@ import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
@@ -192,7 +193,7 @@ const handlePageChange = async (page) => {
                 </button>
                 <Link
                   class="rounded px-2 py-1 bg-blue-500 text-white"
-                  :href="route('employee.edit',employee.id)"
+                  :href="route('employee.edit', employee.id)"
                 >
                   <PencilIcon class="size-4 text-white" />
                 </Link>
@@ -217,6 +218,10 @@ const handlePageChange = async (page) => {
     <template #title> ELIMINAR EMPLEADOS </template>
     <template #content> Esta seguro de eliminar el empleado? </template>
     <template #footer>
+      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
+
       <PrimaryButton type="button" @click="deleteEmployee"
         >Aceptar</PrimaryButton
       >

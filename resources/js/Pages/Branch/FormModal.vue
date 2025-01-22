@@ -5,6 +5,7 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { ref } from "vue";
@@ -97,6 +98,9 @@ defineEmits(["close", "save"]);
       </div>
     </template>
     <template #footer>
+      <SecondaryButton @click="$emit('close')" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
       <button
         @click="$emit('save')"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"

@@ -3,13 +3,14 @@
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
-import { router, useForm  } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
@@ -69,7 +70,7 @@ const save = () => {
   const isUpdate = Boolean(branch.id);
   const routeMethod = isUpdate ? "put" : "post";
   const routeName = isUpdate
-    ? route("branch.update", { id:branch.id}) // Ruta para actualización
+    ? route("branch.update", { id: branch.id }) // Ruta para actualización
     : route("branch.store"); // Ruta para creación
 
   // Preparar la solicitud
@@ -93,7 +94,6 @@ const save = () => {
     },
   });
 };
-
 
 const update = (branchEdit) => {
   resetErrorForm();
@@ -160,9 +160,6 @@ const handlePageChange = async (page) => {
     loading.value = false;
   }
 };
-
-
-
 </script>
 
 <template>
@@ -254,6 +251,9 @@ const handlePageChange = async (page) => {
     <template #title> ELIMINAR ESTABLECIMIENTOS </template>
     <template #content> Esta seguro de eliminar el establecimiento? </template>
     <template #footer>
+      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
       <PrimaryButton type="button" @click="deletebranch">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
