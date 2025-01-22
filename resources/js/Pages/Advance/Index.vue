@@ -10,6 +10,7 @@ import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 //Props
@@ -246,6 +247,9 @@ const handlePageChange = async (page) => {
     <template #title> ELIMINAR ADELANTOS</template>
     <template #content> Esta seguro de eliminar el adelanto? </template>
     <template #footer>
+      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
       <PrimaryButton type="button" @click="deleteadvance"
         >Aceptar</PrimaryButton
       >

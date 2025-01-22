@@ -10,6 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon, ArrowTrendingDownIcon } from "@heroicons/vue/24/solid";
 
 // Props
@@ -156,6 +157,9 @@ const handlePageChange = async (page) => {
     <template #title> ELIMINAR ACTIVOS FIJOS </template>
     <template #content> Esta seguro de eliminar el activo fijo? </template>
     <template #footer>
+      <SecondaryButton @click="modal = !modal" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
       <PrimaryButton type="button" @click="deletefixed">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>

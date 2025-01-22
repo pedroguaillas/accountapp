@@ -10,6 +10,8 @@ import axios from "axios";
 import { ref, reactive, computed } from "vue";
 import { PencilIcon, TrashIcon } from "@heroicons/vue/24/solid";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 //Props
 const props = defineProps({
   accounts: { type: Array, default: () => [] },
@@ -222,6 +224,9 @@ const filteredAccounts = computed(() => {
     <template #title> ELIMINAR CUENTA DEL PLAN DE CUENTAS </template>
     <template #content> Esta seguro de eliminar la cuenta <span class="font-bold">{{account.code}} {{account.name}} </span>?</template>
     <template #footer>
+      <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
       <PrimaryButton type="button" @click="deleteAccount">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>

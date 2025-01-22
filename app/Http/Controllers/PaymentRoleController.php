@@ -169,25 +169,25 @@ class PaymentRoleController extends Controller
             return to_route('journal.create');
         }
 
-        //traer las cuentas del role ingress
-        $roleIngress = RoleIngress::where('company_id', $company->id)
-            ->whereNotNull('account_active_id')
-            ->whereNotNull('account_pasive_id')
-            ->whereNotNull('account_spent_id')
-            ->get();
+        // //traer las cuentas del role ingress
+        // $roleIngress = RoleIngress::where('company_id', $company->id)
+        //     ->whereNotNull('account_active_id')
+        //     ->whereNotNull('account_pasive_id')
+        //     ->whereNotNull('account_spent_id')
+        //     ->get();
 
-        if ($roleIngress->count() === 0) {
-            return to_route('setting.account.rol.index');
-        }
+        // if ($roleIngress->count() === 0) {
+        //     return to_route('setting.account.rol.index');
+        // }
 
-        //traer las cuentas del role egress
-        $roleEgress = RoleEgress::where('company_id', $company->id)
-            ->whereNotNull('account_pasive_id')
-            ->get();
+        // //traer las cuentas del role egress
+        // $roleEgress = RoleEgress::where('company_id', $company->id)
+        //     ->whereNotNull('account_pasive_id')
+        //     ->get();
 
-        if ($roleEgress->count() === 0) {
-            return to_route('ssetting.account.rol.index');
-        }
+        // if ($roleEgress->count() === 0) {
+        //     return to_route('ssetting.account.rol.index');
+        // }
 
         $rolesIds = $request->selectedIds;
 

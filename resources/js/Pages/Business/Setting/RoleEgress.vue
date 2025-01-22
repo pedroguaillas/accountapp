@@ -8,6 +8,7 @@ import axios from "axios";
 import Table from "@/Components/Table.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
@@ -108,7 +109,6 @@ const deleteegress = () => {
       console.error("Error al eliminar egresos", error);
     });
 };
-
 
 const loading = ref(false);
 watch(
@@ -211,6 +211,9 @@ watch(
     <template #title> ELIMINAR EGRESOS</template>
     <template #content> Esta seguro de eliminar el egreso? </template>
     <template #footer>
+      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
       <PrimaryButton type="button" @click="deleteegress">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>

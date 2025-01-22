@@ -8,6 +8,7 @@ import axios from "axios";
 import Table from "@/Components/Table.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
@@ -212,6 +213,9 @@ watch(
     <template #title> ELIMINAR INGRESOS</template>
     <template #content> Esta seguro de eliminar el ingreso? </template>
     <template #footer>
+      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
       <PrimaryButton type="button" @click="deleteingress"
         >Aceptar</PrimaryButton
       >
