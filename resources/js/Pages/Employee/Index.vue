@@ -153,8 +153,8 @@ const handlePageChange = async (page) => {
         </div>
         <Link
           :href="route('employee.create')"
-          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
-        >
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
+          >
           +
         </Link>
       </div>
@@ -186,13 +186,13 @@ const handlePageChange = async (page) => {
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button
-                  class="rounded px-1 py-1 bg-red-500 text-white"
+                   class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
                   @click="removeEmployee(employee.id)"
                 >
                   <TrashIcon class="size-6 text-white" />
                 </button>
                 <Link
-                  class="rounded px-2 py-1 bg-blue-500 text-white"
+                   class="rounded px-2 pt-2 bg-primary hover:bg-primaryhover text-white"
                   :href="route('employee.edit', employee.id)"
                 >
                   <PencilIcon class="size-4 text-white" />

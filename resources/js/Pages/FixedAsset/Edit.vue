@@ -263,7 +263,7 @@ watch(
         <div class="flex justify-end items-center space-x-3 mt-4">
           <button
             type="submit"
-            class="bg-blue-600 text-white px-4 py-2 rounded-lg"
+            class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded"
             :disabled="fixedAsset.processing"
           >
             Guardar

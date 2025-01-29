@@ -2,7 +2,7 @@
 // Imports
 import DialogModal from "@/Components/DialogModal.vue";
 import Table from "@/Components/Table.vue";
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import TextInput from "@/Components/TextInput.vue";
 
 // Props
@@ -26,6 +26,16 @@ const filteredAccounts = computed(() => {
       acc.name.toLowerCase().includes(search.value.toLowerCase()) // Filtrar por nombre
   );
 });
+
+// Watch para reiniciar el buscador al abrir el modal
+watch(
+  () => props.show,
+  (newValue) => {
+    if (newValue) {
+      search.value = ""; // Reinicia el buscador cuando el modal se abre
+    }
+  }
+);
 
 // Emits
 defineEmits(["selectAccount", "close"]);

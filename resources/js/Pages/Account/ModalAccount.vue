@@ -5,6 +5,8 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { ref } from "vue";
@@ -19,8 +21,7 @@ defineProps({
 
 const { focusNextField } = useFocusNextField();
 
-
-const emit = defineEmits(["save", "close"]);  // Asegúrate de emitir 'save' al padre
+const emit = defineEmits(["save", "close"]); // Asegúrate de emitir 'save' al padre
 </script>
 
 <template>
@@ -44,7 +45,7 @@ const emit = defineEmits(["save", "close"]);  // Asegúrate de emitir 'save' al 
             <div class="mt-1 block w-full ml-2 italic">{{ parent.name }}</div>
             <InputError :message="error.code" class="mt-2" />
           </div>
-          <div  class="col-span-6 sm:col-span-4">
+          <div class="col-span-6 sm:col-span-4">
             <InputLabel for="code" value="Cuenta" />
             <div class="mt-1 block w-full ml-2 italic">{{ account.code }}</div>
             <InputError :message="error.code" class="mt-2" />
@@ -66,12 +67,15 @@ const emit = defineEmits(["save", "close"]);  // Asegúrate de emitir 'save' al 
       </div>
     </template>
     <template #footer>
-      <button
+      <SecondaryButton @click="$emit('close')" class="mr-2"
+        >Cancelar
+      </SecondaryButton>
+      <PrimaryButton
         @click="emit('save')"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"
       >
         Guardar
-      </button>
+      </PrimaryButton>
     </template>
   </DialogModal>
 </template>

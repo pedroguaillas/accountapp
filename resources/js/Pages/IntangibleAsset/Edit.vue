@@ -209,7 +209,7 @@ const payMethodOptions = Array.isArray(props.payMethods)
         <div class="mt-4 text-right">
           <button
             @click="save"
-            class="px-4 py-2 bg-blue-500 text-white rounded"
+            class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded"
           >
             Guardar
           </button>

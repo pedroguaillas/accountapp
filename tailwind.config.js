@@ -18,6 +18,17 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                primary: '#153B8A', // Azul oscuro personalizado
+                primaryhover:'#2454AD',
+                secondary: '#ffffff', // Amarillo personalizado
+                secondaryhover:'#eee',
+                success: '#0e9f6e', // Naranja personalizado
+                successhover: '#117729',
+                danger: '#dd1f12',
+                dangerhover: '#bb1a0f',
+
+            },
         },
     },
 

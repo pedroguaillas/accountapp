@@ -181,7 +181,7 @@ const handlePageChange = async (page) => {
         </div>
         <button
           @click="newBranch"
-          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
         >
           +
         </button>
@@ -219,13 +219,13 @@ const handlePageChange = async (page) => {
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button
-                  class="rounded px-1 py-1 bg-red-500 text-white"
+                  class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
                   @click="removeBranch(branch.id)"
                 >
                   <TrashIcon class="size-6 text-white" />
                 </button>
                 <button
-                  class="rounded px-2 py-1 bg-blue-500 text-white"
+                  class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
                   @click="update(branch)"
                 >
                   <PencilIcon class="size-4 text-white" />
@@ -251,7 +251,7 @@ const handlePageChange = async (page) => {
     <template #title> ELIMINAR ESTABLECIMIENTOS </template>
     <template #content> Esta seguro de eliminar el establecimiento? </template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
+      <SecondaryButton  @click="modal1 = !modal1" class="mr-2"
         >Cancelar</SecondaryButton
       >
       <PrimaryButton type="button" @click="deletebranch">Aceptar</PrimaryButton>

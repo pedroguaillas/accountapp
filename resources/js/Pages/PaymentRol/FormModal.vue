@@ -1,6 +1,7 @@
 <script setup>
 // Imports
 import DialogModal from "@/Components/DialogModal.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 // Props
 const props = defineProps({
@@ -64,12 +65,12 @@ defineEmits(["close", "save"]);
     </template>
 
     <template #footer>
-      <button
+      <PrimaryButton
         @click="$emit('save')"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"
       >
         Guardar
-      </button>
+      </PrimaryButton>
     </template>
   </DialogModal>
 </template>

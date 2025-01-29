@@ -167,7 +167,7 @@ const totalHaver = computed(() => {
         <InputError :message="errorForm.totalMismatch" class="mt-2" />
 
         <div class="mt-4 text-right">
-          <button @click="save" :disabled="journal.processing" class="px-4 py-2 bg-blue-500 text-white rounded">
+          <button @click="save" :disabled="journal.processing" class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
             Guardar Cambios
           </button>
         </div>

@@ -1,5 +1,4 @@
 <script setup>
-
 // Imports
 import Table from "@/Components/Table.vue";
 import { ref, watch } from "vue";
@@ -14,7 +13,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 // Props
 const props = defineProps({
   journals: { type: Object, default: () => ({ data: [] }) },
-  validateFixedAsset: { type: Boolean, default: () => (false) },
+  validateFixedAsset: { type: Boolean, default: () => false },
   filters: { type: Object, default: () => ({}) },
 });
 
@@ -47,7 +46,7 @@ const deletejournarls = () => {
 watch(
   search,
   async (newQuery) => {
-    if (loading.value) return
+    if (loading.value) return;
     loading.value = true; // Activa el indicador de carga
     const url = route("journal.index"); // Ruta del índice de sucursales
     try {
@@ -67,7 +66,7 @@ watch(
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
-  if (loading.value) return
+  if (loading.value) return;
   loading.value = true;
   const url = route("journal.index"); // Ruta hacia el backend
 
@@ -87,27 +86,38 @@ const handlePageChange = async (page) => {
 
 <template>
   <AdminLayout title="Asientos contables">
-
     <div v-if="!validateFixedAsset" class="flex mb-3 bg-red-200 p-4 rounded">
-      <p>Ajuste los Activos Fijos
+      <p>
+        Ajuste los Activos Fijos
         <Link :href="route('fixedassets.index')" class="text-blue-800">
-        aqui
+          aqui
         </Link>
       </p>
     </div>
 
     <div class="flex justify-end mb-3">
       <div class="w-full flex sm:justify-end">
-        <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
+        <TextInput
+          v-model="search"
+          type="search"
+          class="block sm:mr-2 h-8 w-full"
+          placeholder="Buscar ..."
+        />
       </div>
-      <Link :href="route('journal.create')"
-        class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
-      +
+      <Link
+        :href="route('journal.create')"
+        class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
+      >
+        +
       </Link>
     </div>
 
     <!-- Card -->
-    <div v-for="journal in props.journals.data" :key="journal.id" class="p-4 bg-white rounded drop-shadow-md mb-3">
+    <div
+      v-for="journal in props.journals.data"
+      :key="journal.id"
+      class="p-4 bg-white rounded drop-shadow-md mb-3"
+    >
       <!-- Card Header -->
       <div class="items-center">
         <h2 class="text-sm sm:text-lg">
@@ -131,7 +141,10 @@ const handlePageChange = async (page) => {
           </tr>
         </thead>
         <tbody class="h-6">
-          <tr v-for="(entry, j) in journal.journal_entries" :key="`journal-${i}-entry-${j}`">
+          <tr
+            v-for="(entry, j) in journal.journal_entries"
+            :key="`journal-${i}-entry-${j}`"
+          >
             <td class="text-left">{{ entry.code }}</td>
             <td class="text-left">{{ entry.name }}</td>
             <td class="text-right">{{ entry.debit.toFixed(2) }}</td>
@@ -148,10 +161,16 @@ const handlePageChange = async (page) => {
         </tfoot>
       </Table>
       <div class="flex flex-row justify-end gap-2">
-        <Link :href="route('journal.edit', journal.id)" class="rounded px-2 py-1 bg-blue-500 text-white">
-        <i class="fa fa-edit"> </i> Modificar
+        <Link
+          :href="route('journal.edit', journal.id)"
+          class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
+        >
+          <i class="fa fa-edit"> </i> Modificar
         </Link>
-        <button class="rounded px-2 py-1 bg-red-500 text-white" @click="removeJournals(journal.id)">
+        <button
+          class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+          @click="removeJournals(journal.id)"
+        >
           <i class="fa fa-trash"></i> Eliminar
         </button>
       </div>
@@ -163,8 +182,12 @@ const handlePageChange = async (page) => {
     <template #title>Eliminar asiento contable</template>
     <template #content> Esta seguro de eliminar el asiento contable? </template>
     <template #footer>
-      <SecondaryButton @click="modal = !modal" class="mr-2">Cancelar</SecondaryButton>
-      <PrimaryButton type="button" @click="deletejournarls">Aceptar</PrimaryButton>
+      <SecondaryButton @click="modal = !modal" class="mr-2"
+        >Cancelar</SecondaryButton
+      >
+      <PrimaryButton type="button" @click="deletejournarls"
+        >Aceptar</PrimaryButton
+      >
     </template>
   </ConfirmationModal>
 </template>

@@ -225,7 +225,7 @@ const save = () => {
         </div>
       </div>
       <div class="mt-4 text-right">
-        <button @click="save" class="px-4 py-2 bg-blue-500 text-white rounded">
+        <button :disabled="employee.processing" @click="save" class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
           Guardar
         </button>
       </div>

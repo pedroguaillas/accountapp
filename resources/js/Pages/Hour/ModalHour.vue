@@ -6,6 +6,7 @@ import TextInput from "@/Components/TextInput.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 
 // Props
@@ -115,12 +116,12 @@ if (!props.hour.date) {
       <SecondaryButton @click="$emit('close')" class="mr-2"
         >Cancelar</SecondaryButton
       >
-      <button
+      <PrimaryButton
         @click="$emit('save')"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"
       >
         Guardar
-      </button>
+      </PrimaryButton>
     </template>
   </DialogModal>
 </template>
