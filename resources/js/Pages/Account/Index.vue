@@ -85,7 +85,7 @@ const deleteAccount = () => {
       router.visit(route("accounts"));
     })
     .catch((error) => {
-      alert("La cuenta esta siendo utilizada. No se puede eliminar");
+      alert("Error al eliminar porque es una cuenta superior o esta utilizada.");
       toggleDelete();
     });
 };
@@ -166,6 +166,7 @@ const filteredAccounts = computed(() => {
             <tr>
               <th class="w-12 text-left">CUENTA</th>
               <th class="text-left">DESCRIPCION</th>
+              <th class="text-right">SALDO</th>
               <th></th>
             </tr>
           </thead>
@@ -184,6 +185,9 @@ const filteredAccounts = computed(() => {
               <td :class="styleAccount(account.code)">
                 {{ account.name }}
               </td>
+              <td class="text-right">
+                {{ account.saldo.toFixed(2) }}
+              </td>
 
               <td
                 v-if="hoveredRow === account.id"
@@ -192,8 +196,8 @@ const filteredAccounts = computed(() => {
                 <ul class="px-4 flex gap-4 rounded items-center justify-center">
                   <li
                     @click="newAccount(account)"
-                    class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
-                  >
+                    class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
+                    >
                     +
                   </li>
                   <li @click="edit(account)">

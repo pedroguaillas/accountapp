@@ -8,6 +8,7 @@ use App\Models\Company;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -22,14 +23,58 @@ class AccountController extends Controller
         }
 
         // Consultar las cuentas con los filtros y relaciones necesarias
-        $accounts = Account::select('accounts.id', 'accounts.code', 'accounts.name', 'a2.code AS c2', 'accounts.is_detail')
-            ->leftJoin('accounts AS a2', 'accounts.parent_id', '=', 'a2.id')
+        $accounts = Account::selectRaw('accounts.id, accounts.code, accounts.name, accounts.parent_id, COALESCE(SUM(je.debit) - SUM(je.have), 0) AS saldo')
+            ->leftJoin('journal_entries as je', function ($join) {
+                $join->on('accounts.id', '=', 'je.account_id')
+                    ->whereNull('je.deleted_at'); // Excluye los eliminados suavemente
+            })
             ->where('accounts.company_id', $company->id)
+            ->groupBy('accounts.id', 'accounts.code', 'accounts.name', 'accounts.parent_id')
             ->orderBy('accounts.code')
             ->get();
 
-        // Retornar la vista con datos
-        return Inertia::render('Account/Index', compact('accounts'));
+        // Convertir las cuentas a una estructura jerárquica
+        $accountsTree = $accounts->groupBy('parent_id');
+
+        // Calcular los saldos desde el nivel raíz
+        $rootAccounts = $accountsTree->get(null) ?? collect();
+        foreach ($rootAccounts as $rootAccount) {
+            $rootAccount->saldo += $this->calculateAccountBalances($rootAccount->id, $accountsTree);
+        }
+
+        // Formatear los datos para retornarlos
+        $formattedAccounts = $accounts->map(function ($account) {
+            return [
+                'id' => $account->id,
+                'code' => $account->code,
+                'name' => $account->name,
+                'parent_id' => $account->parent_id,
+                'saldo' => $account->saldo, // Suma acumulada del saldo
+            ];
+        });
+
+        return Inertia::render('Account/Index', [
+            'accounts' => $formattedAccounts // Pasar directamente como un array asociativo
+        ]);
+    }
+
+    /**
+     * Función recursiva para calcular los saldos de las cuentas hijas y sumar en los padres.
+     */
+    private function calculateAccountBalances($parentId, $accountsTree)
+    {
+        // Obtener las cuentas hijas
+        $children = $accountsTree->get($parentId) ?? collect();
+        $totalSaldo = 0;
+
+        foreach ($children as $child) {
+            // Calcular el saldo de los hijos de forma recursiva
+            $childSaldo = $this->calculateAccountBalances($child->id, $accountsTree);
+            $child->saldo += $childSaldo; // Sumar el saldo acumulado del hijo al propio
+            $totalSaldo += $child->saldo; // Agregar el saldo del hijo al total acumulado
+        }
+
+        return $totalSaldo; // Retornar el saldo total acumulado
     }
 
     public function create(Account $account)
@@ -78,8 +123,13 @@ class AccountController extends Controller
 
     public function destroy(Account $account)
     {
+        $hasChildren = Account::where('parent_id', $account->id)->exists();
+        if (!$hasChildren) {
+            $account->delete();
+        } else {
+            return response()->json(["sms"=>"Error al eliminar porque es una cuenta superior"],400);
+        }
 
-        $account->delete();
     }
 
     public function import(Request $request)

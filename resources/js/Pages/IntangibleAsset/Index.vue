@@ -12,7 +12,6 @@ import Paginate from "@/Components/Paginate.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
-
 // Props
 
 // Props
@@ -107,7 +106,7 @@ const handlePageChange = async (page) => {
 
         <Link
           :href="route('intangibleassets.create')"
-          class="px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
         >
           +
         </Link>
@@ -141,30 +140,27 @@ const handlePageChange = async (page) => {
               <td>
                 {{ inta.value }}
               </td>
-      
-                 
+
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
                   <button
-                    class="rounded px-1 py-1 bg-red-500 text-white"
+                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
                     @click="removeIntangibleAsset(inta.id)"
                   >
                     <TrashIcon class="size-6 text-white" />
                   </button>
                   <Link
-                    class="rounded px-2 py-1 bg-blue-500 text-white"
+                    class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
                     :href="route('intangibleassets.edit', inta.id)"
                   >
                     <PencilIcon class="size-4 text-white" />
                   </Link>
                 </div>
               </td>
-
             </tr>
           </tbody>
         </Table>
-        
-       </div>
+      </div>
     </div>
     <Paginate :page="props.intangibleAssetss" @page-change="handlePageChange" />
   </AdminLayout>

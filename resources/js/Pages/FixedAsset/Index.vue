@@ -1,5 +1,4 @@
 <script setup>
-
 // Imports
 import { Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
@@ -11,7 +10,11 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { TrashIcon, PencilIcon, ArrowTrendingDownIcon } from "@heroicons/vue/24/solid";
+import {
+  TrashIcon,
+  PencilIcon,
+  ArrowTrendingDownIcon,
+} from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
@@ -98,12 +101,19 @@ const handlePageChange = async (page) => {
           Activos fijos
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
+          <TextInput
+            v-model="search"
+            type="search"
+            class="block sm:mr-2 h-8 w-full"
+            placeholder="Buscar ..."
+          />
         </div>
 
-        <Link :href="route('fixedassets.create')"
-          class="mt-2 sm:mt-0 px-2 bg-green-500 dark:bg-green-600 text-2xl text-white rounded font-bold">
-        +
+        <Link
+          :href="route('fixedassets.create')"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
+        >
+          +
         </Link>
       </div>
 
@@ -121,7 +131,11 @@ const handlePageChange = async (page) => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(fixe, i) in props.fixedAssetss.data" :key="fixe.id" class="border-t [&>td]:py-2">
+            <tr
+              v-for="(fixe, i) in props.fixedAssetss.data"
+              :key="fixe.id"
+              class="border-t [&>td]:py-2"
+            >
               <td>{{ i + 1 }}</td>
               <td>{{ fixe.code }}</td>
               <td>
@@ -134,21 +148,29 @@ const handlePageChange = async (page) => {
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button class="rounded px-1 py-1 bg-red-500 text-white" @click="removeFixedAsset(fixe.id)">
+                  <button
+                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                    @click="removeFixedAsset(fixe.id)"
+                  >
                     <TrashIcon class="size-6 text-white" />
                   </button>
-                  <Link class="rounded px-2 py-1 bg-blue-500 text-white" :href="route('fixedassets.edit', fixe.id)">
-                  <PencilIcon class="size-4 text-white" />
+                  <Link
+                    class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
+                    :href="route('fixedassets.edit', fixe.id)"
+                  >
+                    <PencilIcon class="size-4 text-white" />
                   </Link>
-                  <Link class="rounded px-2 pt-1 pb-0 bg-blue-800 text-white" :href="route('depreciations.index', fixe.id)">
-                  <ArrowTrendingDownIcon class="size-4 text-white" />
+                  <Link
+                    class="rounded px-2 pt-1 pb-0 bg-blue-800 text-white"
+                    :href="route('depreciations.index', fixe.id)"
+                  >
+                    <ArrowTrendingDownIcon class="size-4 text-white" />
                   </Link>
                 </div>
               </td>
             </tr>
           </tbody>
         </Table>
-
       </div>
     </div>
     <Paginate :page="props.fixedAssetss" @page-change="handlePageChange" />
