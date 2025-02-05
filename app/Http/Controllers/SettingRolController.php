@@ -17,32 +17,28 @@ class SettingRolController extends Controller
 
         //traer los role ingres para la vinculacion de cuentas 
         $roleIngresses = RoleIngress::selectRaw(
-            "role_ingresses.*," .
-            "aa.code || ' - ' || aa.name AS aa_info," .
-            "ap.code || ' - ' || ap.name AS ap_info," .
-            "ass.code || ' - ' || ass.name AS ass_info"
+            "role_ingresses.*, " .
+            "CONCAT(ap.code, ' - ', ap.name) AS ap_info, " .
+            "CONCAT(ac.code, ' - ', ac.name) AS ac_info"
         )
-            ->leftJoin('accounts AS aa', 'account_active_id', '=', 'aa.id')
-            ->leftJoin('accounts AS ap', 'account_pasive_id', '=', 'ap.id')
-            ->leftJoin('accounts AS ass', 'account_spent_id', '=', 'ass.id')
-            ->where('role_ingresses.company_id', $company->id)
-            ->where('role_ingresses.type','fijo')
-            ->orderBy('id')
-            ->get();
+        ->leftJoin('accounts AS ap', 'role_ingresses.account_departure_id', '=', 'ap.id')
+        ->leftJoin('accounts AS ac', 'role_ingresses.account_counterpart_id', '=', 'ac.id')
+        ->where('role_ingresses.company_id', $company->id)
+        ->orderBy('role_ingresses.id')
+        ->get();
+        
 
         $roleEgresses = RoleEgress::selectRaw(
-            "role_egresses.*," .
-            "aa.code || ' - ' || aa.name AS aa_info," .
-            "ap.code || ' - ' || ap.name AS ap_info," .
-            "ass.code || ' - ' || ass.name AS ass_info"
+            "role_egresses.*, " .
+            "CONCAT(ap.code, ' - ', ap.name) AS ap_info, " .
+            "CONCAT(ac.code, ' - ', ac.name) AS ac_info"
         )
-            ->leftJoin('accounts AS aa', 'account_active_id', '=', 'aa.id')
-            ->leftJoin('accounts AS ap', 'account_pasive_id', '=', 'ap.id')
-            ->leftJoin('accounts AS ass', 'account_spent_id', '=', 'ass.id')
-            ->where('role_egresses.company_id', $company->id)
-            ->orderBy('id')
-            ->where('role_egresses.type','fijo')
-            ->get();
+        ->leftJoin('accounts AS ap', 'role_egresses.account_departure_id', '=', 'ap.id')
+        ->leftJoin('accounts AS ac', 'role_egresses.account_counterpart_id', '=', 'ac.id')
+        ->where('role_egresses.company_id', $company->id)
+        ->orderBy('role_egresses.id')
+        ->get();
+        
 
         $accounts = Account::select('id', 'code', 'name')
             ->where('is_detail', true)

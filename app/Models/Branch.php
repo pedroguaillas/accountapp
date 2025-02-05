@@ -22,6 +22,7 @@ class Branch extends Model
         'enviroment_type', // Ambiente 1-Pruebas, 2-Produccion
         'email', // Correo a utilizar para el envio de correos
         'pass_email', // Contraseñ a utilizar para el envio de correos
+        'state',
     ];
 
     protected function casts(): array
@@ -31,5 +32,10 @@ class Branch extends Model
             'is_matriz' => 'boolean',
             'enviroment_type' => 'integer',
         ];
+    }
+
+    public function getStatusAttribute()
+    {
+        return $this->state ? 'Activo' : 'Inactivo';
     }
 }

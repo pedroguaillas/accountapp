@@ -65,5 +65,14 @@ class TenantSeeder extends Seeder
             ['name' => "Sueldo a pagar", 'code' => 'SP', 'type' => 'fijo'],
             ['name' => "Otros egresos", 'code' => 'OE', 'type' => 'fijo'],
         ]);
+
+        $company->movementtypes()->createMany([
+           // ['name' => "Tarjeta de crédito"],
+           // ['name' => "Anticipo empleado"],
+            ['name' => "Anticipo proveedor",'type'=>"Egreso"],
+            ['name' => "Anticipo cliente",'type'=>"Ingreso"],
+            ['name' => "Deposito",'type'=>"Ingreso"],
+            ['name' => "Retiro",'type'=>"Egreso"],
+        ]);
     }
 }

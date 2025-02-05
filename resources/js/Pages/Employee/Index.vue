@@ -132,6 +132,23 @@ const handlePageChange = async (page) => {
     loading.value = false;
   }
 };
+
+const toggleState = (employeeId, currentState) => {
+  const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
+
+  axios
+    .put(route("employee.updateState", { id: employeeId }), {
+      state: newState,
+    })
+    .then(() => {
+      // On success, reload the page or update the local data
+      router.visit(route("employee.index"));
+    })
+    .catch((error) => {
+      console.error("Error al cambiar el estado del empleado", error);
+      alert("Ocurrió un error al cambiar el estado. Intenta de nuevo.");
+    });
+};
 </script>
 
 <template>
@@ -168,6 +185,7 @@ const handlePageChange = async (page) => {
             <th class="text-left">CARGO</th>
             <th>DIAS</th>
             <th class="text-right pr-4">SALARIO</th>
+            <th >ESTADO</th>
             <th class="w-1"></th>
           </tr>
         </thead>
@@ -183,6 +201,16 @@ const handlePageChange = async (page) => {
             <td class="text-left">{{ employee.position }}</td>
             <td>{{ employee.days }}</td>
             <td class="text-right pr-4">{{ employee.salary.toFixed(2) }}</td>
+
+            <td >
+                <button
+                  :class="employee.state ? 'bg-success' : 'bg-danger'"
+                  @click="toggleState(employee.id, employee.state)"
+                  class="rounded px-2 py-1 text-white"
+                >
+                  {{ employee.state ? "Activo" : "Inactivo" }}
+                </button>
+              </td>
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button

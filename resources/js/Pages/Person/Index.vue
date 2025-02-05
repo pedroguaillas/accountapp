@@ -11,11 +11,11 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { TrashIcon, PencilIcon,ListBulletIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
-  branches: { type: Object, default: () => ({}) },
+  people: { type: Object, default: () => ({}) },
   filters: { type: String, default: "" },
 });
 
@@ -31,29 +31,30 @@ const toggle1 = () => {
 };
 
 // Inicializador de objetos
-const initialBranch = {
-  number: "",
-  name: "",
-  city: "",
-  address: "",
-  is_matriz: false,
-  enviroment_type: "",
+const initialPerson = {
+  identification:"",
+  first_name: "",
+  last_name: "",
+  email:"",
+  phone_number:"",
+  gender: "",
+
 };
 
 // Reactives
-const branch = useForm({ ...initialBranch });
-const errorForm = reactive({ ...initialBranch });
+const person = useForm({ ...initialPerson });
+const errorForm = reactive({ ...initialPerson });
 
-const newBranch = () => {
-  if (branch.id !== undefined) {
-    delete branch.id;
+const newPerson = () => {
+  if (person.id !== undefined) {
+    delete person.id;
   }
-  Object.assign(branch, initialBranch);
+  Object.assign(person, initialPerson);
   toggle();
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialBranch);
+  Object.assign(errorForm, initialPerson);
 };
 
 const toggle = () => {
@@ -61,24 +62,19 @@ const toggle = () => {
 };
 
 const save = () => {
-  // Validar campos obligatorios antes de enviar la solicitud
-  if (!branch.number || !branch.name || !branch.city || !branch.address) {
-    alert("Por favor, complete todos los campos obligatorios");
-    return;
-  }
   // Determinar el método HTTP y la ruta correspondiente
-  const isUpdate = Boolean(branch.id);
+  const isUpdate = Boolean(person.id);
   const routeMethod = isUpdate ? "put" : "post";
   const routeName = isUpdate
-    ? route("branch.update", { id: branch.id }) // Ruta para actualización
-    : route("branch.store"); // Ruta para creación
+    ? route("people.update", { id: person.id }) // Ruta para actualización
+    : route("people.store"); // Ruta para creación
 
   // Preparar la solicitud
-  branch[routeMethod](routeName, {
+  person[routeMethod](routeName, {
     onSuccess: () => {
       toggle(); // Cerrar modal o reiniciar estados
       resetErrorForm(); // Limpiar errores del formulario
-      router.reload({ only: ["stores"] }); // Recargar datos
+      router.reload({ only: ["people"] }); // Recargar datos
     },
     onError: (error) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
@@ -95,28 +91,28 @@ const save = () => {
   });
 };
 
-const update = (branchEdit) => {
+const update = (personEdit) => {
   resetErrorForm();
-  Object.keys(branchEdit).forEach((key) => {
-    branch[key] = branchEdit[key];
+  Object.keys(personEdit).forEach((key) => {
+    person[key] = personEdit[key];
   });
   toggle();
 };
 
-const removeBranch = (branchId) => {
+const removePerson = (personId) => {
   toggle1();
-  deleteid.value = branchId;
+  deleteid.value = personId;
 };
 
-const deletebranch = () => {
+const deletePerson = () => {
   axios
-    .delete(route("branch.delete", deleteid.value)) // Eliminar centro de costos
+    .delete(route("people.delete", deleteid.value)) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("branch.index"));
+      router.visit(route("people.index"));
     })
     .catch((error) => {
-      console.error("Error al eliminar a sucursal", error);
+      console.error("Error al eliminar la persona", error);
     });
 };
 
@@ -124,14 +120,12 @@ watch(
   search,
 
   async (newQuery) => {
-    const url = route("branch.index");
+    const url = route("people.index");
     loading.value = true;
-    console.log("si entra");
-
     try {
       await router.get(
         url,
-        { search: newQuery, page: props.branches.current_page }, // Mantener la página actual
+        { search: newQuery, page: props.people.current_page }, // Mantener la página actual
         { preserveState: true }
       );
     } catch (error) {
@@ -145,7 +139,7 @@ watch(
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
-  const url = route("branch.index"); // Ruta hacia el backend
+  const url = route("people.index"); // Ruta hacia el backend
   loading.value = true;
 
   try {
@@ -161,31 +155,17 @@ const handlePageChange = async (page) => {
   }
 };
 
-const toggleState = (branchId, currentState) => {
-  const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
-
-  axios
-    .put(route("branch.updateState", { id: branchId }), { state: newState })
-    .then(() => {
-      // On success, reload the page or update the local data
-      router.visit(route("branch.index"));
-    })
-    .catch((error) => {
-      console.error("Error al cambiar el estado de la sucursal", error);
-      alert("Ocurrió un error al cambiar el estado. Intenta de nuevo.");
-    });
-};
 
 </script>
 
 <template>
-  <AdminLayout title="Sucursales / establecimientos">
+  <AdminLayout title="Persona">
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Sucursales / establecimientos
+          personas
         </h2>
         <div class="w-full flex sm:justify-end">
           <TextInput
@@ -196,7 +176,7 @@ const toggleState = (branchId, currentState) => {
           />
         </div>
         <button
-          @click="newBranch"
+          @click="newPerson"
           class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
         >
           +
@@ -207,51 +187,35 @@ const toggleState = (branchId, currentState) => {
         <thead>
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
-            <th>ESTAB</th>
-            <th>NOMBRE</th>
-            <th>CIUDAD</th>
-            <th>DIRECCION</th>
-            <th>MATRIZ</th>
-            <th>AMBIENTE</th>
-            <th>ESTADO</th>
-            <th class="w-1"></th>
+            <th class="text-left">CEDULA</th>
+            <th class="text-left">NOMBRE</th>
+            <th class="text-left">APELLIDO</th>
+
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(branch, i) in props.branches.data"
-            :key="branch.id"
+            v-for="(person, i) in props.people.data"
+            :key="person.id"
             class="border-t [&>td]:py-2"
           >
             <td>{{ i + 1 }}</td>
-            <td>{{ branch.number }}</td>
-            <td>{{ branch.name }}</td>
-            <td>{{ branch.city }}</td>
-            <td>{{ branch.address }}</td>
-            <td>{{ branch.is_matriz ? "Matriz" : "Sucursal" }}</td>
-            <td>
-              {{ branch.enviroment_type === 1 ? "Prueba" : "Producción" }}
-            </td>
-            <td >
-              <button
-                :class="branch.state ? 'bg-success' : 'bg-danger'"
-                @click="toggleState(branch.id, branch.state)"
-                class="rounded px-2 py-1 text-white"
-              >
-                {{ branch.state ? "Activo" : "Inactivo" }}
-              </button>
-            </td>
+            <td class="text-left">{{ person.identification }}</td>
+            <td class="text-left">{{ person.first_name }}</td>
+            <td class="text-left">{{ person.last_name }}</td>
+
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button
                   class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="removeBranch(branch.id)"
+                  @click="removePerson(person.id)"
                 >
                   <TrashIcon class="size-6 text-white" />
                 </button>
                 <button
                   class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                  @click="update(branch)"
+                  @click="update(person)"
                 >
                   <PencilIcon class="size-4 text-white" />
                 </button>
@@ -261,25 +225,25 @@ const toggleState = (branchId, currentState) => {
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.branches" @page-change="handlePageChange" />
+    <Paginate :page="props.people" @page-change="handlePageChange" />
   </AdminLayout>
 
   <FormModal
     :show="modal"
-    :branch="branch"
+    :person="person"
     :error="errorForm"
     @close="toggle"
     @save="save"
   />
 
   <ConfirmationModal :show="modal1">
-    <template #title> ELIMINAR ESTABLECIMIENTOS </template>
-    <template #content> Esta seguro de eliminar el establecimiento? </template>
+    <template #title> ELIMINAR PERSONAS</template>
+    <template #content> Esta seguro de eliminar la persona? </template>
     <template #footer>
       <SecondaryButton @click="modal1 = !modal1" class="mr-2"
         >Cancelar</SecondaryButton
       >
-      <PrimaryButton type="button" @click="deletebranch">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deletePerson">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

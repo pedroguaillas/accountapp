@@ -49,5 +49,10 @@ class Employee extends Model
         return $this->hasMany(PaymentRole::class);
     }
 
+    public function getStatusAttribute()
+    {
+        return $this->state ? 'Activo' : 'Inactivo';
+    }
+
 }
 

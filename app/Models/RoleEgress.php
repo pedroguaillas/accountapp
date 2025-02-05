@@ -15,9 +15,8 @@ class RoleEgress extends Model
         'name', // nombre del egreso
         'code', // codigo del egreso
         'type', // typo (fijo y otro)
-        'account_active_id',//cuenta activo
-        'account_pasive_id',//cuenta pasivo
-        'account_spent_id',//cuenta gasto
+        'account_departure_id',//cuenta activo
+        'account_counterpart_id',//cuenta 
     ];
 
 

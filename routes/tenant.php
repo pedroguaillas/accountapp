@@ -6,7 +6,11 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\HourController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\PersonController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\BankController;
+use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\MovementTypeController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\EmployeeController;
@@ -19,6 +23,7 @@ use App\Http\Controllers\RoleEgressController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\SettingAccountController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\SettingRolController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -87,12 +92,14 @@ Route::middleware([
         Route::post('costcenters', [CostCenterController::class, 'store'])->name('costCenter.store');
         Route::put('costcenters/{costCenter}', [CostCenterController::class, 'update'])->name('costCenter.update');
         Route::delete('costcenters/{costCenterId}', [CostCenterController::class, 'destroy'])->name('costCenter.delete');
+        Route::put('costcenters/{id}/state', [CostCenterController::class, 'updateState'])->name('costCenter.updateState');
 
         //establecimientos
         Route::get('establecimientos', [BranchController::class, 'index'])->name('branch.index');
         Route::post('stores', [BranchController::class, 'store'])->name('branch.store');
         Route::put('stores/{branch}', [BranchController::class, 'update'])->name('branch.update');
         Route::delete('stores/{branch}', [BranchController::class, 'destroy'])->name('branch.delete');
+        Route::put('stores/{id}/state', [BranchController::class, 'updateState'])->name('branch.updateState');
 
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
@@ -133,6 +140,7 @@ Route::middleware([
         Route::get('empleados/editar/{employeeId}', [EmployeeController::class, 'edit'])->name('employee.edit');
         Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.delete');
         Route::resource('employee', EmployeeController::class)->only(['store', 'update']);
+        Route::put('employees/{id}/state', [EmployeeController::class, 'updateState'])->name('employee.updateState');
 
         //adelantos
         Route::get('adelantos', [AdvanceController::class, 'index'])->name('advances.index');
@@ -173,5 +181,39 @@ Route::middleware([
         // Emparejamiento de cuentas roles
         Route::get('vinculacion-contable/roles', [SettingRolController::class, 'index'])->name('setting.account.rol.index');
         Route::put('settingaccountrol/update/{id}', [SettingRolController::class, 'updateRoleAccount'])->name('settingaccount.rol.update');
+    
+        //bancos
+        Route::get('bancos', [BankController::class, 'index'])->name('banks.index');
+        Route::post('banks', [BankController::class, 'store'])->name('banks.store');
+        Route::put('banks/{bank}', [BankController::class, 'update'])->name('banks.update');
+        Route::delete('banks/{bank}', [BankController::class, 'destroy'])->name('banks.delete');
+        Route::put('banks/{id}/state', [BankController::class, 'updateState'])->name('banks.updateState');
+
+        //cuentas
+        Route::get('cuentas-bancarias/{bank}', [BankAccountController::class, 'index'])->name('bankaccounts.index');
+        Route::post('bankaccounts', [BankAccountController::class, 'store'])->name('bankaccounts.store');
+        Route::put('bankaccounts/{bankaccount}', [BankAccountController::class, 'update'])->name('bankaccounts.update');
+        Route::delete('bankaccounts/{bankaccount}', [BankAccountController::class, 'destroy'])->name('bankaccounts.delete');
+        Route::put('bankaccounts/{id}/state', [BankAccountController::class, 'updateState'])->name('bankaccounts.updateState');
+
+        //tipos de movimiento
+        Route::get('tipos-movimientos-bancarios', [MovementTypeController::class, 'index'])->name('movementtypes.index');
+        Route::post('movementtypes', [MovementTypeController::class, 'store'])->name('movementtypes.store');
+        Route::put('movementtypes/{movementtype}', [MovementTypeController::class, 'update'])->name('movementtypes.update');
+        Route::delete('movementtypes/{movementtype}', [MovementTypeController::class, 'destroy'])->name('movementtypes.delete');
+
+        //transacciones
+        Route::get('movimientos-bancarios', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('movimientos-bancarios/crear', [TransactionController::class, 'create'])->name('transactions.create');
+        Route::post('transactions', [TransactionController::class, 'store'])->name('transactions.store');
+        Route::put('transactions/{transaction}', [TransactionController::class, 'update'])->name('transactions.update');
+        Route::delete('transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.delete');
+    
+          //bancos
+          Route::get('personas', [PersonController::class, 'index'])->name('people.index');
+          Route::post('people', [PersonController::class, 'store'])->name('people.store');
+          Route::put('people/{person}', [PersonController::class, 'update'])->name('people.update');
+          Route::delete('people/{person}', [PersonController::class, 'destroy'])->name('people.delete');
+          
     });
 });

@@ -24,7 +24,7 @@ const modal = ref(false);
 const search = ref(props.filters);
 
 // Initial cost center object
-const initialCostCenter = { name: "", code: "", state: "" };
+const initialCostCenter = { name: "", code: "" };
 
 // Reactives
 const costCenter = useForm({ ...initialCostCenter });
@@ -153,7 +153,22 @@ const handlePageChange = async (page) => {
   }
 };
 
-// Watch for search changes
+const toggleState = (costcenterId, currentState) => {
+  const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
+
+  axios
+    .put(route("costCenter.updateState", { id: costcenterId }), {
+      state: newState,
+    })
+    .then(() => {
+      // On success, reload the page or update the local data
+      router.visit(route("costcenter.index"));
+    })
+    .catch((error) => {
+      console.error("Error al cambiar el estado del centro de costo", error);
+      alert("Ocurrió un error al cambiar el estado. Intenta de nuevo.");
+    });
+};
 </script>
 
 <template>
@@ -176,7 +191,7 @@ const handlePageChange = async (page) => {
         <button
           @click="newCostCenter"
           class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-          >
+        >
           +
         </button>
       </div>
@@ -190,6 +205,7 @@ const handlePageChange = async (page) => {
               <th class="w-1">N°</th>
               <th>CODIGO</th>
               <th>NOMBRE</th>
+              <th>ESTADO</th>
               <th class="w-1"></th>
             </tr>
           </thead>
@@ -202,7 +218,15 @@ const handlePageChange = async (page) => {
               <td>{{ i + 1 }}</td>
               <td>{{ costCenter.code }}</td>
               <td>{{ costCenter.name }}</td>
-
+              <td >
+                <button
+                  :class="costCenter.state ? 'bg-success' : 'bg-danger'"
+                  @click="toggleState(costCenter.id, costCenter.state)"
+                  class="rounded px-2 py-1 text-white"
+                >
+                  {{ costCenter.state ? "Activo" : "Inactivo" }}
+                </button>
+              </td>
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
                   <button
@@ -212,7 +236,7 @@ const handlePageChange = async (page) => {
                     <TrashIcon class="size-6 text-white" />
                   </button>
                   <button
-                  class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
+                    class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
                     @click="update(costCenter)"
                   >
                     <PencilIcon class="size-4 text-white" />

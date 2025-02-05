@@ -15,7 +15,7 @@ class CostCenter extends Model
         "code", // Codigo de centro de costos
         "name", // Nombre de centro de costos
         "parent_id", // Si tiene un ID padre de Centro de Costos
-        "is_active",
+        "state",
     ];
 
     protected function casts(): array
@@ -23,5 +23,10 @@ class CostCenter extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    public function getStatusAttribute()
+    {
+        return $this->state ? 'Activo' : 'Inactivo';
     }
 }

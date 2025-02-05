@@ -68,6 +68,8 @@ return new class extends Migration {
             $table->integer('enviroment_type')->default(1);
             $table->string('email')->nullable();
             $table->string('pass_email')->nullable();
+            $table->boolean('state')->default(true); // Active/inactive state
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -102,7 +104,8 @@ return new class extends Migration {
             $table->string('code');
             $table->string('name');
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->boolean("is_active")->default(true);
+            $table->boolean('state')->default(true); // Active/inactive state
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -117,7 +120,7 @@ return new class extends Migration {
             $table->string('name');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('type'); // activo, pasivo, patrimonio, ingreso, gasto y costos
-            $table->boolean("is_active")->default(true);
+            $table->boolean("state")->default(true);
             $table->boolean("is_detail")->default(false);
             $table->timestamps();
             $table->softDeletes();
@@ -264,6 +267,8 @@ return new class extends Migration {
             $table->boolean('xiv')->default(false);
             $table->boolean('reserve_funds')->default(false);
             $table->string('email')->nullable();
+            $table->boolean('state')->default(true); // Active/inactive state
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -293,9 +298,8 @@ return new class extends Migration {
             $table->string('code');
             $table->string('name');
             $table->string('type');
-            $table->bigInteger('account_active_id')->nullable();
-            $table->bigInteger('account_pasive_id')->nullable();
-            $table->bigInteger('account_spent_id')->nullable();
+            $table->bigInteger('account_departure_id')->nullable();
+            $table->bigInteger('account_counterpart_id')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
@@ -310,10 +314,9 @@ return new class extends Migration {
             $table->string('code');
             $table->string('name');
             $table->string('type');
-            $table->bigInteger('account_active_id')->nullable();
-            $table->bigInteger('account_pasive_id')->nullable();
-            $table->bigInteger('account_spent_id')->nullable();
-            
+            $table->bigInteger('account_departure_id')->nullable();
+            $table->bigInteger('account_counterpart_id')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -381,6 +384,87 @@ return new class extends Migration {
             $table->foreign('employee_id')->references('id')->on('employees');
             $table->foreign('company_id')->references('id')->on('companies');
         });
+
+        Schema::create('movement_types', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->string('name'); // Movement type name (e.g., debit card, client advance)
+            $table->string('type'); // tipo de movimiento(ingreso o egreso)
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+
+        });
+
+        Schema::create('banks', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->string('name'); // Bank name
+            $table->text('description')->nullable(); // Additional information
+            $table->boolean('state')->default(true); // Active/inactive state
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
+        Schema::create('bank_accounts', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('bank_id');
+            $table->bigInteger('company_id');
+            $table->string('account_number')->unique(); // Unique account number
+            $table->string('account_type'); // Account type
+            $table->decimal('current_balance', 15, 2)->default(0); // Current balance
+            $table->boolean('state')->default(true); // Active/inactive state
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+            $table->foreign('bank_id')->references('id')->on('banks');
+
+            $table->unique(['company_id', 'account_number']);
+
+        });
+
+        Schema::create('transactions', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('movement_type_id');
+            $table->bigInteger('bank_account_id'); 
+            $table->bigInteger('company_id');
+            $table->date('transaction_date'); // Transaction date and time
+            $table->decimal('amount', 15, 2); // Transaction amount
+            $table->string('description')->nullable(); // Transaction description
+            $table->string('payment_method'); // Tipo de pago (por ejemplo, cheque, efectivo, trasnferencia bancaria)
+            $table->string('beneficiary_id'); // Persona beneficiaria
+            $table->date('cheque_date')->nullable(); // Fecha del cheque (solo cuando el método de pago sea cheque)
+            $table->string('transfer_account')->nullable(); // numero de cuenta (solo cuando el método de pago sea diferente de cheque)
+            $table->string('voucher_number')->nullable(); // Número de comprobante
+            $table->string('state_transaction'); // Completed/pending state
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+            $table->foreign('bank_account_id')->references('id')->on('bank_accounts');
+            $table->foreign('movement_type_id')->references('id')->on('movement_types');
+        });
+
+        Schema::create('people', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->string('identification'); // cedula
+            $table->string('first_name'); // Primer nombre
+            $table->string('last_name'); // Apellido
+            $table->string('email')->unique(); // Correo electrónico
+            $table->string('phone_number')->nullable(); // Número de teléfono
+            $table->string('gender')->nullable(); // Género
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
     }
 
     /**
@@ -405,5 +489,10 @@ return new class extends Migration {
         Schema::dropIfExists('advances');
         Schema::dropIfExists('payment_roles');
         Schema::dropIfExists('hours');
+        Schema::dropIfExists('movement_types');
+        Schema::dropIfExists('bank_accounts');
+        Schema::dropIfExists('transactions');
+        Schema::dropIfExists('people');
+
     }
 };

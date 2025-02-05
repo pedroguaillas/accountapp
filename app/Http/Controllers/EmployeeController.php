@@ -30,7 +30,8 @@ class EmployeeController extends Controller
                 is_a_parnert, 
                 is_a_qualified_craftsman, 
                 affiliated_with_spouse, 
-                to_char(date_start, 'YYYY-MM-DD') as date_start
+                to_char(date_start, 'YYYY-MM-DD') as date_start,
+                state
 
             ")
             ->when($search, function ($query, $search) {
@@ -122,5 +123,14 @@ class EmployeeController extends Controller
             'success' => true,
             'message' => 'Empleado eliminado correctamente.',
         ]);
+    }
+
+    public function updateState($id)
+    {
+        $employee = Employee::findOrFail($id);
+        $employee ->state = !$employee ->state; // Toggle the state
+        $employee ->save();
+
+        return response()->json(['success' => true]);
     }
 }
