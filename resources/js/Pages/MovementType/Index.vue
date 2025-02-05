@@ -15,7 +15,7 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
-  branches: { type: Object, default: () => ({}) },
+  movementtypes: { type: Object, default: () => ({}) },
   filters: { type: String, default: "" },
 });
 
@@ -31,29 +31,25 @@ const toggle1 = () => {
 };
 
 // Inicializador de objetos
-const initialBranch = {
-  number: "",
+const initialMovementType = {
   name: "",
-  city: "",
-  address: "",
-  is_matriz: false,
-  enviroment_type: "",
+  type: "",
 };
 
 // Reactives
-const branch = useForm({ ...initialBranch });
-const errorForm = reactive({ ...initialBranch });
+const movementtype = useForm({ ...initialMovementType });
+const errorForm = reactive({ ...initialMovementType });
 
-const newBranch = () => {
-  if (branch.id !== undefined) {
-    delete branch.id;
+const newMovementType = () => {
+  if (movementtype.id !== undefined) {
+    delete movementtype.id;
   }
-  Object.assign(branch, initialBranch);
+  Object.assign(movementtype, initialMovementType);
   toggle();
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialBranch);
+  Object.assign(errorForm, initialMovementType);
 };
 
 const toggle = () => {
@@ -61,24 +57,20 @@ const toggle = () => {
 };
 
 const save = () => {
-  // Validar campos obligatorios antes de enviar la solicitud
-  if (!branch.number || !branch.name || !branch.city || !branch.address) {
-    alert("Por favor, complete todos los campos obligatorios");
-    return;
-  }
   // Determinar el método HTTP y la ruta correspondiente
-  const isUpdate = Boolean(branch.id);
+
+  const isUpdate = Boolean(movementtype.id);
   const routeMethod = isUpdate ? "put" : "post";
   const routeName = isUpdate
-    ? route("branch.update", { id: branch.id }) // Ruta para actualización
-    : route("branch.store"); // Ruta para creación
+    ? route("movementtypes.update", { id: movementtype.id }) // Ruta para actualización
+    : route("movementtypes.store"); // Ruta para creación
 
   // Preparar la solicitud
-  branch[routeMethod](routeName, {
+  movementtype[routeMethod](routeName, {
     onSuccess: () => {
       toggle(); // Cerrar modal o reiniciar estados
       resetErrorForm(); // Limpiar errores del formulario
-      router.reload({ only: ["stores"] }); // Recargar datos
+      router.reload({ only: ["movementtypes"] }); // Recargar datos
     },
     onError: (error) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
@@ -95,28 +87,28 @@ const save = () => {
   });
 };
 
-const update = (branchEdit) => {
+const update = (movementTypeEdit) => {
   resetErrorForm();
-  Object.keys(branchEdit).forEach((key) => {
-    branch[key] = branchEdit[key];
+  Object.keys(movementTypeEdit).forEach((key) => {
+    movementtype[key] = movementTypeEdit[key];
   });
   toggle();
 };
 
-const removeBranch = (branchId) => {
+const removeMovementType = (movementtypeId) => {
   toggle1();
-  deleteid.value = branchId;
+  deleteid.value = movementtypeId;
 };
 
-const deletebranch = () => {
+const deleteMovementType = () => {
   axios
-    .delete(route("branch.delete", deleteid.value)) // Eliminar centro de costos
+    .delete(route("movementtypes.delete", deleteid.value)) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("branch.index"));
+      router.visit(route("movementtypes.index"));
     })
     .catch((error) => {
-      console.error("Error al eliminar a sucursal", error);
+      console.error("Error al eliminar a tipo de movimiento", error);
     });
 };
 
@@ -124,14 +116,12 @@ watch(
   search,
 
   async (newQuery) => {
-    const url = route("branch.index");
+    const url = route("movementtypes.index");
     loading.value = true;
-    console.log("si entra");
-
     try {
       await router.get(
         url,
-        { search: newQuery, page: props.branches.current_page }, // Mantener la página actual
+        { search: newQuery, page: props.movementtypes.current_page }, // Mantener la página actual
         { preserveState: true }
       );
     } catch (error) {
@@ -145,7 +135,7 @@ watch(
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
-  const url = route("branch.index"); // Ruta hacia el backend
+  const url = route("movementtypes.index"); // Ruta hacia el backend
   loading.value = true;
 
   try {
@@ -160,32 +150,16 @@ const handlePageChange = async (page) => {
     loading.value = false;
   }
 };
-
-const toggleState = (branchId, currentState) => {
-  const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
-
-  axios
-    .put(route("branch.updateState", { id: branchId }), { state: newState })
-    .then(() => {
-      // On success, reload the page or update the local data
-      router.visit(route("branch.index"));
-    })
-    .catch((error) => {
-      console.error("Error al cambiar el estado de la sucursal", error);
-      alert("Ocurrió un error al cambiar el estado. Intenta de nuevo.");
-    });
-};
-
 </script>
 
 <template>
-  <AdminLayout title="Sucursales / establecimientos">
+  <AdminLayout title="Tipos de movimientos Bancarios">
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Sucursales / establecimientos
+          Tipos de movimientos bancarios
         </h2>
         <div class="w-full flex sm:justify-end">
           <TextInput
@@ -196,7 +170,7 @@ const toggleState = (branchId, currentState) => {
           />
         </div>
         <button
-          @click="newBranch"
+          @click="newMovementType"
           class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
         >
           +
@@ -207,51 +181,30 @@ const toggleState = (branchId, currentState) => {
         <thead>
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
-            <th>ESTAB</th>
-            <th>NOMBRE</th>
-            <th>CIUDAD</th>
-            <th>DIRECCION</th>
-            <th>MATRIZ</th>
-            <th>AMBIENTE</th>
-            <th>ESTADO</th>
-            <th class="w-1"></th>
+            <th class="text-left p-2">NOMBRE</th>
+            <th>TIPO</th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(branch, i) in props.branches.data"
-            :key="branch.id"
+            v-for="(movementtype, i) in props.movementtypes.data"
+            :key="movementtype.id"
             class="border-t [&>td]:py-2"
           >
             <td>{{ i + 1 }}</td>
-            <td>{{ branch.number }}</td>
-            <td>{{ branch.name }}</td>
-            <td>{{ branch.city }}</td>
-            <td>{{ branch.address }}</td>
-            <td>{{ branch.is_matriz ? "Matriz" : "Sucursal" }}</td>
-            <td>
-              {{ branch.enviroment_type === 1 ? "Prueba" : "Producción" }}
-            </td>
-            <td >
-              <button
-                :class="branch.state ? 'bg-success' : 'bg-danger'"
-                @click="toggleState(branch.id, branch.state)"
-                class="rounded px-2 py-1 text-white"
-              >
-                {{ branch.state ? "Activo" : "Inactivo" }}
-              </button>
-            </td>
+            <td class="text-left p-2">{{ movementtype.name }}</td>
+            <td>{{ movementtype.type }}</td>
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button
                   class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="removeBranch(branch.id)"
+                  @click="removeMovementType(movementtype.id)"
                 >
                   <TrashIcon class="size-6 text-white" />
                 </button>
                 <button
                   class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                  @click="update(branch)"
+                  @click="update(movementtype)"
                 >
                   <PencilIcon class="size-4 text-white" />
                 </button>
@@ -261,25 +214,29 @@ const toggleState = (branchId, currentState) => {
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.branches" @page-change="handlePageChange" />
+    <Paginate :page="props.movementtypes" @page-change="handlePageChange" />
   </AdminLayout>
 
   <FormModal
     :show="modal"
-    :branch="branch"
+    :movementtype="movementtype"
     :error="errorForm"
     @close="toggle"
     @save="save"
   />
 
   <ConfirmationModal :show="modal1">
-    <template #title> ELIMINAR ESTABLECIMIENTOS </template>
-    <template #content> Esta seguro de eliminar el establecimiento? </template>
+    <template #title> ELIMINAR TIPO DE MOVIMIENTO BANCARIO </template>
+    <template #content>
+      Esta seguro de eliminar el movimiento bancario?
+    </template>
     <template #footer>
       <SecondaryButton @click="modal1 = !modal1" class="mr-2"
         >Cancelar</SecondaryButton
       >
-      <PrimaryButton type="button" @click="deletebranch">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deleteMovementType"
+        >Aceptar</PrimaryButton
+      >
     </template>
   </ConfirmationModal>
 </template>

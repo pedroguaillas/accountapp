@@ -53,6 +53,12 @@ class Company extends Model
         return $this->hasMany(Branch::class);//relacion muchos a muchos 
     }
 
+    public function costcenters()
+    {
+        return $this->hasMany(CostCenter::class);//relacion muchos a muchos 
+    }
+
+
     public function accounts()
     {
         return $this->hasMany(Account::class);
@@ -112,5 +118,26 @@ class Company extends Model
     {
         return $this->hasMany(Hour::class);
     }
+    public function bankaccounts()
+    {
+        return $this->hasMany(BankAccount::class);
+    }
+    public function banks()
+    {
+        return $this->hasMany(Bank::class);
+    }
 
+    public function movementtypes()
+    {
+        return $this->hasMany(MovementType::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+    public function people()
+    {
+        return $this->hasMany(Person::class);
+    }
 }

@@ -40,7 +40,8 @@ class CostCenterController extends Controller
     {
         $company = Company::first();
         //crear el costcenter
-        CostCenter::create([...$request->all(), 'company_id' => $company->id]);
+
+        $company->costcenters()->create($request->all());
     }
 
     public function update(Request $request, CostCenter $costCenter)
@@ -59,6 +60,15 @@ class CostCenterController extends Controller
             'success' => true,
             'message' => 'Centro de costo eliminado correctamente.',
         ]);
+    }
+
+    public function updateState($id)
+    {
+        $costcenter = CostCenter::findOrFail($id);
+        $costcenter ->state = !$costcenter ->state; // Toggle the state
+        $costcenter ->save();
+
+        return response()->json(['success' => true]);
     }
 
 }

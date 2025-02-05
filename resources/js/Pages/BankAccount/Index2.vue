@@ -15,8 +15,9 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
-  branches: { type: Object, default: () => ({}) },
+  bankaccounts: { type: Object, default: () => ({}) },
   filters: { type: String, default: "" },
+  banks: { type: Array, default: () => [] },
 });
 
 // Refs
@@ -31,29 +32,28 @@ const toggle1 = () => {
 };
 
 // Inicializador de objetos
-const initialBranch = {
-  number: "",
-  name: "",
-  city: "",
-  address: "",
-  is_matriz: false,
-  enviroment_type: "",
+const initialBankAccount = {
+  account_number: "",
+  account_type: "",
+  banck_id: "",
+  current_balance: "",
+  state: "",
 };
 
 // Reactives
-const branch = useForm({ ...initialBranch });
-const errorForm = reactive({ ...initialBranch });
+const bankaccount = useForm({ ...initialBankAccount });
+const errorForm = reactive({ ...initialBankAccount });
 
-const newBranch = () => {
-  if (branch.id !== undefined) {
-    delete branch.id;
+const newBankAccount = () => {
+  if (bankaccount.id !== undefined) {
+    delete bankaccount.id;
   }
-  Object.assign(branch, initialBranch);
+  Object.assign(bankaccount, initialBankAccount);
   toggle();
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialBranch);
+  Object.assign(errorForm, initialBankAccount);
 };
 
 const toggle = () => {
@@ -61,20 +61,14 @@ const toggle = () => {
 };
 
 const save = () => {
-  // Validar campos obligatorios antes de enviar la solicitud
-  if (!branch.number || !branch.name || !branch.city || !branch.address) {
-    alert("Por favor, complete todos los campos obligatorios");
-    return;
-  }
-  // Determinar el método HTTP y la ruta correspondiente
-  const isUpdate = Boolean(branch.id);
+  const isUpdate = Boolean(bankaccount.id);
   const routeMethod = isUpdate ? "put" : "post";
   const routeName = isUpdate
-    ? route("branch.update", { id: branch.id }) // Ruta para actualización
-    : route("branch.store"); // Ruta para creación
+    ? route("bankaccounts.update", { id: bankaccount.id }) // Ruta para actualización
+    : route("bankaccounts.store"); // Ruta para creación
 
   // Preparar la solicitud
-  branch[routeMethod](routeName, {
+  bankaccount[routeMethod](routeName, {
     onSuccess: () => {
       toggle(); // Cerrar modal o reiniciar estados
       resetErrorForm(); // Limpiar errores del formulario
@@ -95,25 +89,25 @@ const save = () => {
   });
 };
 
-const update = (branchEdit) => {
+const update = (bankaccountEdit) => {
   resetErrorForm();
-  Object.keys(branchEdit).forEach((key) => {
-    branch[key] = branchEdit[key];
+  Object.keys(bankaccountEdit).forEach((key) => {
+    bankaccount[key] = bankaccountEdit[key];
   });
   toggle();
 };
 
-const removeBranch = (branchId) => {
+const removeBankAccount = (bankaccountId) => {
   toggle1();
-  deleteid.value = branchId;
+  deleteid.value = bankaccountId;
 };
 
-const deletebranch = () => {
+const deleteBankAccount = () => {
   axios
-    .delete(route("branch.delete", deleteid.value)) // Eliminar centro de costos
+    .delete(route("bankaccounts.delete", deleteid.value)) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("branch.index"));
+      router.visit(route("bankaccounts.index"));
     })
     .catch((error) => {
       console.error("Error al eliminar a sucursal", error);
@@ -124,14 +118,14 @@ watch(
   search,
 
   async (newQuery) => {
-    const url = route("branch.index");
+    const url = route("bankaccounts.index");
     loading.value = true;
     console.log("si entra");
 
     try {
       await router.get(
         url,
-        { search: newQuery, page: props.branches.current_page }, // Mantener la página actual
+        { search: newQuery, page: props.bankaccounts.current_page }, // Mantener la página actual
         { preserveState: true }
       );
     } catch (error) {
@@ -145,7 +139,7 @@ watch(
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
-  const url = route("branch.index"); // Ruta hacia el backend
+  const url = route("bankaccounts.index"); // Ruta hacia el backend
   loading.value = true;
 
   try {
@@ -160,32 +154,16 @@ const handlePageChange = async (page) => {
     loading.value = false;
   }
 };
-
-const toggleState = (branchId, currentState) => {
-  const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
-
-  axios
-    .put(route("branch.updateState", { id: branchId }), { state: newState })
-    .then(() => {
-      // On success, reload the page or update the local data
-      router.visit(route("branch.index"));
-    })
-    .catch((error) => {
-      console.error("Error al cambiar el estado de la sucursal", error);
-      alert("Ocurrió un error al cambiar el estado. Intenta de nuevo.");
-    });
-};
-
 </script>
 
 <template>
-  <AdminLayout title="Sucursales / establecimientos">
+  <AdminLayout title="Cuentas Bancarias">
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Sucursales / establecimientos
+          Cuentas Bancarias
         </h2>
         <div class="w-full flex sm:justify-end">
           <TextInput
@@ -196,7 +174,7 @@ const toggleState = (branchId, currentState) => {
           />
         </div>
         <button
-          @click="newBranch"
+          @click="newBankAccount"
           class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
         >
           +
@@ -207,51 +185,35 @@ const toggleState = (branchId, currentState) => {
         <thead>
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
-            <th>ESTAB</th>
-            <th>NOMBRE</th>
-            <th>CIUDAD</th>
-            <th>DIRECCION</th>
-            <th>MATRIZ</th>
-            <th>AMBIENTE</th>
-            <th>ESTADO</th>
-            <th class="w-1"></th>
+            <th>BANCO</th>
+            <th>NUMERO DE CUENTA</th>
+            <th>TIPO DE CUENTA</th>
+            <th>SALDO</th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="(branch, i) in props.branches.data"
-            :key="branch.id"
+            v-for="(bankaccount, i) in props.bankaccounts.data"
+            :key="bankaccount.id"
             class="border-t [&>td]:py-2"
           >
             <td>{{ i + 1 }}</td>
-            <td>{{ branch.number }}</td>
-            <td>{{ branch.name }}</td>
-            <td>{{ branch.city }}</td>
-            <td>{{ branch.address }}</td>
-            <td>{{ branch.is_matriz ? "Matriz" : "Sucursal" }}</td>
-            <td>
-              {{ branch.enviroment_type === 1 ? "Prueba" : "Producción" }}
-            </td>
-            <td >
-              <button
-                :class="branch.state ? 'bg-success' : 'bg-danger'"
-                @click="toggleState(branch.id, branch.state)"
-                class="rounded px-2 py-1 text-white"
-              >
-                {{ branch.state ? "Activo" : "Inactivo" }}
-              </button>
-            </td>
+            <td>{{ bankaccount.banck_id }}</td>
+            <td>{{ bankaccount.account_number }}</td>
+            <td>{{ bankaccount.account_type }}</td>
+            <td>{{ bankaccount.current_balance }}</td>
+
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button
                   class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="removeBranch(branch.id)"
+                  @click="removeBankAccount(BankAccount.id)"
                 >
                   <TrashIcon class="size-6 text-white" />
                 </button>
                 <button
                   class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                  @click="update(branch)"
+                  @click="update(BankAccount)"
                 >
                   <PencilIcon class="size-4 text-white" />
                 </button>
@@ -261,25 +223,28 @@ const toggleState = (branchId, currentState) => {
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.branches" @page-change="handlePageChange" />
+    <Paginate :page="props.bankaccounts" @page-change="handlePageChange" />
   </AdminLayout>
 
   <FormModal
     :show="modal"
-    :branch="branch"
+    :bankaccount="bankaccount"
+    :banks="props.banks"
     :error="errorForm"
     @close="toggle"
     @save="save"
   />
 
   <ConfirmationModal :show="modal1">
-    <template #title> ELIMINAR ESTABLECIMIENTOS </template>
-    <template #content> Esta seguro de eliminar el establecimiento? </template>
+    <template #title> ELIMINAR CUENTAS BANCARIAS </template>
+    <template #content> Esta seguro de eliminar la cuenta bancaria? </template>
     <template #footer>
       <SecondaryButton @click="modal1 = !modal1" class="mr-2"
         >Cancelar</SecondaryButton
       >
-      <PrimaryButton type="button" @click="deletebranch">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deleteBankAccount"
+        >Aceptar</PrimaryButton
+      >
     </template>
   </ConfirmationModal>
 </template>

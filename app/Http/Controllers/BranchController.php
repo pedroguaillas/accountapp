@@ -87,4 +87,14 @@ class BranchController extends Controller
             'message' => 'Establecimiento eliminado correctamente.',
         ]);
     }
+
+    public function updateState($id)
+    {
+        $branch = Branch::findOrFail($id);
+        $branch->state = !$branch->state; // Toggle the state
+        $branch->save();
+
+        return response()->json(['success' => true]);
+    }
+
 }

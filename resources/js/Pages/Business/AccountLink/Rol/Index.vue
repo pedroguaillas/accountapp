@@ -38,16 +38,16 @@ const toggle1 = () => {
 const editRole = (roleIdEdit, roleNameEdit, typeEdit) => {
   // Filtrar cuentas según el roleName
   accounts.value = Array.isArray(props.accounts)
-    ? props.accounts.filter((acc) => {
-        const prefix =
-          roleNameEdit === "account_spent_id"
-            ? "5"
-            : roleNameEdit === "account_pasive_id"
-            ? "2"
-            : "1";
-        return acc.code.startsWith(prefix);
-      })
-    : [];
+  ? props.accounts.filter((acc) => {
+      const prefixes =
+        roleNameEdit === "account_counterpart_id"
+          ? ["2"] // Convertimos "2" en un array para tratarlo igual
+          : ["5", "1"];
+
+      return prefixes.some((prefix) => acc.code.startsWith(prefix));
+    })
+  : [];
+
 
   // Actualizar los valores según el tipo
   roleId.value = roleIdEdit;
@@ -99,9 +99,8 @@ const handleInputChange = () => {
         <tr>
           <th class="w-10">N.</th>
           <th class="text-left">DESCRIPCION</th>
-          <th class="text-left">CUENTA ACTIVO</th>
-          <th class="text-left">CUENTA PASIVO</th>
-          <th class="text-left">CUENTA GASTO</th>
+          <th class="text-left">PARTIDA</th>
+          <th class="text-left">CONTRAPARTIDA</th>
         </tr>
       </thead>
       <tbody class="h-6">
@@ -115,16 +114,16 @@ const handleInputChange = () => {
             <div class="flex h-8">
               <input
                 type="text"
-                :value="roleIngress.aa_info ?? ''"
+                :value="roleIngress.ap_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
                 disabled
               />
               <button
-                class=" px-1 py-1 border border-red-400"
+                class="px-1 py-1 border border-red-400"
                 @click="
                   removeVinculation(
                     roleIngress.id,
-                    'account_active_id',
+                    'account_departure_id',
                     'ingress'
                   )
                 "
@@ -133,7 +132,7 @@ const handleInputChange = () => {
               </button>
               <button
                 @click="
-                  editRole(roleIngress.id, 'account_active_id', 'ingress')
+                  editRole(roleIngress.id, 'account_departure_id', 'ingress')
                 "
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
@@ -145,17 +144,17 @@ const handleInputChange = () => {
             <div class="flex h-8">
               <input
                 type="text"
-                :value="roleIngress.ap_info ?? ''"
+                :value="roleIngress.ac_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
                 disabled
               />
 
               <button
-                class=" px-1 py-1 border border-red-400"
+                class="px-1 py-1 border border-red-400"
                 @click="
                   removeVinculation(
                     roleIngress.id,
-                    'account_pasive_id',
+                    'account_counterpart_id',
                     'ingress'
                   )
                 "
@@ -164,36 +163,8 @@ const handleInputChange = () => {
               </button>
               <button
                 @click="
-                  editRole(roleIngress.id, 'account_pasive_id', 'ingress')
+                  editRole(roleIngress.id, 'account_counterpart_id', 'ingress')
                 "
-                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
-              >
-                <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
-              </button>
-            </div>
-          </td>
-          <td>
-            <div class="flex h-8">
-              <input
-                type="text"
-                :value="roleIngress.ass_info ?? ''"
-                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
-                disabled
-              />
-              <button
-                class=" px-1 py-1 border border-red-400"
-                @click="
-                  removeVinculation(
-                    roleIngress.id,
-                    'account_spent_id',
-                    'ingress'
-                  )
-                "
-              >
-                <TrashIcon class="size-6 text-red-400" />
-              </button>
-              <button
-                @click="editRole(roleIngress.id, 'account_spent_id', 'ingress')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -211,9 +182,8 @@ const handleInputChange = () => {
         <tr>
           <th class="w-10">N.</th>
           <th class="text-left">DESCRIPCION</th>
-          <th class="text-left">CUENTA ACTIVO</th>
-          <th class="text-left">CUENTA PASIVO</th>
-          <th class="text-left">CUENTA GASTO</th>
+          <th class="text-left">PARTIDA</th>
+          <th class="text-left">CONTRAPARTIDA</th>
         </tr>
       </thead>
       <tbody class="h-6">
@@ -227,44 +197,16 @@ const handleInputChange = () => {
             <div class="flex h-8">
               <input
                 type="text"
-                :value="roleEgress.aa_info ?? ''"
-                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
-                disabled
-              />
-              <button
-                class=" px-1 py-1 border border-red-400"
-                @click="
-                  removeVinculation(
-                    roleEgress.id,
-                    'account_active_id',
-                    'egress'
-                  )
-                "
-              >
-                <TrashIcon class="size-6 text-red-400" />
-              </button>
-              <button
-                @click="editRole(roleEgress.id, 'account_active_id', 'egress')"
-                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
-              >
-                <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
-              </button>
-            </div>
-          </td>
-          <td>
-            <div class="flex h-8">
-              <input
-                type="text"
                 :value="roleEgress.ap_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
                 disabled
               />
               <button
-                class=" px-1 py-1 border border-red-400"
+                class="px-1 py-1 border border-red-400"
                 @click="
                   removeVinculation(
                     roleEgress.id,
-                    'account_pasive_id',
+                    'account_departure_id',
                     'egress'
                   )
                 "
@@ -272,7 +214,9 @@ const handleInputChange = () => {
                 <TrashIcon class="size-6 text-red-400" />
               </button>
               <button
-                @click="editRole(roleEgress.id, 'account_pasive_id', 'egress')"
+                @click="
+                  editRole(roleEgress.id, 'account_departure_id', 'egress')
+                "
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -283,20 +227,26 @@ const handleInputChange = () => {
             <div class="flex h-8">
               <input
                 type="text"
-                :value="roleEgress.ass_info ?? ''"
+                :value="roleEgress.ac_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
                 disabled
               />
               <button
-                class=" px-1 py-1 border border-red-400"
+                class="px-1 py-1 border border-red-400"
                 @click="
-                  removeVinculation(roleEgress.id, 'account_spent_id', 'egress')
+                  removeVinculation(
+                    roleEgress.id,
+                    'account_counterpart_id',
+                    'egress'
+                  )
                 "
               >
                 <TrashIcon class="size-6 text-red-400" />
               </button>
               <button
-                @click="editRole(roleEgress.id, 'account_spent_id', 'egress')"
+                @click="
+                  editRole(roleEgress.id, 'account_counterpart_id', 'egress')
+                "
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
