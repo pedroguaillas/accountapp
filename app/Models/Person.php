@@ -13,11 +13,15 @@ class Person extends Model
     protected $fillable = [
         'identification',
         'company_id',
-        'first_name',
-        'last_name',
+        'name',
         'email',
-        'phone_number',
-        'gender',
+        'phone',
+        'address',
+        'data',
+    ];
+
+    protected $casts = [
+        'data' => 'array',//devolver un array asociativo
     ];
 
     // Relación con la tabla 'companies'

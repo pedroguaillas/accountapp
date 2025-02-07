@@ -28,7 +28,9 @@ class MovementTypeController extends Controller
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('MovementType/Index', [
-            'filters' => $request->search,
+            'filters' => [
+                'search' => $search,
+            ],
             'movementtypes' => $movementtypes,
         ]);
     }

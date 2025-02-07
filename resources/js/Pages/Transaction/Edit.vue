@@ -14,34 +14,24 @@ import Checkbox from "@/Components/Checkbox.vue";
 
 // Props
 const props = defineProps({
+  transaction: { type: Object, default: () => ({}) },
   bankaccounts: { type: Array, default: () => [] },
   movementtypes: { type: Array, default: () => [] },
   people: { type: Array, default: () => [] },
 });
 
-const date = new Date().toISOString().split("T")[0];
-
-// Inicializador de objetos
-const initialTransaction = {
-  movement_type_id: "",
-  bank_account_id: 0,
-  transaction_date: date,
-  amount: "",
-  description: "",
-  payment_method: "",
-  beneficiary_id: "",
-  cheque_date: null,
-  transfer_account: "",
-  voucher_number: "",
-  state_transaction: "proceso",
-};
-
+const transactionDate = computed(() => {
+  return props.transaction.transaction_date
+    ? new Date(props.transaction.transaction_date).toISOString().split("T")[0]
+    : "";
+});
 // Reactives
-const transaction = useForm({ ...initialTransaction });
+const transaction = useForm({ ...props.transaction,transaction_date:transactionDate});
 const errorForm = reactive({});
 
+
 const save = () => {
-  transaction.post(route("transactions.store"), {
+  transaction.put(route("transactions.update", transaction.id), {
     onSuccess: () => {
       router.visit(route("transactions.index"));
     },
@@ -90,7 +80,7 @@ const peopleOptions = props.people.map((person) => ({
   label: person.name,
 }));
 
-const selectedType = ref("");
+const selectedType = ref(transaction.type);
 
 const filteredMovementTypes = computed(() => {
   return movementTypeOptions.filter((type) => type.type === selectedType.value);
@@ -109,7 +99,7 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
       <!-- Card Header -->
       <div class="flex justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold">
-          Registro movimientos bancarios
+          Editar movimiento bancario
         </h2>
       </div>
 
@@ -259,6 +249,18 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
             class="mt-1 block w-full"
             placeholder="Ingrese el número de comprobante"
           />
+        </div>
+        <div class="col-span-6 sm:col-span-4">
+          <div class="col-span-6 sm:col-span-4">
+            <InputLabel for="state_transaction" value="Estado" />
+            <DynamicSelect
+              id="state_transaction"
+              v-model="transaction.state_transaction"
+              :options="statusOptions"
+              placeholder="Seleccione un estado"
+              class="mt-2 block w-full"
+            />
+          </div>
         </div>
 
         <div class="mt-4 text-right">

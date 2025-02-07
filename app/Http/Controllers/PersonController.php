@@ -13,41 +13,80 @@ class PersonController extends Controller
     public function index(Request $request)
     {
         $company = Company::first();
+        $search = $request->input('search', '');
 
         // Construimos la consulta base
         $people = Person::query()
-            ->where('company_id', $company->id);
+            ->where('company_id', $company->id)
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', '%' . $search . '%');
+            }); // No olvides llamar a get() para ejecutar la consulta
 
-        // Aplicamos el filtro si existe
-        if ($request->has('search') && !empty($request->search)) {
-            $people->where('name', 'LIKE', '%' . $request->search . '%');
-        }
 
+        // $additional_information = Person::select('additional_information')
+        //     ->where('company_id', $company->id)
+        //     ->when($search, function ($query, $search) {
+        //         return $query->where('name', 'like', '%' . $search . '%');
+        //     })
+        //     ->latest()
+        //     ->first(); // Recupera solo el último registro
+
+        // // Verificar el contenido
+        // // dd( $additional_information->additional_information); codificar a json
+        // $json = json_encode($additional_information->additional_information, JSON_PRETTY_PRINT);
+
+        // //  dd($json); convertir a objeto o array
+        // $data = json_decode($json);
+
+        //dd($data->edad);
         // Paginamos los resultados y preservamos los filtros en la URL
         $people = $people->paginate(10)->withQueryString();
 
-
-
+        //dd($people);
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Person/Index', [
-            'filters' => $request->search,
+            'filters' => [
+                'search' => $request->search, // Retornar el filtro de búsqueda
+            ],
             'people' => $people,
         ]);
     }
 
-
     public function store(Request $request)
     {
-        //validacion de datos
+        // Validación de datos
         $request->validate([
             'name' => 'nullable|min:3|max:300',
+            'email' => 'required|email|unique:people,email',
+            'identification' => 'required|string|unique:people,identification',
         ]);
-        //llamada a la compania
+
+        // Llamada a la compañía
         $company = Company::first();
 
-        //creacion de las personas
-        $company->people()->create($request->all());
+        // Datos adicionales en formato JSON
+        $additionalInfo = [
+            'hobbies' => ['leer', 'programar', 'fútbol'],
+            'edad' => 28,
+            'estado_civil' => 'soltero',
+            'redes_sociales' => [
+                'twitter' => '@usuario',
+                'facebook' => 'facebook.com/usuario'
+            ]
+        ];
+        //$additionalInfo  = json_encode($additionalInfo , JSON_PRETTY_PRINT);
 
+        // Creación de la persona
+        $company->people()->create([
+            'identification' => $request->identification,
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'data' => $additionalInfo, // Se pasa el JSON aquí
+        ]);
+
+        //return response()->json(['message' => 'Persona creada con éxito']);
     }
 
     public function update(Request $request, Person $person)

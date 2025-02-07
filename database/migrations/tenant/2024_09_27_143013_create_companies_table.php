@@ -430,13 +430,13 @@ return new class extends Migration {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('movement_type_id');
-            $table->bigInteger('bank_account_id'); 
+            $table->bigInteger('bank_account_id');
             $table->bigInteger('company_id');
             $table->date('transaction_date'); // Transaction date and time
             $table->decimal('amount', 15, 2); // Transaction amount
             $table->string('description')->nullable(); // Transaction description
             $table->string('payment_method'); // Tipo de pago (por ejemplo, cheque, efectivo, trasnferencia bancaria)
-            $table->string('beneficiary_id'); // Persona beneficiaria
+            $table->bigInteger('beneficiary_id'); // Persona beneficiaria
             $table->date('cheque_date')->nullable(); // Fecha del cheque (solo cuando el método de pago sea cheque)
             $table->string('transfer_account')->nullable(); // numero de cuenta (solo cuando el método de pago sea diferente de cheque)
             $table->string('voucher_number')->nullable(); // Número de comprobante
@@ -453,11 +453,11 @@ return new class extends Migration {
             $table->id();
             $table->bigInteger('company_id');
             $table->string('identification'); // cedula
-            $table->string('first_name'); // Primer nombre
-            $table->string('last_name'); // Apellido
+            $table->string('name'); // Primer nombre
             $table->string('email')->unique(); // Correo electrónico
-            $table->string('phone_number')->nullable(); // Número de teléfono
-            $table->string('gender')->nullable(); // Género
+            $table->string('phone')->nullable(); // Número de teléfono
+            $table->string('address')->nullable(); // direccion
+            $table->json('data')->nullable();
 
             $table->timestamps();
             $table->softDeletes();

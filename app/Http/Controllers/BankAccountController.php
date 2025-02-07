@@ -8,6 +8,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+
 class BankAccountController extends Controller
 {
     public function index(Request $request, Bank $bank)
