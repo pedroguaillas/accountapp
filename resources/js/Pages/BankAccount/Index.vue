@@ -24,7 +24,7 @@ const props = defineProps({
 const modal = ref(false);
 const modal1 = ref(false);
 const deleteid = ref(0);
-const search = ref(""); // Término de búsqueda
+const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
 
 const toggle1 = () => {

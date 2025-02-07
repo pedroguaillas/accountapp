@@ -16,14 +16,14 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 // Props
 const props = defineProps({
   movementtypes: { type: Object, default: () => ({}) },
-  filters: { type: String, default: "" },
+  filters: { type: Object, default: () => ({}) },
 });
 
 // Refs
 const modal = ref(false);
 const modal1 = ref(false);
 const deleteid = ref(0);
-const search = ref(""); // Término de búsqueda
+const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
 
 const toggle1 = () => {

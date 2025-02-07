@@ -29,7 +29,9 @@ class RoleEgressController extends Controller
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Business/Setting/RoleEgress', [
             'egresses' => $egresses,
-            'filters' => $request->search,
+            'filters' => [
+                'search' => $request->search,
+            ],
         ]);
     }
 

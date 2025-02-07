@@ -16,14 +16,14 @@ import { TrashIcon, PencilIcon,ListBulletIcon } from "@heroicons/vue/24/solid";
 // Props
 const props = defineProps({
   people: { type: Object, default: () => ({}) },
-  filters: { type: String, default: "" },
+  filters: { type: Object, default: () => ({}) },
 });
 
 // Refs
 const modal = ref(false);
 const modal1 = ref(false);
 const deleteid = ref(0);
-const search = ref(""); // Término de búsqueda
+const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
 
 const toggle1 = () => {
@@ -33,11 +33,10 @@ const toggle1 = () => {
 // Inicializador de objetos
 const initialPerson = {
   identification:"",
-  first_name: "",
-  last_name: "",
-  email:"",
-  phone_number:"",
-  gender: "",
+  name: "",
+  email: "",
+  phone:"",
+  address:"",
 
 };
 
@@ -154,8 +153,6 @@ const handlePageChange = async (page) => {
     loading.value = false;
   }
 };
-
-
 </script>
 
 <template>
@@ -187,9 +184,9 @@ const handlePageChange = async (page) => {
         <thead>
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
-            <th class="text-left">CEDULA</th>
+            <th class="text-left p-2">CEDULA</th>
             <th class="text-left">NOMBRE</th>
-            <th class="text-left">APELLIDO</th>
+            <th class="text-left">DIRECCION</th>
 
             <th></th>
           </tr>
@@ -201,9 +198,9 @@ const handlePageChange = async (page) => {
             class="border-t [&>td]:py-2"
           >
             <td>{{ i + 1 }}</td>
-            <td class="text-left">{{ person.identification }}</td>
-            <td class="text-left">{{ person.first_name }}</td>
-            <td class="text-left">{{ person.last_name }}</td>
+            <td class="text-left p-2">{{ person.identification }}</td>
+            <td class="text-left">{{ person.name }}</td>
+            <td class="text-left">{{ person.address}}</td>
 
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">

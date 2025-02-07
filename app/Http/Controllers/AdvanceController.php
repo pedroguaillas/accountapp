@@ -26,10 +26,8 @@ class AdvanceController extends Controller
             ->where('advances.company_id', $company->id);
 
         // Aplicamos el filtro si existe
-        if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $advances->where('e.name', 'LIKE', '%' . $searchTerm . '%'); // Buscar por nombre del empleado
-        }
+        $search = $request->input('search', '');
+        $advances->whereRaw("LOWER(e.name) LIKE ?", ["%" . strtolower($search) . "%"]); // Buscar por nombre del empleado
 
         // Obtenemos los empleados como una colección
         $employees = Employee::where('company_id', $company->id)->get();
@@ -41,7 +39,7 @@ class AdvanceController extends Controller
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Advance/Index', [
             'filters' => [
-                'search' => $request->search,
+                'search' => $search,
             ],
             'advances' => $paginatedAdvances,
             'employees' => $employees,

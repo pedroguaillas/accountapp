@@ -13,22 +13,22 @@ class BankController extends Controller
     public function index(Request $request)
     {
         $company = Company::first();
-
+        $search = $request->input('search', '');
         // Construimos la consulta base
         $banks = Bank::query()
-            ->where('company_id', $company->id);
-
-        $search = $request->input('search', '');
-
-        $banks->where('name', 'LIKE', '%' . $search . '%');
+            ->where('company_id', $company->id)
+            ->when($search, function ($query, $search) {
+                $query->whereRaw("LOWER(banks.name) LIKE ?", ["%" . strtolower($search) . "%"]);
+            });
         // Paginamos los resultados y preservamos los filtros en la URL
         $banks = $banks->paginate(10)->withQueryString();
 
 
-
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Bank/Index', [
-            'filters' => $request->search,
+            'filters' => [
+                'search' => $search, // Retornar el filtro de búsqueda
+            ],
             'banks' => $banks,
         ]);
     }

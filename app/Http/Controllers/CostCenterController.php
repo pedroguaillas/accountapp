@@ -30,7 +30,9 @@ class CostCenterController extends Controller
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('CostCenter/Index', [
-            'filters' => $request->search,
+            'filters' => [
+                'search' => $search,
+            ],
             'costCenters' => $costCenters,
         ]);
     }

@@ -31,7 +31,9 @@ class CompanyController extends Controller
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Company/Index', [
             'companies' => $companies, // Datos de empresas paginados
-            'filters' => $request->search, // Pasar el término de búsqueda como filtro
+            'filters' => [
+                'search' => $search,
+            ], // Pasar el término de búsqueda como filtro
             'economyActivities' => $economyActivities, // Actividades económicas
             'contributorTypes' => $contributorTypes, // Tipos de contribuyente
         ]);

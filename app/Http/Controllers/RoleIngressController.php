@@ -28,7 +28,9 @@ class RoleIngressController extends Controller
         // Renderizamos la vista con los datos necesarios
         return inertia('Business/Setting/RoleIngress', [
             'ingresses' => $ingreses,
-            'filters' => $request->search,
+            'filters' => [
+                'search' => $request->search,
+            ],
         ]);
     }
 

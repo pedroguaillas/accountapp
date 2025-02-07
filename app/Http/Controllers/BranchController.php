@@ -19,18 +19,18 @@ class BranchController extends Controller
             ->where('company_id', $company->id);
 
         // Aplicamos el filtro si existe
-        if ($request->has('search') && !empty($request->search)) {
-            $branches->where('name', 'LIKE', '%' . $request->search . '%');
-        }
+        $search = $request->input('search', '');
+
+        $branches->whereRaw("LOWER(branches.name) LIKE ?", ["%" . strtolower($search) . "%"]);;
 
         // Paginamos los resultados y preservamos los filtros en la URL
         $branches = $branches->paginate(10)->withQueryString();
-
-
-
+        
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Branch/Index', [
-            'filters' => $request->search,
+            'filters' => [
+                'search' => $request->search, // Retornar el filtro de búsqueda
+            ],
             'branches' => $branches,
         ]);
     }

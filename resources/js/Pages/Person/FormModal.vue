@@ -22,10 +22,6 @@ const { focusNextField } = useFocusNextField();
 // Emits
 defineEmits(["close", "save"]);
 
-const stateGenderOptions = [
-  { value: "1", label: "Femenino" },
-  { value: "0", label: "Masculino" },
-];
 </script>
 
 <template>
@@ -40,7 +36,7 @@ const stateGenderOptions = [
           @keydown.enter.prevent="focusNextField"
         >
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="identification" value="Identificación" />
+            <InputLabel for="identification" value="Cedula/" />
             <TextInput
               v-model="person.identification"
               type="text"
@@ -51,27 +47,15 @@ const stateGenderOptions = [
             <InputError :message="error.identification" class="mt-2" />
           </div>
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="first_name" value="Nombre" />
+            <InputLabel for="name" value="Nombre" />
             <TextInput
-              v-model="person.first_name"
+              v-model="person.name"
               type="text"
               class="mt-1 block w-full"
               min="1"
               max="999"
             />
             <InputError :message="error.first_name" class="mt-2" />
-          </div>
-
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="last_name" value="Apellido" />
-            <TextInput
-              v-model="person.last_name"
-              type="text"
-              class="mt-1 block w-full"
-              minlength="3"
-              maxlength="300"
-            />
-            <InputError :message="error.last_name" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
@@ -87,9 +71,9 @@ const stateGenderOptions = [
           </div>
 
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="phone_number" value="Celular" />
+            <InputLabel for="phone" value="Celular" />
             <TextInput
-              v-model="person.phone_number"
+              v-model="person.phone"
               type="text"
               class="mt-1 block w-full"
               minlength="3"
@@ -98,15 +82,17 @@ const stateGenderOptions = [
             <InputError :message="error.phone_number" class="mt-2" />
           </div>
 
+          
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="gender" value="Genero" />
-            <DynamicSelect
-              v-model="person.gender"
-              :options="stateGenderOptions"
+            <InputLabel for="address" value="Dirección" />
+            <TextInput
+              v-model="person.address"
+              type="text"
               class="mt-1 block w-full"
-              id="account_type"
+              minlength="3"
+              maxlength="300"
             />
-            <InputError :message="error.gender" class="mt-2" />
+            <InputError :message="error.address" class="mt-2" />
           </div>
         </form>
       </div>

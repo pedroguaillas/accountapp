@@ -16,12 +16,12 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 // Props
 const props = defineProps({
   costCenters: { type: Object, default: () => ({ data: [] }) }, // Default empty array to avoid undefined errors
-  filters: { type: String, default: "" },
+  filters:  { type: Object, default: () => ({ data: [] }) }, 
 });
 
 // Refs
 const modal = ref(false);
-const search = ref(props.filters);
+const search = ref(props.filters.search);
 
 // Initial cost center object
 const initialCostCenter = { name: "", code: "" };
