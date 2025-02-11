@@ -61,6 +61,11 @@ class ProcessPaymenRole implements ShouldQueue
             $au = $this->calcularAdelantoS($employee);
             $remuneration = $employee->salary + $ho + $he;
 
+            $data = [
+                "company_id" => $company->id,
+            ];
+    
+
             // Ingresos (para todos los roles de ingresos)
             $inputpaymentroleingress = [];
             $totalIngresos = 0;  // Para sumar los ingresos
@@ -68,7 +73,7 @@ class ProcessPaymenRole implements ShouldQueue
                 $call = $this->calcularIngreso($roleingress, $employee, $ho, $he, $remuneration, $au);
                 $totalIngresos += $call;  // Acumulamos el total de ingresos
                 $inputpaymentroleingress[] = [
-                    'company_id' => $company->id,
+                    'data_additional' => $data,
                     'role_ingress_id' => $roleingress->id,
                     'value' => $call,
                 ];
@@ -81,7 +86,7 @@ class ProcessPaymenRole implements ShouldQueue
                 $call = $this->calcularEgreso($roleegress, $remuneration, $as);
                 $totalEgresos += $call;  // Acumulamos el total de egresos
                 $inputpaymentroleegress[] = [
-                    'company_id' => $company->id,
+                    'data_additional' => $data,
                     'role_egress_id' => $roleegress->id,
                     'value' => $call,
                 ];

@@ -23,6 +23,7 @@ class EmisionPoint extends Model
         'lot',
         'order_note',
         'proforma',
+        'data_additional',
     ];
 
     protected function casts(): array
@@ -38,6 +39,7 @@ class EmisionPoint extends Model
             'lot' => 'integer',
             'order_note' => 'integer',
             'proforma' => 'integer',
+            'data_additional' => 'array',//devolver un array asociativo
         ];
     }
 }

@@ -13,20 +13,18 @@ class CompanyController extends Controller
 {
     public function index(Request $request)
     {
-        // Construimos la consulta base para las empresas
-        $companies = Company::query()
-            ->when($request->has('search') && !empty($request->search), function ($query) use ($request) {
-                $query->where('ruc', 'LIKE', '%' . $request->search . '%'); // Filtrar por RUC
-            });
+        $search = $request->input('search', '');
 
-        // Paginamos los resultados y preservamos los filtros en la URL
-        $companies = $companies->paginate(10)->withQueryString();
+        $companies = Company::query()
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where('ruc', 'LIKE', '%' . $search . '%'); // Filtrar por RUC
+            })
+            ->paginate(10)
+            ->withQueryString();
 
         // Obtener actividades económicas y tipos de contribuyente
         $economyActivities = EconomicActivity::all();
         $contributorTypes = ContributorType::all();
-
-
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Company/Index', [
@@ -48,7 +46,7 @@ class CompanyController extends Controller
             'company' => 'required|min:3|max:300',
             'economic_activity_id' => 'required',
             'contributor_type_id' => 'required',
-            
+
         ]);
 
         //crear las companias
@@ -84,6 +82,6 @@ class CompanyController extends Controller
         ]);
     }
 
-    
+
 
 }

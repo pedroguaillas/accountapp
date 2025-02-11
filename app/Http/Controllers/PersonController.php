@@ -83,7 +83,7 @@ class PersonController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
-            'data' => $additionalInfo, // Se pasa el JSON aquí
+            'data_additional' => $additionalInfo, // Se pasa el JSON aquí
         ]);
 
         //return response()->json(['message' => 'Persona creada con éxito']);

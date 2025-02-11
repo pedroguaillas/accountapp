@@ -14,22 +14,17 @@ class HourController extends Controller
     {
         // Obtener la primera compañía
         $company = Company::first();
-
-        // Validar que la compañía exista
         if (!$company) {
             return back()->withErrors(['error' => 'No se encontró una compañía registrada.']);
         }
+        $search = $request->input('search', '');
 
-        // Construimos la consulta base
         $hours = Hour::select('hours.*', 'e.cuit', 'e.name')
             ->join('employees as e', 'e.id', '=', 'hours.employee_id') // Relación con empleados
-            ->where('hours.company_id', $company->id);
-
-        // Aplicamos el filtro si existe
-        if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $hours->where('e.name', 'LIKE', '%' . $searchTerm . '%'); // Buscar por nombre del empleado
-        }
+            ->where('hours.company_id', $company->id)
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where('e.name', 'LIKE', "%$search%"); // Buscar por nombre del empleado
+            });
 
         // Obtenemos los empleados como una colección
         $employees = Employee::where('company_id', $company->id)->get();
@@ -41,7 +36,7 @@ class HourController extends Controller
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Hour/Index', [
             'filters' => [
-                'search' => $request->search,
+                'search' => $search,
             ],
             'hours' => $paginatedhours,
             'employees' => $employees,

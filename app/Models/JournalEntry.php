@@ -15,6 +15,7 @@ class JournalEntry extends Model
         'account_id', // ID de la cuenta
         'debit', // Monto del debe
         'have', // Monto del haber
+        'data_additional'
     ];
 
     protected function casts(): array
@@ -22,6 +23,7 @@ class JournalEntry extends Model
         return [
             'debit' => 'float',
             'have' => 'float',
+            'data_additional' => 'array',//devolver un array asociativo
         ];
     }
 

@@ -11,14 +11,15 @@ class PaymentRoleIngress extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'company_id', // ID de la compañía
         'payment_role_id', // ID del empleado
         'role_ingress_id', // ID del empleado
         'value', // Salario
+        'data_additional',
     ];
 
     protected $casts = [
         'value' => 'float',
+        'data_additional' => 'array',//devolver un array asociativo
     ];
 
     // Relación con el modelo Employee

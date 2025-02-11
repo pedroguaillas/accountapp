@@ -52,12 +52,19 @@ class ProcessDepreciation implements ShouldQueue
                 $valueDepreciation = ($valueDepreciation / 30) * $this->calDays($fixedAsset->date_acquisition);
             }
 
+
+            $data = [
+                "company_id" => $company->id,
+            ];
+    
+            
             $fixedAsset->depreciations()->create([
                 'date' => $date,
                 'percentage' => 20.0,
                 'amount' => $base,
                 'value' => $valueDepreciation,
                 'accumulated' => $valueDepreciation + $fixedAsset->sum_accumulated,
+                'data_additional' => $data,
             ]);
         }
 

@@ -8,7 +8,6 @@ import DynamicSelect from "@/Components/DynamicSelect.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
-import { ref, computed } from "vue";
 
 // Props
 defineProps({
@@ -26,10 +25,6 @@ const accountTypeOptions = [
   { value: "corriente", label: "Corriente" },
 ];
 
-const stateTypeOptions = [
-  { value: "1", label: "Activo" },
-  { value: "0", label: "Inactivo" },
-];
 
 // Emits
 defineEmits(["close", "save"]);

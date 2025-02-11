@@ -13,18 +13,14 @@ class MovementTypeController extends Controller
     public function index(Request $request)
     {
         $company = Company::first();
+        $search = $request->input('search', '');
 
-        // Construimos la consulta base
-        $movementtypes = MovementType::query()
-            ->where('company_id', $company->id);
-
-        // Aplicamos el filtro si existe
-        if ($request->has('search') && !empty($request->search)) {
-            $movementtypes->where('name', 'LIKE', '%' . $request->search . '%');
-        }
-
-        // Paginamos los resultados y preservamos los filtros en la URL
-        $movementtypes = $movementtypes->paginate(10)->withQueryString();
+        $movementtypes = MovementType::where('company_id', $company->id)
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%$search%");
+            })
+            ->paginate(10)
+            ->withQueryString();
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('MovementType/Index', [

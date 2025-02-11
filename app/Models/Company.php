@@ -58,7 +58,6 @@ class Company extends Model
         return $this->hasMany(CostCenter::class);//relacion muchos a muchos 
     }
 
-
     public function accounts()
     {
         return $this->hasMany(Account::class);
@@ -102,26 +101,13 @@ class Company extends Model
     public function paymentroles()
     {
         return $this->hasMany(PaymentRole::class);
-    }
-    
-    public function paymentroleingresses()
-    {
-        return $this->hasMany(PaymentRoleIngress::class);
-    }
-
-    public function paymentroleegresses()
-    {
-        return $this->hasMany(PaymentRoleEgress::class);
-    }
+    }    
 
     public function hours()
     {
         return $this->hasMany(Hour::class);
     }
-    public function bankaccounts()
-    {
-        return $this->hasMany(BankAccount::class);
-    }
+
     public function banks()
     {
         return $this->hasMany(Bank::class);
@@ -132,10 +118,6 @@ class Company extends Model
         return $this->hasMany(MovementType::class);
     }
 
-    public function transactions()
-    {
-        return $this->hasMany(Transaction::class);
-    }
     public function people()
     {
         return $this->hasMany(Person::class);

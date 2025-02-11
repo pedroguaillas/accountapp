@@ -22,26 +22,24 @@ class FixedAssetController extends Controller
     {
         // Obtener la compañía actual
         $company = Company::first();
+        $search = $request->input('search', '');
 
-        // Consulta para activos fijos con filtros opcionales
-        $fixedAssetssQuery = DB::table('fixed_assets')
+        $fixedAssets = DB::table('fixed_assets')
             ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
             ->where('company_id', $company->id)
-            ->whereNull('deleted_at'); // Excluir registros eliminados
+            ->whereNull('deleted_at') // Excluir registros eliminados
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where('code', 'LIKE', "%$search%");
+            })
+            ->paginate(10)
+            ->withQueryString();
 
-        // Aplicar filtro por código si existe
-        if ($request->search) {
-            $fixedAssetssQuery->where('code', 'LIKE', '%' . $request->search . '%');
-        }
-
-        // Aplicar paginación a activos fijos
-        $fixedAssetss = $fixedAssetssQuery->paginate(10)->withQueryString();
 
         // Retornar la vista con los datos y filtros actuales
         return Inertia::render('FixedAsset/Index', [
-            'fixedAssetss' => $fixedAssetss,
+            'fixedAssetss' => $fixedAssets,
             'filters' => [
-                'search' => $request->search, // Retornar el filtro de código
+                'search' => $search, // Retornar el filtro de código
             ],
         ]);
     }
@@ -158,7 +156,7 @@ class FixedAssetController extends Controller
                 $fixedAsset = $company->fixedassets()->create($fixedAssetStoreRequest->all());
             } else {
                 return redirect()->route('fixedassets.create')->withErrors([
-                    'value' => 'El monto máximo permitido es ' . number_format($valueres, 2,'.',''),
+                    'value' => 'El monto máximo permitido es ' . number_format($valueres, 2, '.', ''),
                     'type' => 'MAXIMO'
                 ]);
             }

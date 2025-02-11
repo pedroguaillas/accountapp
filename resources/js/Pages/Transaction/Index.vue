@@ -41,7 +41,16 @@ const deleteTransaction = () => {
       router.visit(route("transactions.index"));
     })
     .catch((error) => {
-      console.error("Error al eliminar el movimiento", error);
+      if (error.response) {
+        // Si el backend envía un error con status code
+        console.error("Error del backend:", error.response.data);
+
+        // Mostrar el mensaje de error del backend
+        alert(
+          error.response.data.error ||
+            "Ocurrió un error al eliminar la transacción."
+        );
+      }
     });
 };
 
@@ -70,7 +79,6 @@ watch(
 const handlePageChange = async (page) => {
   const url = route("transactions.index"); // Ruta hacia el backend
   loading.value = true;
-
   try {
     await router.get(
       url,
@@ -144,11 +152,12 @@ const handlePageChange = async (page) => {
                 >
                   <TrashIcon class="size-6 text-white" />
                 </button>
-                <button
+                <Link
+                  :href="route('transactions.edit', transaction.id)"
                   class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
                 >
                   <PencilIcon class="size-4 text-white" />
-                </button>
+                </Link>
               </div>
             </td>
           </tr>

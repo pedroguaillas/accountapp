@@ -13,23 +13,24 @@ class RoleIngressController extends Controller
     public function index(Request $request)
     {
         $company = Company::first();
-        // Construimos la consulta base para los ingresos
-        $ingreses = RoleIngress::select("*")
-            ->where('company_id', $company->id)
-            ->whereNull('deleted_at');
+        $search = $request->input('search', '');
 
-        if ($request->has('search') && !empty($request->search)) {
-            $ingreses->where('code', 'LIKE', '%' . $request->search . '%')
-                ->orWhere('name', 'LIKE', '%' . $request->search . '%');
-        }
-
-        $ingreses = $ingreses->paginate(20)->withQueryString(); // Importante usar withQueryString()
+        $ingreses = RoleIngress::where('company_id', $company->id)
+            ->whereNull('deleted_at')
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('code', 'LIKE', "%$search%")
+                        ->orWhere('name', 'LIKE', "%$search%");
+                });
+            })
+            ->paginate(20)
+            ->withQueryString();
 
         // Renderizamos la vista con los datos necesarios
         return inertia('Business/Setting/RoleIngress', [
             'ingresses' => $ingreses,
             'filters' => [
-                'search' => $request->search,
+                'search' => $search,
             ],
         ]);
     }
@@ -38,16 +39,16 @@ class RoleIngressController extends Controller
     public function store(Request $request)
     {
         $company = Company::first();
-        $roleingress =RoleIngress::create([...$request->all(), 'company_id' => $company->id]);
+        $roleingress = RoleIngress::create([...$request->all(), 'company_id' => $company->id]);
 
         $paymentRoles = PaymentRole::where('company_id', $company->id)->get();
 
         // Insertar cada RoleEgress en los PaymentRole
-      
-        $inputpaymentroleingress =[];
+
+        $inputpaymentroleingress = [];
         foreach ($paymentRoles as $paymentRole) {
-            $inputpaymentroleingress []= [
-                'payment_role_id' =>$paymentRole->id,
+            $inputpaymentroleingress[] = [
+                'payment_role_id' => $paymentRole->id,
                 'role_ingress_id' => $roleingress->id,
                 'value' => 0,
             ];

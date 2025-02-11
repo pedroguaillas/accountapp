@@ -13,24 +13,24 @@ class RoleEgressController extends Controller
     public function index(Request $request)
     {
         $company = Company::first();
+        $search = $request->input('search', '');
 
-        //lista de egresos
-        $egresses = RoleEgress::select("*")
-            ->where('company_id', $company->id)
-            ->whereNull('deleted_at');
-
-        if ($request->has('search') && !empty($request->search)) {
-            $egresses->where('code', 'LIKE', '%' . $request->search . '%')
-                ->orWhere('name', 'LIKE', '%' . $request->search . '%');
-        }
-
-        $egresses = $egresses->paginate(10)->withQueryString(); // Importante usar withQueryString()
+        $egresses = RoleEgress::where('company_id', $company->id)
+            ->whereNull('deleted_at')
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('code', 'LIKE', "%$search%")
+                        ->orWhere('name', 'LIKE', "%$search%");
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Business/Setting/RoleEgress', [
             'egresses' => $egresses,
             'filters' => [
-                'search' => $request->search,
+                'search' => $search,
             ],
         ]);
     }
@@ -43,10 +43,10 @@ class RoleEgressController extends Controller
         $paymentRoles = PaymentRole::where('company_id', $company->id)->get();
 
         // Insertar cada RoleEgress en los PaymentRole
-        $inputpaymentroleegress =[];
+        $inputpaymentroleegress = [];
         foreach ($paymentRoles as $paymentRole) {
             $inputpaymentroleegress[] = [
-                'payment_role_id' =>$paymentRole->id,
+                'payment_role_id' => $paymentRole->id,
                 'role_egress_id' => $roleegress->id,
                 'value' => 0,
             ];

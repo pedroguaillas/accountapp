@@ -20,28 +20,25 @@ class AdvanceController extends Controller
             return back()->withErrors(['error' => 'No se encontró una compañía registrada.']);
         }
 
+        $search = $request->input('search', '');
         // Construimos la consulta base
         $advances = Advance::select('advances.*', 'e.cuit', 'e.name')
-            ->join('employees as e', 'e.id', '=', 'advances.employee_id') // Relación con empleados
-            ->where('advances.company_id', $company->id);
-
-        // Aplicamos el filtro si existe
-        $search = $request->input('search', '');
-        $advances->whereRaw("LOWER(e.name) LIKE ?", ["%" . strtolower($search) . "%"]); // Buscar por nombre del empleado
+            ->join('employees as e', 'e.id', '=', 'advances.employee_id')
+            ->where('advances.company_id', $company->id)
+            ->when($search, function ($query, $search) {
+                return $query->whereRaw("LOWER(e.name) LIKE ?", ["%" . strtolower($search) . "%"]);
+            })
+            ->paginate(10)->withQueryString();
 
         // Obtenemos los empleados como una colección
         $employees = Employee::where('company_id', $company->id)->get();
-
-        // Paginamos los resultados y preservamos los filtros en la URL
-        $paginatedAdvances = $advances->paginate(10)->withQueryString();
-
         //dd($paginatedAdvances);
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Advance/Index', [
             'filters' => [
                 'search' => $search,
             ],
-            'advances' => $paginatedAdvances,
+            'advances' => $advances,
             'employees' => $employees,
         ]);
     }
