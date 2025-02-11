@@ -25,12 +25,14 @@ class Transaction extends Model
         'transfer_account',
         'voucher_number',
         'state_transaction',
+        'data_additional',
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount' => 'float',
         'transaction_date' => 'date',
         'cheque_date' => 'date',
+        'data_additional' => 'array',//devolver un array asociativo
     ];
 
     // Relación con la tabla MovementType
@@ -43,11 +45,5 @@ class Transaction extends Model
     public function bankAccount()
     {
         return $this->belongsTo(BankAccount::class, 'bank_account_id');
-    }
-
-    // Relación con la tabla Company
-    public function company()
-    {
-        return $this->belongsTo(Company::class, 'company_id');
     }
 }

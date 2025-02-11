@@ -14,27 +14,24 @@ class BankAccountController extends Controller
     public function index(Request $request, Bank $bank)
     {
         $company = Company::first();
-
+        $search = $request->input('search', '');
         // Construimos la consulta base
         $bankaccounts = BankAccount::query()
-            ->where('company_id', $company->id)
-            ->where('bank_id',$bank->id);
-
-        // Aplicamos el filtro si existe
-        if ($request->has('search') && !empty($request->search)) {
-            $bankaccounts->where('name', 'LIKE', '%' . $request->search . '%');
-        }
-
-        // Paginamos los resultados y preservamos los filtros en la URL
-        $bankaccounts = $bankaccounts->paginate(10)->withQueryString();
+            ->select('id','account_number','account_type','current_balance','state')
+            ->where('data_additional->company_id', $company->id)
+            ->where('bank_id',$bank->id) 
+            ->when($search, function ($query, $search) {
+                $query->whereRaw("LOWER(name) LIKE ?", ["%" . strtolower($search) . "%"]);
+            })->paginate(10)
+            ->withQueryString();
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('BankAccount/Index', [
             'filters' => [
-                'search' => $request->search, // Retornar el filtro de código
+                'search' => $search, // Retornar el filtro de código
             ],
             'bankaccounts' => $bankaccounts,
-            'bank_id' => $bank->id,
+            'bank' => $bank,
         ]);
     }
 
@@ -45,12 +42,15 @@ class BankAccountController extends Controller
         $request->validate([
             'account_number' => 'required|min:1|max:999',
         ]);
-        //llamada a la compania
+
         $company = Company::first();
-
+        
+        $data=[
+            "company_id"=> $company->id,
+        ];
+        
         //creacion de los estableicmientos 
-        $company->bankaccounts()->create($request->all());
-
+        BankAccount::create([...$request->all(),'data_additional'=>$data]);
     }
 
     public function update(Request $request, BankAccount $bankaccount)

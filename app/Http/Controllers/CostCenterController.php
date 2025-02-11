@@ -13,20 +13,17 @@ class CostCenterController extends Controller
     public function index(Request $request)
     {
         $company = Company::first();
+        $search = $request->input('search', '');
 
-        // Construimos la consulta base
-        $costCenters = CostCenter::select("*")
-            ->where('company_id', $company->id);
-
-        // Aplicamos el filtro si existe
-        if ($request->has('search') && !empty($request->search)) {
-            $costCenters->where('code', 'LIKE', '%' . $request->search . '%')
-                ->orWhere('name', 'LIKE', '%' . $request->search . '%');
-        }
-
-        // Paginamos los resultados
-        $costCenters = $costCenters->paginate(10)->withQueryString(); // Importante usar withQueryString()
-
+        $costCenters = CostCenter::where('company_id', $company->id)
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('code', 'LIKE', "%$search%")
+                        ->orWhere('name', 'LIKE', "%$search%");
+                });
+            })
+            ->paginate(10)
+            ->withQueryString();
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('CostCenter/Index', [
@@ -67,8 +64,8 @@ class CostCenterController extends Controller
     public function updateState($id)
     {
         $costcenter = CostCenter::findOrFail($id);
-        $costcenter ->state = !$costcenter ->state; // Toggle the state
-        $costcenter ->save();
+        $costcenter->state = !$costcenter->state; // Toggle the state
+        $costcenter->save();
 
         return response()->json(['success' => true]);
     }

@@ -91,6 +91,8 @@ return new class extends Migration {
             $table->integer('lot')->default(1);
             $table->integer('order_note')->default(1);
             $table->integer('proforma')->default(1);
+            $table->json('data_additional')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -145,6 +147,9 @@ return new class extends Migration {
 
         Schema::create('journals', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger("company_id");
+            $table->bigInteger("user_id");
+            $table->bigInteger('cost_center_id')->nullable();
             $table->date('date');
             $table->string('reference')->nullable(); // Numero de asiento contable de cada compania
             $table->string('description')->nullable();
@@ -152,9 +157,7 @@ return new class extends Migration {
             $table->string('prefix')->nullable();
             $table->string('document_id')->nullable(); // Ej. ID compra
             $table->string('table')->nullable(); // shops
-            $table->bigInteger("user_id");
-            $table->bigInteger("company_id");
-            $table->bigInteger('cost_center_id')->nullable();
+        
             $table->timestamps();
             $table->softDeletes();
 
@@ -168,6 +171,8 @@ return new class extends Migration {
             $table->bigInteger('account_id');
             $table->decimal('debit', 14, 2)->default(0);
             $table->decimal('have', 14, 2)->default(0);
+            $table->json('data_additional')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -177,8 +182,8 @@ return new class extends Migration {
 
         Schema::create('fixed_assets', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('pay_method_id');
             $table->bigInteger('company_id');
+            $table->bigInteger('pay_method_id');
             $table->bigInteger('active_type_id');
             $table->boolean('is_depretation_a')->default(false);
             $table->boolean('is_legal')->default(false);
@@ -208,6 +213,8 @@ return new class extends Migration {
             $table->decimal('amount', 14, 2)->default(0);
             $table->decimal('value', 14, 2)->default(0);
             $table->decimal('accumulated', 14, 2)->default(0);
+            $table->json('data_additional')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -216,8 +223,8 @@ return new class extends Migration {
 
         Schema::create('intangible_assets', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('pay_method_id');
             $table->bigInteger('company_id');
+            $table->bigInteger('pay_method_id');
             $table->String('type');
             $table->boolean('is_legal')->default(false);
             $table->string('vaucher')->nullable();
@@ -243,6 +250,8 @@ return new class extends Migration {
             $table->decimal('amount', 14, 2)->default(0);
             $table->decimal('value', 14, 2)->default(0);
             $table->decimal('accumulated', 14, 2)->default(0);
+            $table->json('data_additional')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -278,8 +287,8 @@ return new class extends Migration {
 
         Schema::create('advances', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('employee_id');
             $table->bigInteger('company_id');
+            $table->bigInteger('employee_id');
             $table->string('detail')->nullable();
             $table->decimal('amount', 14, 2)->default(0);
             $table->date('date');
@@ -344,36 +353,36 @@ return new class extends Migration {
 
         Schema::create('payment_role_ingresses', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('company_id');
             $table->bigInteger('payment_role_id');
             $table->bigInteger('role_ingress_id');
             $table->decimal('value', 14, 2)->default(0);
+            $table->json('data_additional')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('payment_role_id')->references('id')->on('payment_roles');
             $table->foreign('role_ingress_id')->references('id')->on('role_ingresses');
-            $table->foreign('company_id')->references('id')->on('companies');
         });
 
         Schema::create('payment_role_egresses', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('company_id');
             $table->bigInteger('payment_role_id');
             $table->bigInteger('role_egress_id');
             $table->decimal('value', 14, 2)->default(0);
+            $table->json('data_additional')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('payment_role_id')->references('id')->on('payment_roles');
             $table->foreign('role_egress_id')->references('id')->on('role_egresses');
-            $table->foreign('company_id')->references('id')->on('companies');
         });
 
         Schema::create('hours', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('employee_id');
             $table->bigInteger('company_id');
+            $table->bigInteger('employee_id');
             $table->string('detail')->nullable();
             $table->decimal('amount', 14, 2)->default(0);
             $table->date('date');
@@ -394,7 +403,6 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign('company_id')->references('id')->on('companies');
-
         });
 
         Schema::create('banks', function (Blueprint $table) {
@@ -412,26 +420,24 @@ return new class extends Migration {
         Schema::create('bank_accounts', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('bank_id');
-            $table->bigInteger('company_id');
-            $table->string('account_number')->unique(); // Unique account number
+            $table->string('account_number'); // Unique account number
             $table->string('account_type'); // Account type
             $table->decimal('current_balance', 15, 2)->default(0); // Current balance
             $table->boolean('state')->default(true); // Active/inactive state
+            $table->json('data_additional')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('company_id')->references('id')->on('companies');
             $table->foreign('bank_id')->references('id')->on('banks');
 
-            $table->unique(['company_id', 'account_number']);
-
+            $table->unique(['bank_id', 'account_number']);
         });
 
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('movement_type_id');
             $table->bigInteger('bank_account_id');
-            $table->bigInteger('company_id');
             $table->date('transaction_date'); // Transaction date and time
             $table->decimal('amount', 15, 2); // Transaction amount
             $table->string('description')->nullable(); // Transaction description
@@ -441,10 +447,11 @@ return new class extends Migration {
             $table->string('transfer_account')->nullable(); // numero de cuenta (solo cuando el método de pago sea diferente de cheque)
             $table->string('voucher_number')->nullable(); // Número de comprobante
             $table->string('state_transaction'); // Completed/pending state
+            $table->json('data_additional')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('company_id')->references('id')->on('companies');
             $table->foreign('bank_account_id')->references('id')->on('bank_accounts');
             $table->foreign('movement_type_id')->references('id')->on('movement_types');
         });
@@ -454,17 +461,16 @@ return new class extends Migration {
             $table->bigInteger('company_id');
             $table->string('identification'); // cedula
             $table->string('name'); // Primer nombre
-            $table->string('email')->unique(); // Correo electrónico
+            $table->string('email'); // Correo electrónico
             $table->string('phone')->nullable(); // Número de teléfono
             $table->string('address')->nullable(); // direccion
-            $table->json('data')->nullable();
+            $table->json('data_additional')->nullable();
 
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('company_id')->references('id')->on('companies');
         });
-
     }
 
     /**

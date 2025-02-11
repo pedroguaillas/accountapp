@@ -13,28 +13,24 @@ class BranchController extends Controller
     public function index(Request $request)
     {
         $company = Company::first();
+        $search = $request->input('search', '');
 
         // Construimos la consulta base
         $branches = Branch::query()
-            ->where('company_id', $company->id);
+            ->where('company_id', $company->id)
+            ->when($search, function ($query, $search) {
+                $query->whereRaw("LOWER(branches.name) LIKE ?", ["%" . strtolower($search) . "%"]);
+            })->paginate(10)
+            ->withQueryString();
 
-        // Aplicamos el filtro si existe
-        $search = $request->input('search', '');
-
-        $branches->whereRaw("LOWER(branches.name) LIKE ?", ["%" . strtolower($search) . "%"]);;
-
-        // Paginamos los resultados y preservamos los filtros en la URL
-        $branches = $branches->paginate(10)->withQueryString();
-        
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Branch/Index', [
             'filters' => [
-                'search' => $request->search, // Retornar el filtro de búsqueda
+                'search' => $search, // Retornar el filtro de búsqueda
             ],
             'branches' => $branches,
         ]);
     }
-
 
     public function store(Request $request)
     {
@@ -53,7 +49,6 @@ class BranchController extends Controller
 
         //creacion de los estableicmientos 
         $company->branches()->create($request->all());
-
     }
 
     public function update(Request $request, Branch $branch)

@@ -19,10 +19,8 @@ class BankController extends Controller
             ->where('company_id', $company->id)
             ->when($search, function ($query, $search) {
                 $query->whereRaw("LOWER(banks.name) LIKE ?", ["%" . strtolower($search) . "%"]);
-            });
-        // Paginamos los resultados y preservamos los filtros en la URL
-        $banks = $banks->paginate(10)->withQueryString();
-
+            })->paginate(10)
+            ->withQueryString();
 
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Bank/Index', [
@@ -32,7 +30,6 @@ class BankController extends Controller
             'banks' => $banks,
         ]);
     }
-
 
     public function store(Request $request)
     {

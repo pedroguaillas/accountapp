@@ -17,7 +17,7 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 const props = defineProps({
   bankaccounts: { type: Object, default: () => ({}) },
   filters: { type: Object, default: () => ({}) },
-  bank_id:{type :Number},
+  bank:{ type: Object, default: () => ({}) },
 });
 
 // Refs
@@ -35,7 +35,7 @@ const toggle1 = () => {
 const initialBankAccount = {
   account_number: "",
   account_type: 0,
-  bank_id: props.bank_id,
+  bank_id: props.bank.id,
   current_balance: 0,
 };
 
@@ -66,6 +66,7 @@ const save = () => {
     ? route("bankaccounts.update", { id: bankaccount.id }) // Ruta para actualización
     : route("bankaccounts.store"); // Ruta para creación
 
+  console.log(bankaccount.data);
   // Preparar la solicitud
   bankaccount[routeMethod](routeName, {
     onSuccess: () => {
@@ -106,7 +107,7 @@ const deleteBankAccount = () => {
     .delete(route("bankaccounts.delete", deleteid.value)) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("bankaccounts.index",props.bank_id));
+      router.visit(route("bankaccounts.index",props.bank.id));
     })
     .catch((error) => {
       console.error("Error al eliminar a sucursal", error);
@@ -117,7 +118,7 @@ watch(
   search,
 
   async (newQuery) => {
-    const url = route("bankaccounts.index",props.bank_id);
+    const url = route("bankaccounts.index",props.bank.id);
     loading.value = true;
     console.log("si entra");
 
@@ -138,7 +139,7 @@ watch(
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
-  const url = route("bankaccounts.index",props.bank_id); // Ruta hacia el backend
+  const url = route("bankaccounts.index",props.bank.id); // Ruta hacia el backend
   loading.value = true;
 
   try {
@@ -163,7 +164,7 @@ const toggleState = (bankaccountId, currentState) => {
     })
     .then(() => {
       // On success, reload the page or update the local data
-      router.visit(route("bankaccounts.index",props.bank_id));
+      router.visit(route("bankaccounts.index",props.bank.id));
     })
     .catch((error) => {
       console.error("Error al cambiar el estado del cuenta bancaria", error);
@@ -179,7 +180,7 @@ const toggleState = (bankaccountId, currentState) => {
       <!-- Card Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Cuentas Bancarias
+          Cuentas Bancarias {{ props.bank.name }}
         </h2>
         <div class="w-full flex sm:justify-end">
           <TextInput
@@ -201,7 +202,6 @@ const toggleState = (bankaccountId, currentState) => {
         <thead>
           <tr class="[&>th]:py-2">
             <th class="w-1">N°</th>
-            <th>BANCO</th>
             <th>NUMERO DE CUENTA</th>
             <th>TIPO DE CUENTA</th>
             <th>SALDO</th>
@@ -216,7 +216,6 @@ const toggleState = (bankaccountId, currentState) => {
             class="border-t [&>td]:py-2"
           >
             <td>{{ i + 1 }}</td>
-            <td>{{ bankaccount.bank_id }}</td>
             <td>{{ bankaccount.account_number }}</td>
             <td>{{ bankaccount.account_type }}</td>
             <td>{{ bankaccount.current_balance }}</td>

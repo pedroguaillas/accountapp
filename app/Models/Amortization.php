@@ -16,5 +16,13 @@ class Amortization extends Model
         'amount',
         'value',
         'accumulated',
+        'data_additional',
+    ];
+    protected $casts = [
+        'date' => 'date',
+        'data_additional' => 'array',//devolver un array asociativo
+        'percentage' => 'float',
+        'amount' => 'float',
+        'value' => 'float',
     ];
 }

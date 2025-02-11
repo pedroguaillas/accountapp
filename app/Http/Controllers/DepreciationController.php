@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessDepreciation;
-use App\Models\Depreciation;
 use App\Models\FixedAsset;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -25,25 +22,5 @@ class DepreciationController extends Controller
             'fixedAsset' => $fixedAsset,
             'depreciations' => $depreciations,
         ]);
-    }
-
-    public function create()
-    {
-        //
-    }
-
-    public function store(Request $request)
-    {
-        //
-    }
-
-    public function edit(Depreciation $depreciation)
-    {
-        //
-    }
-
-    public function update(Request $request, Depreciation $depreciation)
-    {
-        //
     }
 }

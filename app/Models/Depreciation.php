@@ -16,12 +16,14 @@ class Depreciation extends Model
         'amount',
         'value',
         'accumulated',
+        'data_additional',
     ];
 
     protected function casts(): array
     {
         return [
             'date' => 'date',
+            'data_additional' => 'array',
             'percentage' => 'float',
             'amount' => 'float',
             'accumulated' => 'float',

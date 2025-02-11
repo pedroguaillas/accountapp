@@ -17,11 +17,11 @@ class Person extends Model
         'email',
         'phone',
         'address',
-        'data',
+        'data_additional',
     ];
 
     protected $casts = [
-        'data' => 'array',//devolver un array asociativo
+        'data_additional' => 'array',//devolver un array asociativo
     ];
 
     // Relación con la tabla 'companies'

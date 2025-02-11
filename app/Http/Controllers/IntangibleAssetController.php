@@ -16,23 +16,20 @@ class IntangibleAssetController extends Controller
         $company = Company::first();
 
         // Filtro de búsqueda
-        $search = $request->search;
+        $search = $request->input('search', '');
 
-        // Consulta principal
-        $intangibleAssetssQuery = DB::table('intangible_assets')
+        $intangibleAssets = DB::table('intangible_assets')
             ->selectRaw("id, code, to_char(date_acquisition, 'DD-MM-YYYY') as date_acquisition, detail, value")
             ->where('company_id', $company->id)
-            ->whereNull('deleted_at');
-
-        if ($search) {
-            $intangibleAssetssQuery->where('code', 'LIKE', '%' . $search . '%');
-        }
-
-        //paginacion de los activos intangibles
-        $intangibleAssetss = $intangibleAssetssQuery->paginate(10)->withQueryString();
+            ->whereNull('deleted_at') // Excluir registros eliminados
+            ->when(!empty($search), function ($query) use ($search) {
+                $query->where('code', 'LIKE', "%$search%");
+            })
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('IntangibleAsset/Index', [
-            'intangibleAssetss' => $intangibleAssetss,
+            'intangibleAssetss' => $intangibleAssets,
             'filters' => ['search' => $search],
         ]);
     }
