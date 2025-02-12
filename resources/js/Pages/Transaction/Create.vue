@@ -17,6 +17,7 @@ const props = defineProps({
   bankaccounts: { type: Array, default: () => [] },
   movementtypes: { type: Array, default: () => [] },
   people: { type: Array, default: () => [] },
+  countperson: { type: Number, default: ()=>0} ,
 });
 
 const date = new Date().toISOString().split("T")[0];
@@ -205,10 +206,10 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
         </div>
 
         <!-- beneficiario-->
-        <div v-if="people.length > 0" class="col-span-6 sm:col-span-4">
+        <div v-if="props.countperson > 0" class="col-span-6 sm:col-span-4">
           <InputLabel for="person_id" value="Benediciario" />
           <DynamicSelect
-            v-if="people.length <= 5"
+            v-if=" props.countperson<5"
             class="mt-2 block w-full"
             v-model="transaction.beneficiary_id"
             :options="peopleOptions"
@@ -216,7 +217,6 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
           />
           <SearchPerson
             v-else-if="people.length > 5"
-            :people="people"
             @selectPerson="handlePersonSelect"
           />
           <InputError :message="errorForm.beneficiary_id" class="mt-2" />
