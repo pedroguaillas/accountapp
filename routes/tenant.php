@@ -105,9 +105,9 @@ Route::middleware([
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
         Route::resource('accounts', AccountController::class)->only(['store', 'update', 'destroy']);
-       // Route::post('accounts', [AccountController::class, 'store'])->name('accounts.store');
+        // Route::post('accounts', [AccountController::class, 'store'])->name('accounts.store');
         Route::get('accounts/create/{account}', [AccountController::class, 'create'])->name('accounts.create');
-      
+
         // Journals
         Route::get('asientos', [JournalController::class, 'index'])->name('journal.index');
         Route::get('asiento/crear', [JournalController::class, 'create'])->name('journal.create');
@@ -181,7 +181,7 @@ Route::middleware([
         // Emparejamiento de cuentas roles
         Route::get('vinculacion-contable/roles', [SettingRolController::class, 'index'])->name('setting.account.rol.index');
         Route::put('settingaccountrol/update/{id}', [SettingRolController::class, 'updateRoleAccount'])->name('settingaccount.rol.update');
-    
+
         //bancos
         Route::get('bancos', [BankController::class, 'index'])->name('banks.index');
         Route::post('banks', [BankController::class, 'store'])->name('banks.store');
@@ -207,15 +207,15 @@ Route::middleware([
         Route::get('movimientos-bancarios/crear', [TransactionController::class, 'create'])->name('transactions.create');
         Route::post('transactions', [TransactionController::class, 'store'])->name('transactions.store');
         Route::get('movimientos-bancarios/editar/{transactionId}', [TransactionController::class, 'edit'])->name('transactions.edit');
-       
         Route::put('transactions/{transaction}', [TransactionController::class, 'update'])->name('transactions.update');
         Route::delete('transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.delete');
-    
-          //bancos
-          Route::get('personas', [PersonController::class, 'index'])->name('people.index');
-          Route::post('people', [PersonController::class, 'store'])->name('people.store');
-          Route::put('people/{person}', [PersonController::class, 'update'])->name('people.update');
-          Route::delete('people/{person}', [PersonController::class, 'destroy'])->name('people.delete');
-          
+
+        //personas
+        Route::get('personas', [PersonController::class, 'index'])->name('people.index');
+        Route::post('people', [PersonController::class, 'store'])->name('people.store');
+        Route::put('people/{person}', [PersonController::class, 'update'])->name('people.update');
+        Route::delete('people/{person}', [PersonController::class, 'destroy'])->name('people.delete');
+        Route::get('people', [PersonController::class, 'getPeople'])->name('people.filters.index');
+
     });
 });

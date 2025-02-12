@@ -51,6 +51,22 @@ class PersonController extends Controller
             'people' => $people,
         ]);
     }
+    public function getPeople(Request $request)
+    {
+        $company = Company::first();
+
+        // Obtener el término de búsqueda si existe
+        $search = $request->input('search');
+        $paginate= $request->input('paginate',10);
+        // Obtener los datos con filtro y paginación
+        $people = Person::where('company_id', $company->id)
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('identification', 'LIKE', "%{$search}%");
+            })
+            ->paginate($paginate); // Cambia el número de elementos por página si es necesario
+        return response()->json($people);
+    }
 
     public function store(Request $request)
     {
