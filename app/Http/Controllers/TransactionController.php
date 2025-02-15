@@ -30,7 +30,6 @@ class TransactionController extends Controller
             })->paginate(10)
             ->withQueryString(); // Puedes seleccionar lo que necesites
 
-
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Transaction/Index', [
             'filters' => [

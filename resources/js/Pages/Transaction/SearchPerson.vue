@@ -8,27 +8,23 @@ import axios from "axios";
 const modal = ref(false);
 const search = ref(""); // Texto del input
 const searchModal = ref(""); // Texto del input
-const identification = ref(""); // Identificación de la persona seleccionada
+//const identification = ref(""); // Identificación de la persona seleccionada
 const people = ref({}); // Sugerencias obtenidas del backend
 const suggestion = ref([]);
 const isDropdownOpen = ref(false);
 const selectedPerson = ref(null); // Controla si ya se seleccionó una persona
+const page = ref(1);
 
 // Fetch de personas con paginación limitada (5 o 3 resultados)
-const fetchPeople = async () => {
-  if (!search.value || selectedPerson.value) {
-    people.value = [];
-    return; // Retorna siempre un objeto válido
-  }
+const fetchPeople = async (search, page = 1, paginate = 10) => {
   try {
-    console.log("hola");
     const response = await axios.get(route("people.filters.index"), {
-      params: { search: search.value, page: 1, paginate: 3 },
+      params: { search, page, paginate },
     });
-    return response; // Retornar la respuesta completa
+    return response.data;
   } catch (error) {
     console.error("Error al obtener personas:", error);
-    return { data: {} }; // Manejar error retornando un objeto vacío
+    return { data: [], last_page: 1 };
   }
 };
 
@@ -39,60 +35,68 @@ const toggleModal = () => {
 
 // Seleccionar persona (desde dropdown o modal)
 const handlePersonSelect = (person) => {
+  modal.value = false;
   search.value = person.name;
-  identification.value = person.identification;
+  //identification.value = person.identification;
   isDropdownOpen.value = false;
-  people.value = []; // Limpiar sugerencias
+  people.value = {}; // Limpiar sugerencias
   selectedPerson.value = person; // Marcar persona como seleccionada
-
+  console.log(selectedPerson.value.identification);
   emit("selectPerson", person);
 };
 
-// Detectar cambios en la búsqueda y hacer fetch solo si no hay persona seleccionada
+// Detectar cambios en la búsqueda y hacer fetch solo si no hay persona seleccionada sugerencias
 watch(search, async (newValue) => {
   if (!newValue) {
-    selectedPerson.value = null; // Permitir nuevas búsquedas si se borra el campo
+    selectedPerson.value = null;
+    suggestion.value = [];
+    return;
   }
-  const { data } = await fetchPeople();
-  suggestion.value = data;
+  suggestion.value = await fetchPeople(newValue, 1, 3); // Paginate = 3 para sugerencias
   isDropdownOpen.value = search.value.length > 0 && !selectedPerson.value;
 });
-
-watch(searchModal, async (newValue) => {
-  if (!newValue) {
-    selectedPerson.value = null; // Permitir nuevas búsquedas si se borra el campo
-  }
-  person.value = await fetchPeople();
-  isDropdownOpen.value = search.value.length > 0 && !selectedPerson.value;
-});
-
+//para cargar el inicio
 watch(modal, async (newValue) => {
   if (newValue) {
-    
-    const response = await fetchPeople(); // Obtener respuesta
-    console.log(response);
-    if (response) {
-      people.value = response.data; // Asignar solo si hay datos
+    const response = await fetchPeople(""); // Obtener respuesta
+    if (response && response.data) {
+      people.value = response; // Asignar datos correctamente
+      isDropdownOpen.value = false;
+      search.value = "";
+    } else {
+      people.value = {}; // En caso de error, asigna array vacío
     }
   }
 });
 
+watch(searchModal, async (newValue) => {
+  if (!newValue) {
+    selectedPerson.value = null;
+    people.value = {};
+    return;
+  }
+  people.value = await fetchPeople(newValue);
+});
+
+watch(
+  () => page.value,
+  async (newPage) => {
+    people.value = await fetchPeople(searchModal.value, newPage);
+  }
+);
+
 // Cambiar de página
 const nextPage = () => {
-  if (page.value < totalPages.value) {
+  if (page.value < people.value.last_page) {
     page.value++;
-    fetchPeople();
   }
 };
 
 const prevPage = () => {
   if (page.value > 1) {
-    page.value--;
-    fetchPeople();
+    page.value--; // ✅ Esto activará automáticamente el `watch`
   }
 };
-
-
 
 const emit = defineEmits(["selectPerson"]);
 </script>
@@ -104,7 +108,7 @@ const emit = defineEmits(["selectPerson"]);
       <div
         class="w-[10em] border-y border-l border-gray-300 text-gray-500 px-4 py-2"
       >
-        {{ identification || "Identificación" }}
+        {{ selectedPerson?.value?.identification ?? "Identificación" }}
       </div>
 
       <!-- Campo de búsqueda con sugerencias -->
@@ -117,11 +121,11 @@ const emit = defineEmits(["selectPerson"]);
           @focus="isDropdownOpen = true"
         />
         <ul
-          v-if="isDropdownOpen && suggestion.length"
+          v-if="isDropdownOpen && suggestion.data.length"
           class="absolute z-10 bg-white border-b border-x border-gray-300 rounded-b w-full max-h-40 overflow-y-auto shadow-lg"
         >
           <li
-            v-for="person in suggestion"
+            v-for="person in suggestion.data"
             :key="person.id"
             @click="handlePersonSelect(person)"
             class="px-4 py-2 cursor-pointer hover:bg-gray-100"
@@ -146,7 +150,11 @@ const emit = defineEmits(["selectPerson"]);
     :show="modal"
     :people="people"
     :search="searchModal"
+    :page="page"
+    @update:search="searchModal = $event"
     @close="toggleModal"
     @selectPerson="handlePersonSelect"
+    @nextPage="nextPage"
+    @prevPage="prevPage"
   />
 </template>
