@@ -20,6 +20,7 @@ use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
 use App\Http\Controllers\RoleIngressController;
 use App\Http\Controllers\RoleEgressController;
+use App\Http\Controllers\PayMethodController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\SettingAccountController;
@@ -217,5 +218,8 @@ Route::middleware([
         Route::delete('people/{person}', [PersonController::class, 'destroy'])->name('people.delete');
         Route::get('people', [PersonController::class, 'getPeople'])->name('people.filters.index');
 
+
+        Route::post('paymethods', [PayMethodController::class, 'store'])->name('paymethods.store');
+        Route::get('metodosglobales', [PayMethodController::class, 'index'])->name('paymethods.index');
     });
 });

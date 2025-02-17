@@ -26,7 +26,7 @@ return new class extends Migration {
 
         Schema::create('pay_methods', function (Blueprint $table) {
             $table->id();
-            $table->integer('code');
+            $table->integer('code')->unique('code');;
             $table->string('name');
             $table->timestamps();
             $table->softDeletes();
