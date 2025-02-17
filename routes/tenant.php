@@ -84,10 +84,6 @@ Route::middleware([
         Route::put('rucs/{company}', [CompanyController::class, 'update'])->name('company.update');
         Route::delete('rucs/{companyId}', [CompanyController::class, 'destroy'])->name('company.delete');
 
-        // Ajustes de empresa
-        Route::get('empresa/ajuste/roles', [BusinessController::class, 'roles'])->name('business.setting.roles');
-        Route::get('settingsrole', [BusinessController::class, 'roles'])->name('business.setting.roles');
-
         // Centro de costos
         Route::get('centro-de-costos', [CostCenterController::class, 'index'])->name('costcenter.index');
         Route::post('costcenters', [CostCenterController::class, 'store'])->name('costCenter.store');
@@ -171,9 +167,14 @@ Route::middleware([
         Route::put('hours/{hour}', [HourController::class, 'update'])->name('hours.update');
         Route::delete('hours/{hour}', [HourController::class, 'destroy'])->name('hours.delete');
 
+        // Ajustes de empresa
+        Route::get('empresa/ajuste/roles', [BusinessController::class, 'roles'])->name('business.setting.roles');
+        Route::get('settingsrole', [BusinessController::class, 'roles'])->name('business.setting.roles');
+       
+       
         // Vinculacion general de cuentas
-        Route::get('empresa/ajuste/vinculacioncuentas', [AccountLinkController::class, 'roles'])->name('business.setting.roles');
-        Route::get('settingsaccountlink', [AccountLinkController::class, 'roles'])->name('business.setting.roles');
+        Route::get('empresa/ajuste/vinculacioncuentas', [AccountLinkController::class, 'roles'])->name('business.setting.accountlinks');
+        Route::get('settingsaccountlink', [AccountLinkController::class, 'roles'])->name('business.setting.accountlinks');
 
         // Emparejamiento de cuentas activo fijo
         Route::get('vinculacion-contable/activos-fijos', [SettingAccountController::class, 'index'])->name('setting.account.index');
