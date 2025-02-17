@@ -4,6 +4,7 @@ import DialogModal from "@/Components/DialogModal.vue";
 import Table from "@/Components/Table.vue";
 import { ref, computed, watch } from "vue";
 import TextInput from "@/Components/TextInput.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 // Props
 const props = defineProps({
@@ -57,6 +58,7 @@ defineEmits(["selectAccount", "close"]);
       </div>
     </template>
     <template #content>
+      <div class="mt-0 max-h-[300px] overflow-y-auto">
       <Table>
         <thead>
           <tr class="border-b">
@@ -76,14 +78,12 @@ defineEmits(["selectAccount", "close"]);
           </tr>
         </tbody>
       </Table>
+    </div>
     </template>
     <template #footer>
-      <button
-        @click="$emit('selectAccount')"
-        class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"
+      <SecondaryButton @click="$emit('close')" class="mr-2"
+        >Cancelar</SecondaryButton
       >
-        Guardar
-      </button>
     </template>
   </DialogModal>
 </template>

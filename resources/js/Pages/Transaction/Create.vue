@@ -10,14 +10,13 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
 import { TrashIcon } from "@heroicons/vue/24/outline";
-import Checkbox from "@/Components/Checkbox.vue";
 
 // Props
 const props = defineProps({
   bankaccounts: { type: Array, default: () => [] },
   movementtypes: { type: Array, default: () => [] },
   people: { type: Array, default: () => [] },
-  countperson: { type: Number, default: ()=>0} ,
+  countperson: { type: Number, default: () => 0 },
 });
 
 const date = new Date().toISOString().split("T")[0];
@@ -37,8 +36,10 @@ const initialTransaction = {
   state_transaction: "proceso",
 };
 
+const bank_account_id =
+  props.bankaccounts.length === 1 ? props.bankaccounts[0].id : 0;
 // Reactives
-const transaction = useForm({ ...initialTransaction });
+const transaction = useForm({ ...initialTransaction, bank_account_id });
 const errorForm = reactive({});
 
 const save = () => {
@@ -209,7 +210,7 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
         <div v-if="props.countperson > 0" class="col-span-6 sm:col-span-4">
           <InputLabel for="person_id" value="Benediciario" />
           <DynamicSelect
-            v-if=" props.countperson<5"
+            v-if="props.countperson < 5"
             class="mt-2 block w-full"
             v-model="transaction.beneficiary_id"
             :options="peopleOptions"
@@ -269,7 +270,7 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
           >
             Guardar
           </button>
-        </div>  
+        </div>
       </div>
     </div>
   </AdminLayout>

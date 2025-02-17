@@ -28,12 +28,15 @@ const initialJournal = {
   date,
   description: "",
   journalEntries: [],
-  cost_center_id: "",
+  cost_center_id: 0,
   is_deductible: true,
 };
+ const cost_center_id  =
+ props.  costCenters.length === 1 ? props.costCenters[0].id : 0;
+
 
 // Reactives
-const journal = useForm({ ...initialJournal, description: props.countJournals === 0 ? "ASIENTO DE SITUACION INICIAL" : "" });
+const journal = useForm({ ...initialJournal,cost_center_id , description: props.countJournals === 0 ? "ASIENTO DE SITUACION INICIAL" : "" });
 const errorForm = reactive({});
 
 const eliminarCuenta = (index) => {

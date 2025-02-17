@@ -20,14 +20,14 @@ class TenantSeeder extends Seeder
         ContributorType::create(['name' => 'RIMPE']);
         ContributorType::create(['name' => 'NEGOCIO POPULAR - RÉGIMEN RIMPE']);
 
-        PayMethod::create(['name' => 'SIN UTILIZACION DEL SISTEMA FINANCIERO', 'code' => 1]);
-        PayMethod::create(['name' => 'COMPENSACIÓN DE DEUDAS', 'code' => 15]);
-        PayMethod::create(['name' => 'TARJETA DE DÉBITO', 'code' => 16]);
-        PayMethod::create(['name' => 'DINERO ELECTRÓNICO', 'code' => 17]);
-        PayMethod::create(['name' => 'TARJETA PREPAGO', 'code' => 18]);
-        PayMethod::create(['name' => 'TARJETA DE CRÉDITO', 'code' => 19]);
-        PayMethod::create(['name' => 'OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO', 'code' => 20]);
-        PayMethod::create(['name' => 'ENDOSO DE TÍTULOS', 'code' => 21]);
+        // PayMethod::create(['name' => 'SIN UTILIZACION DEL SISTEMA FINANCIERO', 'code' => 1]);
+        // PayMethod::create(['name' => 'COMPENSACIÓN DE DEUDAS', 'code' => 15]);
+        // PayMethod::create(['name' => 'TARJETA DE DÉBITO', 'code' => 16]);
+        // PayMethod::create(['name' => 'DINERO ELECTRÓNICO', 'code' => 17]);
+        // PayMethod::create(['name' => 'TARJETA PREPAGO', 'code' => 18]);
+        // PayMethod::create(['name' => 'TARJETA DE CRÉDITO', 'code' => 19]);
+        // PayMethod::create(['name' => 'OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO', 'code' => 20]);
+        // PayMethod::create(['name' => 'ENDOSO DE TÍTULOS', 'code' => 21]);
 
         $company = Company::create([
             'ruc' => '1100167694001',
