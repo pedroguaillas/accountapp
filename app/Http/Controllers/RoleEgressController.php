@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PaymentRoleEgress;
 use App\Models\Company;
 use App\Models\RoleEgress;
 use App\Models\PaymentRole;
@@ -43,15 +44,22 @@ class RoleEgressController extends Controller
         $paymentRoles = PaymentRole::where('company_id', $company->id)->get();
 
         // Insertar cada RoleEgress en los PaymentRole
-        $inputpaymentroleegress = [];
-        foreach ($paymentRoles as $paymentRole) {
-            $inputpaymentroleegress[] = [
-                'payment_role_id' => $paymentRole->id,
-                'role_egress_id' => $roleegress->id,
-                'value' => 0,
-            ];
-        }
-        $company->paymentroleegresses()->createMany($inputpaymentroleegress);
+        $data = [
+            "company_id" => $company->id,
+        ];
+
+        // $inputpaymentroleegress = [];
+        // foreach ($paymentRoles as $paymentRole) {
+        //     $inputpaymentroleegress[] = [
+        //         'payment_role_id' => $paymentRole->id,
+        //         'role_egress_id' => $roleegress->id,
+        //         'value' => 0,
+        //         'data_additional' => json_encode($data),
+        //         'created_at' => now(),
+        //         'updated_at' => now(),
+        //     ];
+        // }
+        // PaymentRoleEgress::insert($inputpaymentroleegress);
     }
 
     public function update(Request $request, RoleEgress $roleegress)

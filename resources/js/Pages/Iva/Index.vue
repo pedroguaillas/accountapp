@@ -5,36 +5,36 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 
 // Recibes 'paymethods' desde Inertia
 const props = defineProps({
-  paymethods: {
+  ivas: {
     type: Array,
     default: () => [],
   },
 });
 
 // Inicializar selectedPayments con los métodos que tienen selected: true
-const selectedPayments = ref(
-  props.paymethods.filter((method) => method.selected).map((method) => method.code)
+const selectedIvas = ref(
+  props.ivas.filter((method) => method.selected).map((method) => method.code)
 );
 
 // Computed para verificar si todos están seleccionados
 const allSelected = computed(
-  () => selectedPayments.value.length === props.paymethods.length
+  () => selectedIvas.value.length === props.ivas.length
 );
 
 // Función para seleccionar/deseleccionar todos
 const toggleAll = () => {
   if (allSelected.value) {
-    selectedPayments.value = [];
+    selectedIvas.value = [];
   } else {
-    selectedPayments.value = props.paymethods.map((pm) => pm.code);
+    selectedIvas.value = props.ivas.map((pm) => pm.code);
   }
 };
 
 // Enviar la selección al backend
 const saveSelection = () => {
   axios
-    .post(route("busssines.setting.paymethods.store"), {
-      selected: selectedPayments.value,
+    .post(route("busssines.setting.ivas.store"), {
+      selected: selectedIvas.value,
     })
     .then((response) => {
       console.log(response.data.message);
@@ -53,7 +53,7 @@ const saveSelection = () => {
       <!-- Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Métodos de pago
+          Ivas
         </h2>
       </div>
 
@@ -65,13 +65,13 @@ const saveSelection = () => {
         </div>
 
         <!-- Lista de checkboxes -->
-        <div v-for="method in props.paymethods" :key="method.code" class="mt-2">
+        <div v-for="iva in ivas" :key="iva.code" class="mt-2">
           <input
             type="checkbox"
-            :value="method.code"
-            v-model="selectedPayments"
+            :value="iva.code"
+            v-model="selectedIvas"
           />
-          <label class="ml-2">{{ method.name }}</label>
+          <label class="ml-2">{{ iva.name }}</label>
         </div>
 
         <!-- Botón para guardar -->

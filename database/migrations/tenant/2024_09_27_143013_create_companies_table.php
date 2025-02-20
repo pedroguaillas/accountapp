@@ -28,6 +28,7 @@ return new class extends Migration {
             $table->id();
             $table->integer('code')->unique('code');;
             $table->string('name');
+            $table->decimal('max')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -471,6 +472,34 @@ return new class extends Migration {
 
             $table->foreign('company_id')->references('id')->on('companies');
         });
+
+        Schema::create('ivas', function (Blueprint $table) {
+            $table->id();
+            $table->integer('code')->unique();
+            $table->string('name');
+            $table->decimal('fee');
+            $table->timestamps();
+        });
+        
+        Schema::create('ices', function (Blueprint $table) {
+            $table->id();
+            $table->integer('code')->unique();
+            $table->string('name');
+            $table->decimal('fee')->nullable();
+            $table->decimal('specific_fee')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('withholdings', function (Blueprint $table) {
+            $table->id();
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->decimal('fee')->default(0);
+            $table->string('type');
+            $table->timestamps();
+        });
+
+        
     }
 
     /**

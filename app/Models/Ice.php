@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models\Landlord;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PayMethod extends Model
+class Ice extends Model
 {
     use HasFactory;
 
@@ -14,11 +14,13 @@ class PayMethod extends Model
     protected $fillable = [
         'code',         // Codigo del metodo de pago
         'name',         // Nombre del method de pago
-        'max',
+        'fee',
+        'Specific_fee',
     ];
 
     protected $casts = [
         'code' => 'integer',
-        'max' => 'float',
+        'fee' => 'float',
+        'Specific_fee' => 'float',
     ];
 }

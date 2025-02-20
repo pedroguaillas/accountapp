@@ -5,7 +5,7 @@ namespace App\Models\Landlord;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PayMethod extends Model
+class Iva extends Model
 {
     use HasFactory;
 
@@ -14,11 +14,11 @@ class PayMethod extends Model
     protected $fillable = [
         'code',         // Codigo del metodo de pago
         'name',         // Nombre del method de pago
-        'max',
+        'fee',
     ];
 
     protected $casts = [
         'code' => 'integer',
-        'max' => 'float',
+        'fee' => 'float',
     ];
 }

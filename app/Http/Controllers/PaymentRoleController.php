@@ -32,7 +32,7 @@ class PaymentRoleController extends Controller
         $company = Company::first();
 
         //$job = new ProcessPaymenRole();
-        //$job->handle();
+       // $job->handle();
         // Consulta principal con relaciones
         $paymentroles = PaymentRole::with(['employee', 'paymentroleingresses.roleIngress', 'paymentroleegresses.roleEgress'])
             ->when($search, function ($query, $search) {
@@ -169,26 +169,6 @@ class PaymentRoleController extends Controller
             return to_route('journal.create');
         }
 
-        // //traer las cuentas del role ingress
-        // $roleIngress = RoleIngress::where('company_id', $company->id)
-        //     ->whereNotNull('account_active_id')
-        //     ->whereNotNull('account_pasive_id')
-        //     ->whereNotNull('account_spent_id')
-        //     ->get();
-
-        // if ($roleIngress->count() === 0) {
-        //     return to_route('setting.account.rol.index');
-        // }
-
-        // //traer las cuentas del role egress
-        // $roleEgress = RoleEgress::where('company_id', $company->id)
-        //     ->whereNotNull('account_pasive_id')
-        //     ->get();
-
-        // if ($roleEgress->count() === 0) {
-        //     return to_route('ssetting.account.rol.index');
-        // }
-
         $rolesIds = $request->selectedIds;
 
         // usuario autentificado
@@ -210,9 +190,8 @@ class PaymentRoleController extends Controller
                 ->mapWithKeys(function ($ingress) {
                     return [
                         $ingress->roleIngress->id => [
-                            'account_spent_id' => $ingress->roleIngress->account_spent_id,
-                            'account_active_id' => $ingress->roleIngress->account_active_id,
-                            'account_pasive_id' => $ingress->roleIngress->account_pasive_id,
+                            'account_departure_id' => $ingress->roleIngress->account_departure_id,
+                            'account_counterpart_id' => $ingress->roleIngress->account_counterpart_id,
                             'amount' => $ingress->value,
                             'code' => $ingress->roleIngress->code,
                         ]
@@ -221,7 +200,7 @@ class PaymentRoleController extends Controller
 
             $otrosIngressSum = $paymentRole->paymentroleingresses
                 ->filter(function ($ingress) {
-                    return $ingress->roleIngress->type === 'otro';// Asegúrate de que 'type' sea el campo correcto en tu modelo
+                    return $ingress->roleIngress->type === 'otro' && $ingress->roleIngress->account_departure_id==null && $ingress->roleIngress->account_counterpart_id==null;// Asegúrate de que 'type' sea el campo correcto en tu modelo
                 })
                 ->sum(function ($ingress) {
                     // Convierte 'amount' a float
@@ -236,9 +215,8 @@ class PaymentRoleController extends Controller
                 ->mapWithKeys(function ($egress) {
                     return [
                         $egress->roleEgress->id => [
-                            'account_spent_id' => $egress->roleEgress->account_spent_id,
-                            'account_active_id' => $egress->roleEgress->account_active_id,
-                            'account_pasive_id' => $egress->roleEgress->account_pasive_id,
+                            'account_departure_id' => $egress->roleEgress->account_departure_id,
+                            'account_counterpart_id' => $egress->roleEgress->account_counterpart_id,
                             'amount' => $egress->value,
                             'code' => $egress->roleEgress->code,
                         ]
@@ -247,7 +225,7 @@ class PaymentRoleController extends Controller
 
             $otrosEgressSum = $paymentRole->paymentroleegresses
                 ->filter(function ($egress) {
-                    return $egress->roleEgress->type === 'otro'; // Asegúrate de que 'type' sea el campo correcto en tu modelo
+                    return $egress->roleEgress->type === 'otro' && $egress->roleEgress->account_departure_id==null && $egress->roleEgress->account_counterpart_id==null; // Asegúrate de que 'type' sea el campo correcto en tu modelo
                 })
                 ->sum(function ($egress) {
                     // Convierte 'amount' a float
@@ -262,13 +240,14 @@ class PaymentRoleController extends Controller
                 'date' => $date,
                 'user_id' => $user->id,
             ];
+
             // Crear las entradas en el diario
             $journalEntries = [];
 
-            foreach ($ingressData as $account_spent_id => $value) {
-                if ($value['amount'] != 0) {
+            foreach ($ingressData as $account_departure_id => $value) {
+                if ($value['amount'] != 0 && $value['account_departure_id']!= null && $value['code'] != 'OI')  {
                     $journalEntries[] = [
-                        'account_id' => $value['code'] === 'AU' ? $value['account_active_id'] : $value['account_spent_id'],
+                        'account_id' =>  $value['account_departure_id'] ,
                         'debit' => $value['amount'],
                         'have' => 0,
                     ];
@@ -276,10 +255,10 @@ class PaymentRoleController extends Controller
                 }
             }
 
-            foreach ($ingressData as $account_spent_id => $value) {
-                if (($value['code'] === 'OI') && !($otrosIngressSum == 0)) {
+            foreach ($ingressData as $account_departure_id => $value) {
+                if (($value['code'] === 'OI') && ($otrosIngressSum != 0)) {
                     $journalEntries[] = [
-                        'account_id' => $value['account_spent_id'],
+                        'account_id' => $value['account_departure_id'],
                         'debit' => $otrosIngressSum,
                         'have' => 0,
                     ];
@@ -287,13 +266,22 @@ class PaymentRoleController extends Controller
                 }
             }
 
+            foreach ($egressData as $account_departure_id => $value) {
+                if ($value['amount'] != 0 && $value['account_departure_id']!= null && $value['code'] != 'OE')  {
+                    $journalEntries[] = [
+                        'account_id' => $value['account_departure_id'],
+                        'debit' =>  $value['amount'],
+                        'have' => 0,
+                    ];
+                    $sumDebit  +=   $value['amount'];
+                }
+            }
+
             $sumHave = 0;
-            $validCodes = ['XIII', 'XIV', 'FDR', 'VC', 'AL']; // Lista de códigos válidos
-
-            foreach ($ingressData as $account_pasive_id => $value) {
-                if (in_array($value['code'], $validCodes) && $value['amount'] != 0) {
+            foreach ($egressData as $account_counterpart_id => $value) {
+                if ($value['amount'] != 0 && $value['account_departure_id']!= null && $value['code'] != 'OE' && ($value['code'] != 'SP'))  {
                     $journalEntries[] = [
-                        'account_id' => $value['account_pasive_id'],
+                        'account_id' => $value['account_counterpart_id'],
                         'debit' => 0,
                         'have' => $value['amount'],
                     ];
@@ -301,11 +289,10 @@ class PaymentRoleController extends Controller
                 }
             }
 
-            // Procesar los egresos
-            foreach ($egressData as $account_pasive_id => $value) {
-                if ((!($value['code'] == 'SP') or !($value['code'] == 'OE')) && !($value['amount'] == 0)) {
+            foreach ($ingressData as $account_counterpart_id => $value) {
+                if ($value['amount'] != 0 && $value['account_counterpart_id']!= null ) {
                     $journalEntries[] = [
-                        'account_id' => $value['account_pasive_id'],
+                        'account_id' => $value['account_counterpart_id'],
                         'debit' => 0,
                         'have' => $value['amount'],
                     ];
@@ -313,22 +300,23 @@ class PaymentRoleController extends Controller
                 }
             }
 
-            foreach ($egressData as $account_pasive_id => $value) {
-                if (($value['code'] == 'OE') && !($otrosEgressSum == 0)) {
+            foreach ($egressData as $account_counterpart_id => $value) {
+                if (($value['code'] === 'OE') && ($otrosEgressSum != 0)) {
                     $journalEntries[] = [
-                        'account_id' => $value['account_pasive_id'],
+                        'account_id' => $value['account_counterpart_id'],
                         'debit' => 0,
                         'have' => $otrosEgressSum,
                     ];
                     $sumHave += $otrosEgressSum;
                 }
             }
+           
 
             $salary = $sumDebit - $sumHave;
-            foreach ($egressData as $account_pasive_id => $value) {
+            foreach ($egressData as $account_counterpart_id  => $value) {
                 if ($value['code'] == 'SP') {
                     $journalEntries[] = [
-                        'account_id' => $value['account_pasive_id'],
+                        'account_id' => $value['account_counterpart_id'],
                         'debit' => 0,
                         'have' => $salary,
                     ];

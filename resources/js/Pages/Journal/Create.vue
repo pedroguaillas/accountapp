@@ -28,11 +28,11 @@ const initialJournal = {
   date,
   description: "",
   journalEntries: [],
-  cost_center_id: 0,
+  cost_center_id: "",
   is_deductible: true,
 };
  const cost_center_id  =
- props.  costCenters.length === 1 ? props.costCenters[0].id : 0;
+ props.  costCenters.length === 1 ? props.costCenters[0].id : "";
 
 
 // Reactives

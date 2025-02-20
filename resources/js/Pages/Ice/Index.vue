@@ -5,36 +5,36 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 
 // Recibes 'paymethods' desde Inertia
 const props = defineProps({
-  paymethods: {
+  ices: {
     type: Array,
     default: () => [],
   },
 });
 
 // Inicializar selectedPayments con los métodos que tienen selected: true
-const selectedPayments = ref(
-  props.paymethods.filter((method) => method.selected).map((method) => method.code)
+const selectedIces = ref(
+  props.ices.filter((method) => method.selected).map((method) => method.code)
 );
 
 // Computed para verificar si todos están seleccionados
 const allSelected = computed(
-  () => selectedPayments.value.length === props.paymethods.length
+  () => selectedIces.value.length === props.ices.length
 );
 
 // Función para seleccionar/deseleccionar todos
 const toggleAll = () => {
   if (allSelected.value) {
-    selectedPayments.value = [];
+    selectedIces.value = [];
   } else {
-    selectedPayments.value = props.paymethods.map((pm) => pm.code);
+    selectedIces.value = props.ices.map((pm) => pm.code);
   }
 };
 
 // Enviar la selección al backend
 const saveSelection = () => {
   axios
-    .post(route("busssines.setting.paymethods.store"), {
-      selected: selectedPayments.value,
+    .post(route("busssines.setting.ices.store"), {
+      selected: selectedIces.value,
     })
     .then((response) => {
       console.log(response.data.message);
@@ -48,12 +48,12 @@ const saveSelection = () => {
 </script>
 
 <template>
-  <AdminLayout title="Métodos de pago">
+  <AdminLayout title="ICES">
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Header -->
       <div class="flex flex-col sm:flex-row justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Métodos de pago
+          ICE
         </h2>
       </div>
 
@@ -65,11 +65,11 @@ const saveSelection = () => {
         </div>
 
         <!-- Lista de checkboxes -->
-        <div v-for="method in props.paymethods" :key="method.code" class="mt-2">
+        <div v-for="method in props.ices" :key="method.code" class="mt-2">
           <input
             type="checkbox"
             :value="method.code"
-            v-model="selectedPayments"
+            v-model="selectedIces"
           />
           <label class="ml-2">{{ method.name }}</label>
         </div>

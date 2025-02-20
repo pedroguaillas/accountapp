@@ -18,6 +18,9 @@ use App\Http\Controllers\PaymentRoleController;
 use App\Http\Controllers\AccountLinkController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
+use App\Http\Controllers\IvaController;
+use App\Http\Controllers\WithholdingController;
+use App\Http\Controllers\IceController;
 use App\Http\Controllers\RoleIngressController;
 use App\Http\Controllers\RoleEgressController;
 use App\Http\Controllers\PayMethodController;
@@ -220,7 +223,17 @@ Route::middleware([
         Route::get('people', [PersonController::class, 'getPeople'])->name('people.filters.index');
 
 
-        Route::post('paymethods', [PayMethodController::class, 'store'])->name('paymethods.store');
-        Route::get('metodosglobales', [PayMethodController::class, 'index'])->name('paymethods.index');
+        Route::post('paymethods', [PayMethodController::class, 'store'])->name('busssines.setting.paymethods.store');
+        Route::get('metodosglobales', [PayMethodController::class, 'index'])->name('busssines.setting.paymethods.index');
+
+        Route::post('ivas', [IvaController::class, 'store'])->name('busssines.setting.ivas.store');
+        Route::get('ivas', [IvaController::class, 'index'])->name('busssines.setting.ivas.index');
+   
+        Route::post('ices', [IceController::class, 'store'])->name('busssines.setting.ices.store');
+        Route::get('ices', [IceController::class, 'index'])->name('busssines.setting.ices.index');
+   
+        Route::post('withholdings', [WithholdingController::class, 'store'])->name('busssines.setting.withholding.store');
+        Route::get('retenciones', [WithholdingController::class, 'index'])->name('busssines.setting.withholding.index');
+
     });
 });
