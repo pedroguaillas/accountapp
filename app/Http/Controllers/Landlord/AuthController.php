@@ -23,7 +23,6 @@ class AuthController extends Controller
 
             // Regenerar la sesión para prevenir fijación de sesión
             $request->session()->regenerate();
-
             $user = auth()->user();
             $tenant = $user->tenants()->first();
 
@@ -58,7 +57,6 @@ class AuthController extends Controller
         // Redirigir al dominio del tenant
         // $domain = config('tenancy.central_domains')[1];
         // return Inertia::location("http://{$domain}"); // Ensure this route exists
-
 
         // Redirigir al usuario a la página de login principal (base de datos central)
         return redirect()->away('http://localhost');

@@ -497,9 +497,7 @@ return new class extends Migration {
             $table->decimal('fee')->default(0);
             $table->string('type');
             $table->timestamps();
-        });
-
-        
+        }); 
     }
 
     /**
@@ -528,6 +526,5 @@ return new class extends Migration {
         Schema::dropIfExists('bank_accounts');
         Schema::dropIfExists('transactions');
         Schema::dropIfExists('people');
-
     }
 };

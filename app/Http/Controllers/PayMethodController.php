@@ -12,7 +12,6 @@ class PayMethodController extends Controller
     // Método para mostrar los métodos de pago globales en la vista
     public function index()
     {
-
         $globalMethods = LandlordPayMethod::all(); // Puedes usar paginate() si lo deseas
         $tenantCodes = PayMethod::pluck('code')->toArray();
 
@@ -21,7 +20,7 @@ class PayMethodController extends Controller
             return $method;
         });
 
-        return Inertia::render('PayMethod/Index', [
+        return Inertia::render('Business/General/PayMethod/Index', [
             'paymethods' => $globalMethods,
         ]);
     }
@@ -57,5 +56,4 @@ class PayMethodController extends Controller
         PayMethod::whereNotIn('code', $request->input('selected'))->delete();
         //NOTA verificar el eliminar porque puede depender de otras tablas si depende solo eliminar [pr el sofdelete sino eliminar total]
     }
-
 }

@@ -7,7 +7,6 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-
 class MovementTypeController extends Controller
 {
     public function index(Request $request)
@@ -31,7 +30,6 @@ class MovementTypeController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         //validacion de datos
@@ -43,7 +41,6 @@ class MovementTypeController extends Controller
 
         //creacion de los estableicmientos 
         $company->movementtypes()->create($request->all());
-
     }
 
     public function update(Request $request, MovementType $movementtype)

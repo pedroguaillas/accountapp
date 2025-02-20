@@ -50,7 +50,6 @@ class DatabaseSeeder extends Seeder
         PayMethod::create(['name' => 'OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO', 'code' => 20]);
         PayMethod::create(['name' => 'ENDOSO DE TÍTULOS', 'code' => 21]);
 
-
         Iva::create(['code' => 0, 'name' => '0', 'fee' => 0.00]);
         Iva::create(['code' => 2, 'name' => '12', 'fee' => 0.12]);
         Iva::create(['code' => 3, 'name' => '14', 'fee' => 0.14]);
@@ -79,7 +78,5 @@ class DatabaseSeeder extends Seeder
             'fee' => 0, 
             'type' => 'RENTA' 
         ]);
-
-
     }
 }

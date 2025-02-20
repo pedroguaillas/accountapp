@@ -22,7 +22,6 @@ class PersonController extends Controller
                 return $query->where('name', 'like', '%' . $search . '%');
             }); // No olvides llamar a get() para ejecutar la consulta
 
-
         // $additional_information = Person::select('additional_information')
         //     ->where('company_id', $company->id)
         //     ->when($search, function ($query, $search) {
@@ -51,6 +50,7 @@ class PersonController extends Controller
             'people' => $people,
         ]);
     }
+
     public function getPeople(Request $request)
     {
         $company = Company::first();
@@ -101,8 +101,6 @@ class PersonController extends Controller
             'address' => $request->address,
             'data_additional' => $additionalInfo, // Se pasa el JSON aquí
         ]);
-
-        //return response()->json(['message' => 'Persona creada con éxito']);
     }
 
     public function update(Request $request, Person $person)
@@ -124,5 +122,4 @@ class PersonController extends Controller
             'message' => 'Persona eliminada correctamente.',
         ]);
     }
-
 }

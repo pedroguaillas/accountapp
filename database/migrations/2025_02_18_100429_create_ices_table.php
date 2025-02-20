@@ -20,7 +20,6 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-
         Schema::create('ivas', function (Blueprint $table) {
             $table->id();
             $table->integer('code')->unique();

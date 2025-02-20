@@ -12,7 +12,6 @@ class IvaController extends Controller
     // Método para mostrar los métodos de pago globales en la vista
     public function index()
     {
-
         $globalIva = LandlordIva::all();
         $tenantCodes = Iva::pluck('code')->toArray();
 
@@ -21,7 +20,6 @@ class IvaController extends Controller
             return $method;
         });
 
-       
         return Inertia::render('Iva/Index', [
             'ivas' => $globalIva,
         ]);
@@ -59,5 +57,4 @@ class IvaController extends Controller
         Iva::whereNotIn('code', $request->input('selected'))->delete();
         //NOTA verificar el eliminar porque puede depender de otras tablas si depende solo eliminar [pr el sofdelete sino eliminar total]
     }
-
 }

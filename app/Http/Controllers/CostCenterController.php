@@ -34,12 +34,11 @@ class CostCenterController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         $company = Company::first();
-        //crear el costcenter
 
+        //crear el costcenter
         $company->costcenters()->create($request->all());
     }
 
@@ -69,5 +68,4 @@ class CostCenterController extends Controller
 
         return response()->json(['success' => true]);
     }
-
 }

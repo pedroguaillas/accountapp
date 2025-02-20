@@ -34,7 +34,6 @@ class FixedAssetController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-
         // Retornar la vista con los datos y filtros actuales
         return Inertia::render('FixedAsset/Index', [
             'fixedAssetss' => $fixedAssets,
@@ -62,7 +61,6 @@ class FixedAssetController extends Controller
         if ($activeTypes->count() === 0) {
             return to_route('setting.account.index');
         }
-
 
         $payMethods = PayMethod::all();
 

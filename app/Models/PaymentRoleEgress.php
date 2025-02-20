@@ -10,7 +10,6 @@ class PaymentRoleEgress extends Model
 {
     use HasFactory, SoftDeletes;
 
-   
     protected $fillable = [
         'payment_role_id', // ID del empleado
         'role_egress_id', // ID del empleado

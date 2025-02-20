@@ -2,21 +2,16 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Company;
 use App\Models\Journal;
 use App\Models\PaymentRole;
 use App\Models\PaymentRoleIngress;
 use App\Models\PaymentRoleEgress;
-use App\Jobs\ProcessPaymenRole;
-use App\Models\RoleIngress;
-use App\Models\RoleEgress;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use App\Exports\PaymentRolesExport;
 use Maatwebsite\Excel\Facades\Excel;
-
 
 class PaymentRoleController extends Controller
 {
@@ -32,7 +27,7 @@ class PaymentRoleController extends Controller
         $company = Company::first();
 
         //$job = new ProcessPaymenRole();
-       // $job->handle();
+        // $job->handle();
         // Consulta principal con relaciones
         $paymentroles = PaymentRole::with(['employee', 'paymentroleingresses.roleIngress', 'paymentroleegresses.roleEgress'])
             ->when($search, function ($query, $search) {
@@ -118,30 +113,43 @@ class PaymentRoleController extends Controller
         ]);
     }
 
-    // PaymentRoleController.php
     public function update(Request $request, $id)
     {
         // Encuentra el PaymentRole por su ID
         $paymentRole = PaymentRole::findOrFail($id);
+        $sum = 0;
 
         // Actualiza los valores de los ingresos
-        foreach ($request->input('ingresses') as $ingress) {
-            $paymentRoleIngress = PaymentRoleIngress::findOrFail($ingress['id']);
-            $paymentRoleIngress->value = $ingress['value'];
-            $paymentRoleIngress->save();
-        }
+        $ingressIds = collect($request->input('ingresses'))->pluck('id');
+        $ingressValues = collect($request->input('ingresses'))->pluck('value', 'id');
+
+        PaymentRoleIngress::whereIn('id', $ingressIds)->each(function ($ingress) use ($ingressValues, $sum) {
+            if ($ingress->value != $ingressValues[$ingress->id]) {
+                $ingress->value = $ingressValues[$ingress->id];
+                $ingress->save();
+            }
+            $sum += $ingress['value'];
+        });
 
         // Actualiza los valores de los egresos
-        foreach ($request->input('egresses') as $egress) {
-            $paymentRoleEgress = PaymentRoleEgress::findOrFail($egress['id']);
-            $paymentRoleEgress->value = $egress['value'];
-            $paymentRoleEgress->save();
-        }
+        $egressIds = collect($request->input('egresses'))->pluck('id');
+        $egressValues = collect($request->input('egresses'))->pluck('value', 'id');
+
+        PaymentRoleEgress::whereIn('id', $egressIds)->each(function ($egress) use ($egressValues, $sum) {
+            if ($egress->value != $egressValues[$egress->id]) {
+                $egress->value = $egressValues[$egress->id];
+                $egress->save();
+            }
+            $sum -= $egress['value'];
+        });
+
+        //Actualiza el nuevo salario a recibir en el rol de pagos (paymentrol)
+        $paymentRole->salary_receive = $sum;
+        $paymentRole->save();
 
         // Responde con los datos actualizados o un mensaje de éxito
         return response()->json([
             'success' => true,
-            'message' => 'Pago actualizado correctamente',
             'paymentRole' => $paymentRole->load(['paymentroleingresses', 'paymentroleegresses']),
         ]);
     }
@@ -200,7 +208,7 @@ class PaymentRoleController extends Controller
 
             $otrosIngressSum = $paymentRole->paymentroleingresses
                 ->filter(function ($ingress) {
-                    return $ingress->roleIngress->type === 'otro' && $ingress->roleIngress->account_departure_id==null && $ingress->roleIngress->account_counterpart_id==null;// Asegúrate de que 'type' sea el campo correcto en tu modelo
+                    return $ingress->roleIngress->type === 'otro' && $ingress->roleIngress->account_departure_id == null && $ingress->roleIngress->account_counterpart_id == null;// Asegúrate de que 'type' sea el campo correcto en tu modelo
                 })
                 ->sum(function ($ingress) {
                     // Convierte 'amount' a float
@@ -225,7 +233,7 @@ class PaymentRoleController extends Controller
 
             $otrosEgressSum = $paymentRole->paymentroleegresses
                 ->filter(function ($egress) {
-                    return $egress->roleEgress->type === 'otro' && $egress->roleEgress->account_departure_id==null && $egress->roleEgress->account_counterpart_id==null; // Asegúrate de que 'type' sea el campo correcto en tu modelo
+                    return $egress->roleEgress->type === 'otro' && $egress->roleEgress->account_departure_id == null && $egress->roleEgress->account_counterpart_id == null; // Asegúrate de que 'type' sea el campo correcto en tu modelo
                 })
                 ->sum(function ($egress) {
                     // Convierte 'amount' a float
@@ -245,9 +253,9 @@ class PaymentRoleController extends Controller
             $journalEntries = [];
 
             foreach ($ingressData as $account_departure_id => $value) {
-                if ($value['amount'] != 0 && $value['account_departure_id']!= null && $value['code'] != 'OI')  {
+                if ($value['amount'] != 0 && $value['account_departure_id'] != null && $value['code'] != 'OI') {
                     $journalEntries[] = [
-                        'account_id' =>  $value['account_departure_id'] ,
+                        'account_id' => $value['account_departure_id'],
                         'debit' => $value['amount'],
                         'have' => 0,
                     ];
@@ -267,19 +275,19 @@ class PaymentRoleController extends Controller
             }
 
             foreach ($egressData as $account_departure_id => $value) {
-                if ($value['amount'] != 0 && $value['account_departure_id']!= null && $value['code'] != 'OE')  {
+                if ($value['amount'] != 0 && $value['account_departure_id'] != null && $value['code'] != 'OE') {
                     $journalEntries[] = [
                         'account_id' => $value['account_departure_id'],
-                        'debit' =>  $value['amount'],
+                        'debit' => $value['amount'],
                         'have' => 0,
                     ];
-                    $sumDebit  +=   $value['amount'];
+                    $sumDebit += $value['amount'];
                 }
             }
 
             $sumHave = 0;
             foreach ($egressData as $account_counterpart_id => $value) {
-                if ($value['amount'] != 0 && $value['account_departure_id']!= null && $value['code'] != 'OE' && ($value['code'] != 'SP'))  {
+                if ($value['amount'] != 0 && $value['account_departure_id'] != null && $value['code'] != 'OE' && ($value['code'] != 'SP')) {
                     $journalEntries[] = [
                         'account_id' => $value['account_counterpart_id'],
                         'debit' => 0,
@@ -290,7 +298,7 @@ class PaymentRoleController extends Controller
             }
 
             foreach ($ingressData as $account_counterpart_id => $value) {
-                if ($value['amount'] != 0 && $value['account_counterpart_id']!= null ) {
+                if ($value['amount'] != 0 && $value['account_counterpart_id'] != null) {
                     $journalEntries[] = [
                         'account_id' => $value['account_counterpart_id'],
                         'debit' => 0,
@@ -310,10 +318,10 @@ class PaymentRoleController extends Controller
                     $sumHave += $otrosEgressSum;
                 }
             }
-           
+
 
             $salary = $sumDebit - $sumHave;
-            foreach ($egressData as $account_counterpart_id  => $value) {
+            foreach ($egressData as $account_counterpart_id => $value) {
                 if ($value['code'] == 'SP') {
                     $journalEntries[] = [
                         'account_id' => $value['account_counterpart_id'],

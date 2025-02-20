@@ -16,7 +16,6 @@ class Withholding extends Model
         'name',
         'fee',
         'type',
-
     ];
 
     protected $casts = [

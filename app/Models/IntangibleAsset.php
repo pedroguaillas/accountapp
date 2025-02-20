@@ -22,6 +22,7 @@ class IntangibleAsset extends Model
         'value', //valor  del af
         'date_end',//fecha de finalizacion de la depreciacion
     ];
+    
     protected $casts = [
         'is_legal' => 'boolean',
         'date_acquisition' => 'date',
@@ -29,6 +30,7 @@ class IntangibleAsset extends Model
         'value' => 'float',
         'date_end' => 'date',
     ];
+
     public function paymethod()
     {
         return $this->belongsTo(PayMethod::class);

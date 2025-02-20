@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Company;
 use App\Models\ContributorType;
 use App\Models\EconomicActivity;
-use App\Models\PayMethod;
 use Illuminate\Database\Seeder;
 
 class TenantSeeder extends Seeder
@@ -19,15 +18,6 @@ class TenantSeeder extends Seeder
         ContributorType::create(['name' => 'GENERAL']);
         ContributorType::create(['name' => 'RIMPE']);
         ContributorType::create(['name' => 'NEGOCIO POPULAR - RÉGIMEN RIMPE']);
-
-        // PayMethod::create(['name' => 'SIN UTILIZACION DEL SISTEMA FINANCIERO', 'code' => 1]);
-        // PayMethod::create(['name' => 'COMPENSACIÓN DE DEUDAS', 'code' => 15]);
-        // PayMethod::create(['name' => 'TARJETA DE DÉBITO', 'code' => 16]);
-        // PayMethod::create(['name' => 'DINERO ELECTRÓNICO', 'code' => 17]);
-        // PayMethod::create(['name' => 'TARJETA PREPAGO', 'code' => 18]);
-        // PayMethod::create(['name' => 'TARJETA DE CRÉDITO', 'code' => 19]);
-        // PayMethod::create(['name' => 'OTROS CON UTILIZACIÓN DEL SISTEMA FINANCIERO', 'code' => 20]);
-        // PayMethod::create(['name' => 'ENDOSO DE TÍTULOS', 'code' => 21]);
 
         $company = Company::create([
             'ruc' => '1100167694001',
@@ -67,12 +57,14 @@ class TenantSeeder extends Seeder
         ]);
 
         $company->movementtypes()->createMany([
-           // ['name' => "Tarjeta de crédito"],
-           // ['name' => "Anticipo empleado"],
-            ['name' => "Anticipo proveedor",'type'=>"Egreso"],
-            ['name' => "Anticipo cliente",'type'=>"Ingreso"],
-            ['name' => "Deposito",'type'=>"Ingreso"],
-            ['name' => "Retiro",'type'=>"Egreso"],
+            ['name' => "Préstamo", 'type' => "Ingreso"],
+            ['name' => "Anticipo proveedor", 'type' => "Egreso"],
+            ['name' => "Anticipo cliente", 'type' => "Ingreso"],
+            ['name' => "Deposito", 'type' => "Ingreso"],
+            ['name' => "Retiro", 'type' => "Egreso"],
+            ['name' => "Pago préstamo", 'type' => "Egreso"],
+            ['name' => "Gastos no deducibles", 'type' => "Egreso"],
+            ['name' => "Gasto personal", 'type' => "Egreso"],
         ]);
     }
 }

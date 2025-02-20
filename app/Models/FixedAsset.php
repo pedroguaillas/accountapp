@@ -51,4 +51,3 @@ class FixedAsset extends Model
         return $this->belongsTo(ActiveType::class, 'active_type_id');
     }
 }
-

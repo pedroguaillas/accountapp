@@ -19,7 +19,6 @@ class CreateTenantsTable extends Migration
             $table->string('id')->primary();
 
             // Datos de la empresa
-
             $table->timestamps();
             $table->json('data')->nullable();
         });

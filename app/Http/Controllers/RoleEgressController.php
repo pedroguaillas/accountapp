@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PaymentRoleEgress;
 use App\Models\Company;
 use App\Models\RoleEgress;
 use App\Models\PaymentRole;
@@ -36,30 +35,10 @@ class RoleEgressController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         $company = Company::first();
-        $roleegress = RoleEgress::create([...$request->all(), 'company_id' => $company->id]);
-        $paymentRoles = PaymentRole::where('company_id', $company->id)->get();
-
-        // Insertar cada RoleEgress en los PaymentRole
-        $data = [
-            "company_id" => $company->id,
-        ];
-
-        // $inputpaymentroleegress = [];
-        // foreach ($paymentRoles as $paymentRole) {
-        //     $inputpaymentroleegress[] = [
-        //         'payment_role_id' => $paymentRole->id,
-        //         'role_egress_id' => $roleegress->id,
-        //         'value' => 0,
-        //         'data_additional' => json_encode($data),
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ];
-        // }
-        // PaymentRoleEgress::insert($inputpaymentroleegress);
+        RoleEgress::create([...$request->all(), 'company_id' => $company->id]);
     }
 
     public function update(Request $request, RoleEgress $roleegress)
@@ -71,7 +50,5 @@ class RoleEgressController extends Controller
     {
         $egress = RoleEgress::findOrFail($egressId);
         $egress->delete(); // Esto usará SoftDeletes
-
     }
-
 }

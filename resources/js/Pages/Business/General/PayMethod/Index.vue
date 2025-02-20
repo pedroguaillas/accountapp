@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import axios from "axios";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
+import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 
 // Recibes 'paymethods' desde Inertia
 const props = defineProps({
@@ -48,15 +48,8 @@ const saveSelection = () => {
 </script>
 
 <template>
-  <AdminLayout title="Métodos de pago">
+  <GeneralSetting title="Métodos de pago">
     <div class="p-4 bg-white rounded drop-shadow-md">
-      <!-- Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Métodos de pago
-        </h2>
-      </div>
-
       <div>
         <!-- Checkbox para seleccionar todos -->
         <div>
@@ -83,5 +76,5 @@ const saveSelection = () => {
         </button>
       </div>
     </div>
-  </AdminLayout>
+  </GeneralSetting>
 </template>

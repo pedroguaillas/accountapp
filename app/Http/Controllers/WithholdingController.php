@@ -12,7 +12,6 @@ class WithholdingController extends Controller
     // Método para mostrar los métodos de pago globales en la vista
     public function index()
     {
-
         $globalWithholdings = LandlordWithholding::all(); // Puedes usar paginate() si lo deseas
         $tenantCodes = Withholding::pluck('code')->toArray();
 
@@ -57,5 +56,4 @@ class WithholdingController extends Controller
         Withholding::whereNotIn('code', $request->input('selected'))->delete();
         //NOTA verificar el eliminar porque puede depender de otras tablas si depende solo eliminar [pr el sofdelete sino eliminar total]
     }
-
 }

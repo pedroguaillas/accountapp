@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Models\Company;
 
-class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles,WithEvents
+class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles, WithEvents
 {
 
     protected $search;
@@ -50,11 +50,11 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles,Wit
 
             // Mapear los ingresos
             $ingressData = $paymentRole->paymentroleingresses->mapWithKeys(function ($ingress) {
-                return [$ingress->roleIngress->name => $ingress->value ];
+                return [$ingress->roleIngress->name => $ingress->value];
             });
 
             $egressData = $paymentRole->paymentroleegresses->mapWithKeys(function ($egress) {
-                return [$egress->roleEgress->name => $egress->value ];
+                return [$egress->roleEgress->name => $egress->value];
             });
 
             // Combinar los valores fijos con los ingresos dinámicos
@@ -93,7 +93,6 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles,Wit
             ->toArray();
 
         // Encabezados dinámicos de egresos
-
         $dynamicHeadingss = PaymentRole::join('payment_role_egresses', 'payment_roles.id', '=', 'payment_role_egresses.payment_role_id')
             ->join('role_egresses', 'payment_role_egresses.role_egress_id', '=', 'role_egresses.id')
             ->whereColumn('role_egresses.created_at', '<=', 'payment_roles.created_at')
@@ -105,13 +104,16 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles,Wit
 
         $fixedHeadingss = [
             'Sueldo a recibir',
+            'Firma',
         ];
 
         return array_merge($fixedHeadings, $dynamicHeadings, $dynamicHeadingss, $fixedHeadingss);
     }
+
     public function styles(Worksheet $sheet)
     {
         $company = Company::first();
+        $highestColumn = $sheet->getHighestColumn();
 
         //vector meses para la seleccion del mes que se utiliza en la parte de abajo
         $meses = [
@@ -139,7 +141,7 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles,Wit
         $sheet->setCellValue('A2', 'ROL DE PAGOS ' . $meses[$this->month - 1] . ' ' . $this->year);
 
         // Combina las celdas de la fila de título
-        $highestColumn = $sheet->getHighestColumn();
+
         $sheet->mergeCells("A1:{$highestColumn}1");
         $sheet->mergeCells("A2:{$highestColumn}2");
 
@@ -168,6 +170,22 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles,Wit
         ]);
 
         // Aplica estilos a todas las celdas de la tabla
+        $lastColumn = $highestColumn; // Última columna (por letra)
+
+        // Definir los anchos de A, B y la última columna
+        $columnWidths = [
+            'A' => 12,
+            'B' => 30,
+            $lastColumn => 15, // Última columna con ancho específico
+        ];
+        foreach ($columnWidths as $col => $width) {
+            $sheet->getColumnDimension($col)->setWidth($width);
+        }
+
+        // Aplicar un solo tamaño a las demás columnas
+        for ($col = 'C'; $col < $lastColumn; $col++) {
+            $sheet->getColumnDimension($col)->setWidth(10);
+        }
         $highestRow = $sheet->getHighestRow();
         $range = "A3:{$highestColumn}{$highestRow}";
 
@@ -193,12 +211,21 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles,Wit
             ],
         ]);
 
+        $highestRow = $sheet->getHighestRow(); // Última fila con datos
+        $sheet->getStyle("A3:A{$highestRow}")->applyFromArray([
+            'alignment' => [
+                'horizontal' => 'center', // Centrar horizontalmente
+                'vertical' => 'center',   // Centrar verticalmente
+            ],
+        ]);
+
+
         return [];
     }
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 $highestRow = $sheet->getHighestRow();
                 // Convertir la columna más a la derecha (letra) a índice numérico
@@ -206,7 +233,7 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles,Wit
 
                 // Suponiendo que los datos comienzan en la fila 4 (después de dos filas de título y una de encabezados)
                 for ($row = 4; $row <= $highestRow; $row++) {
-                    for ($col = 1; $col <= $highestColumnIndex; $col++) {
+                    for ($col = 1; $col <= $highestColumnIndex - 1; $col++) {
                         $cell = $sheet->getCellByColumnAndRow($col, $row);
                         $value = $cell->getValue();
                         if ($value === null || $value === '') {

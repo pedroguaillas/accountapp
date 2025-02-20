@@ -12,7 +12,6 @@ class IceController extends Controller
     // Método para mostrar los métodos de pago globales en la vista
     public function index()
     {
-
         $globalIce = LandlordIce::all(); // Puedes usar paginate() si lo deseas
         $tenantCodes = Ice::pluck('code')->toArray();
 
@@ -57,5 +56,4 @@ class IceController extends Controller
         Ice::whereNotIn('code', $request->input('selected'))->delete();
         //NOTA verificar el eliminar porque puede depender de otras tablas si depende solo eliminar [pr el sofdelete sino eliminar total]
     }
-
 }

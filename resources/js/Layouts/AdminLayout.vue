@@ -1,19 +1,18 @@
 <script setup>
-
 // Imports
-import Header from './admin/Header.vue';
-import Sidebar from './admin/Sidebar.vue';
-import { Head } from '@inertiajs/vue3';
-import { ref, watch, onMounted } from 'vue';
+import Header from "./admin/Header.vue";
+import Sidebar from "./admin/Sidebar.vue";
+import { Head } from "@inertiajs/vue3";
+import { ref, watch, onMounted } from "vue";
 import { initFlowbite } from "flowbite";
 
 onMounted(() => {
-    initFlowbite();
+  initFlowbite();
 });
 
 // Props
 defineProps({
-    title: String
+  title: String,
 });
 
 // Refs
@@ -21,34 +20,29 @@ const divRef = ref(null);
 const menu = ref(false);
 
 const toggle = () => {
-    menu.value = !menu.value;
+  menu.value = !menu.value;
 };
 
 watch(divRef, () => {
-    if (divRef.value.getBoundingClientRect().width > 640) {
-        toggle();
-    }
-    // divRef si altura del main mas altura del Header > h-screen ? h-full : h-screen
-})
-
+  if (divRef.value.getBoundingClientRect().width > 640) {
+    toggle();
+  }
+  // divRef si altura del main mas altura del Header > h-screen ? h-full : h-screen
+});
 </script>
 
 <template>
+  <Head :title="title" />
+  <div ref="divRef" class="w-screen h-screen flex">
+    <!-- Sidebar -->
+    <Sidebar :menu="menu" @toggle="toggle" />
 
-    <Head :title="title" />
-
-    <div ref="divRef" class="w-screen h-screen flex">
-
-        <!-- Sidebar -->
-        <Sidebar :menu="menu" @toggle="toggle" />
-
-        <!-- Main -->
-        <div class="w-full h-full">
-            <Header :menu="menu" @toggle="toggle" />
-            <div class="h-[calc(100vh-60px)] bg-slate-200 p-4 md:p-8 overflow-y-auto">
-                <slot />
-
-            </div>
-        </div>
+    <!-- Main -->
+    <div class="w-full h-full">
+      <Header :menu="menu" @toggle="toggle" />
+      <div class="h-[calc(100vh-60px)] bg-slate-200 p-4 md:p-8 overflow-y-auto">
+        <slot />
+      </div>
     </div>
+  </div>
 </template>

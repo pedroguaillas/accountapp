@@ -37,8 +37,6 @@ class CompanyController extends Controller
         ]);
     }
 
-
-
     public function store(Request $request)
     {
         $request->validate([
@@ -81,7 +79,4 @@ class CompanyController extends Controller
             'message' => 'Compania eliminado correctamente.',
         ]);
     }
-
-
-
 }
