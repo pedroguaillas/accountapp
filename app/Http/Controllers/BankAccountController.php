@@ -8,7 +8,6 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-
 class BankAccountController extends Controller
 {
     public function index(Request $request, Bank $bank)
@@ -17,9 +16,9 @@ class BankAccountController extends Controller
         $search = $request->input('search', '');
         // Construimos la consulta base
         $bankaccounts = BankAccount::query()
-            ->select('id','account_number','account_type','current_balance','state')
+            ->select('id', 'account_number', 'account_type', 'current_balance', 'state')
             ->where('data_additional->company_id', $company->id)
-            ->where('bank_id',$bank->id) 
+            ->where('bank_id', $bank->id)
             ->when($search, function ($query, $search) {
                 $query->whereRaw("LOWER(name) LIKE ?", ["%" . strtolower($search) . "%"]);
             })->paginate(10)
@@ -35,7 +34,6 @@ class BankAccountController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         //validacion de datos
@@ -44,13 +42,12 @@ class BankAccountController extends Controller
         ]);
 
         $company = Company::first();
-        
-        $data=[
-            "company_id"=> $company->id,
+        $data = [
+            "company_id" => $company->id,
         ];
-        
+
         //creacion de los estableicmientos 
-        BankAccount::create([...$request->all(),'data_additional'=>$data]);
+        BankAccount::create([...$request->all(), 'data_additional' => $data]);
     }
 
     public function update(Request $request, BankAccount $bankaccount)
@@ -58,7 +55,6 @@ class BankAccountController extends Controller
         $request->validate([
             'account_number' => 'required|min:1|max:999',
         ]);
-
 
         //actulizar los establecimientos
         $bankaccount->update($request->all());
@@ -77,8 +73,8 @@ class BankAccountController extends Controller
     public function updateState($id)
     {
         $bankaccount = BankAccount::findOrFail($id);
-        $bankaccount ->state = !$bankaccount ->state; // Toggle the state
-        $bankaccount ->save();
+        $bankaccount->state = !$bankaccount->state; // Toggle the state
+        $bankaccount->save();
 
         return response()->json(['success' => true]);
     }

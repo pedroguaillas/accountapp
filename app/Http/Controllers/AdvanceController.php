@@ -52,7 +52,6 @@ class AdvanceController extends Controller
         $company = Company::first();
 
         $company->advances()->create($request->all());
-
     }
 
     public function update(Request $request, Advance $advance)

@@ -26,7 +26,6 @@ class SettingRolController extends Controller
         ->where('role_ingresses.company_id', $company->id)
         ->orderBy('role_ingresses.id')
         ->get();
-        
 
         $roleEgresses = RoleEgress::selectRaw(
             "role_egresses.*, " .
@@ -39,7 +38,6 @@ class SettingRolController extends Controller
         ->orderBy('role_egresses.id')
         ->get();
         
-
         $accounts = Account::select('id', 'code', 'name')
             ->where('is_detail', true)
             ->where('company_id', $company->id)
@@ -66,6 +64,5 @@ class SettingRolController extends Controller
             $model = RoleEgress::find($id);
         }
         $model->update([$request->name => $request->account_id]);
-
     }
 }

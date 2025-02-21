@@ -7,7 +7,6 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-
 class BankController extends Controller
 {
     public function index(Request $request)
@@ -42,7 +41,6 @@ class BankController extends Controller
 
         //creacion de los estableicmientos 
         $company->banks()->create($request->all());
-
     }
 
     public function update(Request $request, Bank $bank)

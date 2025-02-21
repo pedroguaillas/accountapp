@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import axios from "axios";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
+import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 
 // Recibes 'paymethods' desde Inertia
 const props = defineProps({
@@ -33,7 +33,7 @@ const toggleAll = () => {
 // Enviar la selección al backend
 const saveSelection = () => {
   axios
-    .post(route("paymethods.store"), {
+    .post(route("busssines.setting.paymethods.store"), {
       selected: selectedPayments.value,
     })
     .then((response) => {
@@ -48,15 +48,8 @@ const saveSelection = () => {
 </script>
 
 <template>
-  <AdminLayout title="Métodos de pago">
+  <GeneralSetting title="Métodos de pago">
     <div class="p-4 bg-white rounded drop-shadow-md">
-      <!-- Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Métodos de pago
-        </h2>
-      </div>
-
       <div>
         <!-- Checkbox para seleccionar todos -->
         <div>
@@ -65,7 +58,7 @@ const saveSelection = () => {
         </div>
 
         <!-- Lista de checkboxes -->
-        <div v-for="method in paymethods" :key="method.code" class="mt-2">
+        <div v-for="method in props.paymethods" :key="method.code" class="mt-2">
           <input
             type="checkbox"
             :value="method.code"
@@ -83,5 +76,5 @@ const saveSelection = () => {
         </button>
       </div>
     </div>
-  </AdminLayout>
+  </GeneralSetting>
 </template>

@@ -64,6 +64,7 @@ defineProps({
         </div>
         <div class="p-0 rounded-lg">
           <slot />
+          <slot />
         </div>
       </div>
     </div>

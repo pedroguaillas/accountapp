@@ -53,6 +53,4 @@ class Employee extends Model
     {
         return $this->state ? 'Activo' : 'Inactivo';
     }
-
 }
-

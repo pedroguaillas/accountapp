@@ -8,6 +8,7 @@ use App\Http\Controllers\HourController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\IessController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\MovementTypeController;
@@ -18,6 +19,9 @@ use App\Http\Controllers\PaymentRoleController;
 use App\Http\Controllers\AccountLinkController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
+use App\Http\Controllers\IvaController;
+use App\Http\Controllers\WithholdingController;
+use App\Http\Controllers\IceController;
 use App\Http\Controllers\RoleIngressController;
 use App\Http\Controllers\RoleEgressController;
 use App\Http\Controllers\PayMethodController;
@@ -170,8 +174,8 @@ Route::middleware([
         // Ajustes de empresa
         Route::get('empresa/ajuste/roles', [BusinessController::class, 'roles'])->name('business.setting.roles');
         Route::get('settingsrole', [BusinessController::class, 'roles'])->name('business.setting.roles');
-       
-       
+
+
         // Vinculacion general de cuentas
         Route::get('empresa/ajuste/vinculacioncuentas', [AccountLinkController::class, 'roles'])->name('business.setting.accountlinks');
         Route::get('settingsaccountlink', [AccountLinkController::class, 'roles'])->name('business.setting.accountlinks');
@@ -219,8 +223,20 @@ Route::middleware([
         Route::delete('people/{person}', [PersonController::class, 'destroy'])->name('people.delete');
         Route::get('people', [PersonController::class, 'getPeople'])->name('people.filters.index');
 
+        Route::get('ajustes/metodos-de-pago', [PayMethodController::class, 'index'])->name('busssines.setting.paymethods.index');
+        Route::post('paymethods', [PayMethodController::class, 'store'])->name('busssines.setting.paymethods.store');
 
-        Route::post('paymethods', [PayMethodController::class, 'store'])->name('paymethods.store');
-        Route::get('metodosglobales', [PayMethodController::class, 'index'])->name('paymethods.index');
+        Route::get('ajustes/ivas', [IvaController::class, 'index'])->name('busssines.setting.ivas.index');
+        Route::post('ivas', [IvaController::class, 'store'])->name('busssines.setting.ivas.store');
+
+        Route::get('ajustes/ices', [IceController::class, 'index'])->name('busssines.setting.ices.index');
+        Route::post('ices', [IceController::class, 'store'])->name('busssines.setting.ices.store');
+
+        Route::get('ajustes/retenciones', [WithholdingController::class, 'index'])->name('busssines.setting.withholding.index');
+        Route::post('withholdings', [WithholdingController::class, 'store'])->name('busssines.setting.withholding.store');
+
+        Route::get('ajustes/iess', [IessController::class, 'index'])->name('busssines.setting.iess.index');
+        Route::post('iess', [IessController::class, 'store'])->name('busssines.setting.iess.store');
+
     });
 });

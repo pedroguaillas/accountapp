@@ -7,7 +7,6 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-
 class BranchController extends Controller
 {
     public function index(Request $request)
@@ -42,7 +41,6 @@ class BranchController extends Controller
             'address' => 'required',
             //'is_matriz' => '',
             'enviroment_type' => 'required',
-
         ]);
         //llamada a la compania
         $company = Company::first();
@@ -91,5 +89,4 @@ class BranchController extends Controller
 
         return response()->json(['success' => true]);
     }
-
 }

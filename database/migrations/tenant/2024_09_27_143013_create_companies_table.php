@@ -28,6 +28,7 @@ return new class extends Migration {
             $table->id();
             $table->integer('code')->unique('code');;
             $table->string('name');
+            $table->decimal('max')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -471,6 +472,40 @@ return new class extends Migration {
 
             $table->foreign('company_id')->references('id')->on('companies');
         });
+
+        Schema::create('ivas', function (Blueprint $table) {
+            $table->id();
+            $table->integer('code')->unique();
+            $table->string('name');
+            $table->decimal('percentage');
+            $table->timestamps();
+        });
+        
+        Schema::create('ices', function (Blueprint $table) {
+            $table->id();
+            $table->integer('code')->unique();
+            $table->string('name');
+            $table->decimal('percentage')->nullable();
+            $table->timestamps();
+        });
+
+        //retenciones tenant
+        Schema::create('withholdings', function (Blueprint $table) {
+            $table->id();
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->decimal('percentage')->default(0);
+            $table->string('type');
+            $table->timestamps();
+        }); 
+
+        Schema::create('iesses', function (Blueprint $table) {
+            $table->id();
+            $table->string('type');
+            $table->string('name');
+            $table->decimal('percentage');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -499,6 +534,9 @@ return new class extends Migration {
         Schema::dropIfExists('bank_accounts');
         Schema::dropIfExists('transactions');
         Schema::dropIfExists('people');
-
+        Schema::dropIfExists('ivas');
+        Schema::dropIfExists('ices');
+        Schema::dropIfExists('withholdings');
+        Schema::dropIfExists('iesses');
     }
 };

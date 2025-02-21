@@ -8,7 +8,6 @@ use App\Models\Company;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -113,7 +112,6 @@ class AccountController extends Controller
         $company->accounts()->create($inputs);
         Account::where('id', $request->parent_id)
             ->update(['is_detail' => false]);
-
     }
 
     public function update(Request $request, Account $account)
@@ -129,7 +127,6 @@ class AccountController extends Controller
         } else {
             return response()->json(["sms"=>"Error al eliminar porque es una cuenta superior"],400);
         }
-
     }
 
     public function import(Request $request)

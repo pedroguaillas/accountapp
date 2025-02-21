@@ -14,10 +14,11 @@ class PayMethod extends Model
     protected $fillable = [
         'code',         // Codigo del metodo de pago
         'name',         // Nombre del method de pago
+        'max',
     ];
 
     protected $casts = [
-        'account_id' => 'integer',
         'code' => 'integer',
+        'max' => 'float',
     ];
 }

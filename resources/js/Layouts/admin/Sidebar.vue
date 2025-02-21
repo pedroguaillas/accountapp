@@ -1,6 +1,10 @@
 <script setup>
 // Imports
-import { BookOpenIcon, UserGroupIcon,BuildingLibraryIcon } from "@heroicons/vue/24/outline";
+import {
+  BookOpenIcon,
+  UserGroupIcon,
+  BuildingLibraryIcon,
+} from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import { Link, usePage } from "@inertiajs/vue3";
 import { ref, computed } from "vue";

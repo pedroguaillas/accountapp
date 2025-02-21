@@ -7,9 +7,12 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use App\Models\Company;
 
-class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
+class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles, WithEvents
 {
 
     protected $search;
@@ -44,21 +47,6 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
 
         // Mapea los resultados para transformarlos
         $transformed = $paymentroles->map(function ($paymentRole) {
-            $totalIngressF = $paymentRole->paymentroleingresses->filter(function ($ingress) {
-                return $ingress->roleIngress && $ingress->roleIngress->type === 'fijo';
-            })->sum('value') ?? 0;
-
-            $totalIngressO = $paymentRole->paymentroleingresses->filter(function ($ingress) {
-                return $ingress->roleIngress && $ingress->roleIngress->type === 'otro';
-            })->sum('value') ?? 0;
-
-            $totalEgressF = $paymentRole->paymentroleegresses->filter(function ($egress) {
-                return $egress->roleEgress && $egress->roleEgress->type === 'fijo';
-            })->sum('value') ?? 0;
-
-            $totalEgressO = $paymentRole->paymentroleegresses->filter(function ($egress) {
-                return $egress->roleEgress && $egress->roleEgress->type === 'otro';
-            })->sum('value') ?? 0;
 
             // Mapear los ingresos
             $ingressData = $paymentRole->paymentroleingresses->mapWithKeys(function ($ingress) {
@@ -68,7 +56,6 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
             $egressData = $paymentRole->paymentroleegresses->mapWithKeys(function ($egress) {
                 return [$egress->roleEgress->name => $egress->value];
             });
-
 
             // Combinar los valores fijos con los ingresos dinámicos
             return array_merge([
@@ -80,7 +67,6 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
                 'salary' => $paymentRole->employee->salary,
             ], $ingressData->toArray(), $egressData->toArray(), ['salary_receive' => $paymentRole->salary_receive,]); // Agregar los ingresos mapeados
         });
-
         return collect($transformed); // Retorna la colección transformada
     }
 
@@ -97,30 +83,37 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
         ];
 
         // Encabezados dinámicos de ingresos
-        $dynamicHeadings = PaymentRole::with('paymentroleingresses.roleIngress')
-            ->get()
-            ->pluck('paymentroleingresses.*.roleIngress.name')
-            ->flatten()
+        $dynamicHeadings = PaymentRole::join('payment_role_ingresses', 'payment_roles.id', '=', 'payment_role_ingresses.payment_role_id')
+            ->join('role_ingresses', 'payment_role_ingresses.role_ingress_id', '=', 'role_ingresses.id')
+            ->whereColumn('role_ingresses.created_at', '<=', 'payment_roles.created_at')
+            ->whereRaw("EXTRACT(YEAR FROM \"date\") = ?", [$this->year]) // Filtrar por año
+            ->whereRaw("EXTRACT(MONTH FROM \"date\") = ?", [$this->month]) // Filtrar por mes
+            ->pluck('role_ingresses.name')
             ->unique()
             ->toArray();
 
         // Encabezados dinámicos de egresos
-        $dynamicHeadingss = PaymentRole::with('paymentroleegresses.roleEgress')
-            ->get()
-            ->pluck('paymentroleegresses.*.roleEgress.name')
-            ->flatten()
+        $dynamicHeadingss = PaymentRole::join('payment_role_egresses', 'payment_roles.id', '=', 'payment_role_egresses.payment_role_id')
+            ->join('role_egresses', 'payment_role_egresses.role_egress_id', '=', 'role_egresses.id')
+            ->whereColumn('role_egresses.created_at', '<=', 'payment_roles.created_at')
+            ->whereRaw("EXTRACT(YEAR FROM \"date\") = ?", [$this->year]) // Filtrar por año
+            ->whereRaw("EXTRACT(MONTH FROM \"date\") = ?", [$this->month]) // Filtrar por mes
+            ->pluck('role_egresses.name')
             ->unique()
             ->toArray();
 
         $fixedHeadingss = [
             'Sueldo a recibir',
+            'Firma',
         ];
 
         return array_merge($fixedHeadings, $dynamicHeadings, $dynamicHeadingss, $fixedHeadingss);
     }
+
     public function styles(Worksheet $sheet)
     {
         $company = Company::first();
+        $highestColumn = $sheet->getHighestColumn();
 
         //vector meses para la seleccion del mes que se utiliza en la parte de abajo
         $meses = [
@@ -148,7 +141,7 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
         $sheet->setCellValue('A2', 'ROL DE PAGOS ' . $meses[$this->month - 1] . ' ' . $this->year);
 
         // Combina las celdas de la fila de título
-        $highestColumn = $sheet->getHighestColumn();
+
         $sheet->mergeCells("A1:{$highestColumn}1");
         $sheet->mergeCells("A2:{$highestColumn}2");
 
@@ -177,6 +170,22 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
         ]);
 
         // Aplica estilos a todas las celdas de la tabla
+        $lastColumn = $highestColumn; // Última columna (por letra)
+
+        // Definir los anchos de A, B y la última columna
+        $columnWidths = [
+            'A' => 12,
+            'B' => 30,
+            $lastColumn => 15, // Última columna con ancho específico
+        ];
+        foreach ($columnWidths as $col => $width) {
+            $sheet->getColumnDimension($col)->setWidth($width);
+        }
+
+        // Aplicar un solo tamaño a las demás columnas
+        for ($col = 'C'; $col < $lastColumn; $col++) {
+            $sheet->getColumnDimension($col)->setWidth(10);
+        }
         $highestRow = $sheet->getHighestRow();
         $range = "A3:{$highestColumn}{$highestRow}";
 
@@ -202,8 +211,37 @@ class PaymentRolesExport implements FromCollection, WithHeadings, WithStyles
             ],
         ]);
 
+        $highestRow = $sheet->getHighestRow(); // Última fila con datos
+        $sheet->getStyle("A3:A{$highestRow}")->applyFromArray([
+            'alignment' => [
+                'horizontal' => 'center', // Centrar horizontalmente
+                'vertical' => 'center',   // Centrar verticalmente
+            ],
+        ]);
+
+
         return [];
     }
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $highestRow = $sheet->getHighestRow();
+                // Convertir la columna más a la derecha (letra) a índice numérico
+                $highestColumnIndex = Coordinate::columnIndexFromString($sheet->getHighestColumn());
 
-
+                // Suponiendo que los datos comienzan en la fila 4 (después de dos filas de título y una de encabezados)
+                for ($row = 4; $row <= $highestRow; $row++) {
+                    for ($col = 1; $col <= $highestColumnIndex - 1; $col++) {
+                        $cell = $sheet->getCellByColumnAndRow($col, $row);
+                        $value = $cell->getValue();
+                        if ($value === null || $value === '') {
+                            $cell->setValue(0);
+                        }
+                    }
+                }
+            }
+        ];
+    }
 }
