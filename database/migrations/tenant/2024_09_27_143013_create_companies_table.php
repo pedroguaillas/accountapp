@@ -477,7 +477,7 @@ return new class extends Migration {
             $table->id();
             $table->integer('code')->unique();
             $table->string('name');
-            $table->decimal('fee');
+            $table->decimal('percentage');
             $table->timestamps();
         });
         
@@ -485,19 +485,27 @@ return new class extends Migration {
             $table->id();
             $table->integer('code')->unique();
             $table->string('name');
-            $table->decimal('fee')->nullable();
-            $table->decimal('specific_fee')->nullable();
+            $table->decimal('percentage')->nullable();
             $table->timestamps();
         });
 
+        //retenciones tenant
         Schema::create('withholdings', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
-            $table->decimal('fee')->default(0);
+            $table->decimal('percentage')->default(0);
             $table->string('type');
             $table->timestamps();
         }); 
+
+        Schema::create('iesses', function (Blueprint $table) {
+            $table->id();
+            $table->string('type');
+            $table->string('name');
+            $table->decimal('percentage');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -526,5 +534,9 @@ return new class extends Migration {
         Schema::dropIfExists('bank_accounts');
         Schema::dropIfExists('transactions');
         Schema::dropIfExists('people');
+        Schema::dropIfExists('ivas');
+        Schema::dropIfExists('ices');
+        Schema::dropIfExists('withholdings');
+        Schema::dropIfExists('iesses');
     }
 };

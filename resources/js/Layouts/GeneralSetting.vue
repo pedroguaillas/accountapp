@@ -27,12 +27,12 @@ defineProps({
             <li class="me-2">
               <Link
                 class="pointer inline-block p-4 border-b-2 rounded-t-lg"
-                :href="route('busssines.setting.ivas.index')"
+                :href="route('busssines.setting.iess.index')"
                 :class="{
                   ' border-gray-300 dark:text-gray-300 text-xl pt-2':
-                    route().current('busssines.setting.ivas.index'),
+                    route().current('busssines.setting.iess.index'),
                   ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
-                    !route().current('busssines.setting.ivas.index'),
+                    !route().current('busssines.setting.iess.index'),
                 }"
                 type="button"
               >

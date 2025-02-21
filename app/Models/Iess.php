@@ -1,25 +1,21 @@
 <?php
 
-namespace App\Models\Landlord;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Withholding extends Model
+class Iess extends Model
 {
     use HasFactory;
 
-    protected $connection = 'central'; // Forzar la conexión a la base global
-
     protected $fillable = [
-        'code',
+        'type',
         'name',
         'percentage',
-        'type',
     ];
 
     protected $casts = [
-        'code' => 'integer',
-        
+        'percentage' => 'float',
     ];
 }

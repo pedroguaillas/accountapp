@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import axios from "axios";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
+import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 
 // Recibes 'withholdings' desde Inertia
 const props = defineProps({
@@ -13,7 +13,9 @@ const props = defineProps({
 
 // Inicializar selectedPayments con los métodos que tienen selected: true
 const selectedWithholdings = ref(
-  props.withholdings.filter((method) => method.selected).map((method) => method.code)
+  props.withholdings
+    .filter((method) => method.selected)
+    .map((method) => method.code)
 );
 
 // Computed para verificar si todos están seleccionados
@@ -48,14 +50,9 @@ const saveSelection = () => {
 </script>
 
 <template>
-  <AdminLayout title="Retenciones">
+  <GeneralSetting title="Retenciones">
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">
-          Retenciones
-        </h2>
-      </div>
 
       <div>
         <!-- Checkbox para seleccionar todos -->
@@ -65,7 +62,11 @@ const saveSelection = () => {
         </div>
 
         <!-- Lista de checkboxes -->
-        <div v-for="method in props.withholdings" :key="method.code" class="mt-2">
+        <div
+          v-for="method in props.withholdings"
+          :key="method.code"
+          class="mt-2"
+        >
           <input
             type="checkbox"
             :value="method.code"
@@ -83,5 +84,5 @@ const saveSelection = () => {
         </button>
       </div>
     </div>
-  </AdminLayout>
+  </GeneralSetting>
 </template>

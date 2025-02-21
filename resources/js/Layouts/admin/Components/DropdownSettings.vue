@@ -22,7 +22,7 @@ import DropdownLink from "@/Components/DropdownLink.vue";
     <template #content>
       <div class="w-60">
         <!-- Team Settings -->
-        <DropdownLink :href="route('busssines.setting.paymethods.index')"> General </DropdownLink>
+        <DropdownLink :href="route('busssines.setting.iess.index')"> General </DropdownLink>
 
         <DropdownLink :href="route('business.setting.accountlinks')">
           Vinculación de cuentas

@@ -20,7 +20,7 @@ class WithholdingController extends Controller
             return $method;
         });
 
-        return Inertia::render('Withholding/Index', [
+        return Inertia::render('Business/General/Withholding/Index', [
             'withholdings' => $globalWithholdings,
         ]);
     }

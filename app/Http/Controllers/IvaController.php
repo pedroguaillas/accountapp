@@ -20,7 +20,7 @@ class IvaController extends Controller
             return $method;
         });
 
-        return Inertia::render('Iva/Index', [
+        return Inertia::render('Business/General/Iva/Index', [
             'ivas' => $globalIva,
         ]);
     }

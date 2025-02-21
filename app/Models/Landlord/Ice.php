@@ -14,13 +14,11 @@ class Ice extends Model
     protected $fillable = [
         'code',         // Codigo del metodo de pago
         'name',         // Nombre del method de pago
-        'fee',
-        'specific_fee',
+        'percentage',
     ];
 
     protected $casts = [
         'code' => 'integer',
-        'fee' => 'float',
-        'specific_fee' => 'float',
+        'percentage' => 'float',
     ];
 }

@@ -3,38 +3,40 @@ import { ref, computed } from "vue";
 import axios from "axios";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 
-// Recibes 'paymethods' desde Inertia
+// Recibes 'withholdings' desde Inertia
 const props = defineProps({
-  ivas: {
+  iess: {
     type: Array,
     default: () => [],
   },
 });
 
 // Inicializar selectedPayments con los métodos que tienen selected: true
-const selectedIvas = ref(
-  props.ivas.filter((method) => method.selected).map((method) => method.code)
+const selectedIess = ref(
+  props.iess
+    .filter((method) => method.selected)
+    .map((method) => method.id)
 );
 
 // Computed para verificar si todos están seleccionados
 const allSelected = computed(
-  () => selectedIvas.value.length === props.ivas.length
+  () => selectedIess.value.length === props.iess.length
 );
 
 // Función para seleccionar/deseleccionar todos
 const toggleAll = () => {
   if (allSelected.value) {
-    selectedIvas.value = [];
+    selectedIess.value = [];
   } else {
-    selectedIvas.value = props.ivas.map((pm) => pm.code);
+    selectedIess.value = props.iess.map((pm) => pm.id);
   }
 };
 
 // Enviar la selección al backend
 const saveSelection = () => {
   axios
-    .post(route("busssines.setting.ivas.store"), {
-      selected: selectedIvas.value,
+    .post(route("busssines.setting.iess.store"), {
+      selected: selectedWithholdings.value,
     })
     .then((response) => {
       console.log(response.data.message);
@@ -48,8 +50,10 @@ const saveSelection = () => {
 </script>
 
 <template>
-  <GeneralSetting title="Iva">
+  <GeneralSetting title="IESS">
     <div class="p-4 bg-white rounded drop-shadow-md">
+      <!-- Header -->
+
       <div>
         <!-- Checkbox para seleccionar todos -->
         <div>
@@ -58,9 +62,19 @@ const saveSelection = () => {
         </div>
 
         <!-- Lista de checkboxes -->
-        <div v-for="iva in ivas" :key="iva.code" class="mt-2">
-          <input type="checkbox" :value="iva.code" v-model="selectedIvas" />
-          <label class="ml-2">{{ iva.name }}</label>
+        <div
+          v-for="method in props.iess"
+          :key="method.id"
+          class="mt-2"
+        >
+          <input
+            type="checkbox"
+            :value="method.id"
+            v-model="selectedWithholdings"
+          />
+          <label class="ml-2">{{ method.type }}</label>
+          <label class="ml-2">{{ method.name }}</label>
+          <label class="ml-2">{{ method.percentaje}}</label>
         </div>
 
         <!-- Botón para guardar -->

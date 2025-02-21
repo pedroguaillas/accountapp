@@ -8,6 +8,7 @@ use App\Http\Controllers\HourController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\IessController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\MovementTypeController;
@@ -227,11 +228,15 @@ Route::middleware([
 
         Route::get('ajustes/ivas', [IvaController::class, 'index'])->name('busssines.setting.ivas.index');
         Route::post('ivas', [IvaController::class, 'store'])->name('busssines.setting.ivas.store');
-        
+
         Route::get('ajustes/ices', [IceController::class, 'index'])->name('busssines.setting.ices.index');
         Route::post('ices', [IceController::class, 'store'])->name('busssines.setting.ices.store');
-       
+
         Route::get('ajustes/retenciones', [WithholdingController::class, 'index'])->name('busssines.setting.withholding.index');
         Route::post('withholdings', [WithholdingController::class, 'store'])->name('busssines.setting.withholding.store');
+
+        Route::get('ajustes/iess', [IessController::class, 'index'])->name('busssines.setting.iess.index');
+        Route::post('iess', [IessController::class, 'store'])->name('busssines.setting.iess.store');
+
     });
 });

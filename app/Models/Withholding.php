@@ -9,17 +9,15 @@ class Withholding extends Model
 {
     use HasFactory;
 
-    protected $connection = 'central'; // Forzar la conexión a la base global
-
     protected $fillable = [
         'code',
         'name',
-        'fee',
+        'percentage',
         'type',
     ];
 
     protected $casts = [
         'code' => 'integer',
-        'fee' => 'float',
+        'percentage' => 'float',
     ];
 }
