@@ -107,6 +107,7 @@ class ProcessPaymenRole implements ShouldQueue
 
     private function calcularIngreso($roleingress, $employee, $ho, $he, $remuneration, $au)
     {
+
         switch ($roleingress->code) {
             case 'HO':
                 return $ho;
@@ -115,9 +116,9 @@ class ProcessPaymenRole implements ShouldQueue
             case 'RE':
                 return $remuneration;
             case 'XIII':
-                return $employee->xiii ? 0 : $remuneration / 12;
+                return $employee->xiii ? 0 : ($remuneration+$ho+$he )/ 12;
             case 'XV':
-                return $employee->xiv ? 0 : (38.33 * 30) / $employee->days;
+                return $employee->xiv ? 0 : ($remuneration) / 12;
             case 'FDR':
                 return $employee->reserve_funds ? 0 : $remuneration * 0.083333;
             case 'AU':

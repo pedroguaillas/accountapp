@@ -1,90 +1,95 @@
 <script setup>
-import { ref, computed } from "vue";
-import axios from "axios";
+import { ref } from "vue";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
+import ModalIess from "./ModalIess.vue";
+import { router } from "@inertiajs/vue3";
+import Table from "@/Components/Table.vue";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
-// Recibes 'withholdings' desde Inertia
+// Recibes 'paymethods' desde Inertia
 const props = defineProps({
-  iess: {
-    type: Array,
-    default: () => [],
-  },
+  globalIess: { type: Array, default: () => [] },
+  iesses: { type: Array, default: () => [] },
 });
 
-// Inicializar selectedPayments con los métodos que tienen selected: true
-const selectedIess = ref(
-  props.iess
-    .filter((method) => method.selected)
-    .map((method) => method.id)
-);
+const modal = ref(false);
 
-// Computed para verificar si todos están seleccionados
-const allSelected = computed(
-  () => selectedIess.value.length === props.iess.length
-);
-
-// Función para seleccionar/deseleccionar todos
-const toggleAll = () => {
-  if (allSelected.value) {
-    selectedIess.value = [];
-  } else {
-    selectedIess.value = props.iess.map((pm) => pm.id);
-  }
+const toggle = () => {
+  modal.value = !modal.value;
 };
 
-// Enviar la selección al backend
-const saveSelection = () => {
-  axios
-    .post(route("busssines.setting.iess.store"), {
-      selected: selectedWithholdings.value,
-    })
-    .then((response) => {
-      console.log(response.data.message);
-      alert("Selección guardada correctamente");
-    })
-    .catch((error) => {
-      console.error("Error al guardar la selección", error);
-      alert("Ocurrió un error al guardar");
-    });
+const selectedIess = (iess) => {
+  router.post(route("busssines.setting.iess.store"), iess, {
+    preserveState: true,
+  });
+  toggle();
 };
 </script>
 
 <template>
-  <GeneralSetting title="IESS">
+  <GeneralSetting title="Iess">
     <div class="p-4 bg-white rounded drop-shadow-md">
-      <!-- Header -->
-
-      <div>
-        <!-- Checkbox para seleccionar todos -->
-        <div>
-          <input type="checkbox" :checked="allSelected" @change="toggleAll" />
-          <label class="ml-2">Seleccionar todos</label>
-        </div>
-
-        <!-- Lista de checkboxes -->
-        <div
-          v-for="method in props.iess"
-          :key="method.id"
-          class="mt-2"
-        >
-          <input
-            type="checkbox"
-            :value="method.id"
-            v-model="selectedWithholdings"
-          />
-          <label class="ml-2">{{ method.type }}</label>
-          <label class="ml-2">{{ method.name }}</label>
-          <label class="ml-2">{{ method.percentaje}}</label>
-        </div>
-
-        <!-- Botón para guardar -->
+      <div class="w-full flex sm:justify-end">
         <button
-          @click="saveSelection"
-          class="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+          @click="toggle"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
         >
-          Guardar selección
+          +
         </button>
+      </div>
+
+      <div class="w-full overflow-x-auto">
+        <!-- Tabla -->
+        <Table>
+          <thead>
+            <tr class="[&>th]:py-2">
+              <th class="w-1">N°</th>
+              <th>CODIGO</th>
+              <th class="text-left">NOMBRE</th>
+              <th class="text-left">TIPO</th>
+              <th>ESTADO</th>
+              <th>PORCENTAJE</th>
+              <th class="w-1"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(iess, i) in props.iesses"
+              :key="iess.id"
+              class="border-t [&>td]:py-2"
+            >
+              <td>{{ i + 1 }}</td>
+              <td>{{ iess.code }}</td>
+              <td class="text-left">{{ iess.name }}</td>
+              <td class="text-left">{{ iess.type }}</td>
+              <td>
+                <span class="rounded px-2 py-1 m-0 text-white bg-success">
+                  Activo
+                </span>
+              </td>
+              <td>{{ iess.percentage }}</td>
+
+              <td class="flex justify-end">
+                <div class="relative inline-flex gap-1">
+                  <button
+                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                  >
+                    <TrashIcon class="size-6 text-white" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </Table>
       </div>
     </div>
   </GeneralSetting>
+
+  <ModalIess
+    :show="modal"
+    :iesses="props.globalIess"
+    @close="toggle"
+    @save="save"
+    @selectedIess="selectedIess"
+  />
 </template>

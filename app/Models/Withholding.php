@@ -15,9 +15,4 @@ class Withholding extends Model
         'percentage',
         'type',
     ];
-
-    protected $casts = [
-        'code' => 'integer',
-        'percentage' => 'float',
-    ];
 }
