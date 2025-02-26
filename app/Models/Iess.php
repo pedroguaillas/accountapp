@@ -10,6 +10,7 @@ class Iess extends Model
     use HasFactory;
 
     protected $fillable = [
+        'code',
         'type',
         'name',
         'percentage',

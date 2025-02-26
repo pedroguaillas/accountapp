@@ -13,6 +13,7 @@ class Iess extends Model
     protected $connection = 'central'; // Forzar la conexión a la base global
     
     protected $fillable = [
+        'code',
         'type',
         'name',
         'percentage',

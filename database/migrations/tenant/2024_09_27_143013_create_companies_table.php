@@ -494,17 +494,48 @@ return new class extends Migration {
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
-            $table->decimal('percentage')->default(0);
+            $table->string('percentage');
             $table->string('type');
             $table->timestamps();
         }); 
 
         Schema::create('iesses', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
             $table->string('type');
             $table->string('name');
             $table->decimal('percentage');
             $table->timestamps();
+        });
+
+        Schema::create('payment_regimes', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger("company_id");
+            $table->string('region'); // Costa o Sierra 
+            $table->string('months_xiii'); // Meses para el décimo tercero
+            $table->string('months_xiv'); // Meses para el décimo cuarto
+            $table->string('months_reserve_funds'); // Meses para fondos de reserva
+            $table->timestamps();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+           
+            
+        });
+
+        Schema::create('benefits_accumulation', function (Blueprint $table) {
+            $table->id();
+            $table->string('employee_id'); // Número de identificación del empleado
+            $table->foreignId('regimen_id');//sierra o a costa
+            $table->string('month'); // Mes de pago o acumulacion
+            $table->decimal('value', 10, 2)->default(0.00);
+            $table->string('type');
+            $table->string('pay_status')->default("pendiente");//pendiente/pagado
+            
+            $table->timestamps();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+            $table->foreign('regimen_id')->references('id')->on('payment_regimes');
+            $table->unique(['employee_id', 'month','type']);
         });
     }
 
@@ -538,5 +569,7 @@ return new class extends Migration {
         Schema::dropIfExists('ices');
         Schema::dropIfExists('withholdings');
         Schema::dropIfExists('iesses');
+        Schema::dropIfExists('payment_regimes');
+        Schema::dropIfExists('employee_payments');
     }
 };

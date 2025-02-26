@@ -41,16 +41,26 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
-            $table->string('percentage');
+             $table->string('percentage');
             $table->string('type');
             $table->timestamps();
         });
 
         Schema::create('iesses', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
             $table->string('type');
             $table->string('name');
             $table->decimal('percentage');
+            $table->timestamps();
+        });
+
+        Schema::create('payment_regimes', function (Blueprint $table) {
+            $table->id();
+            $table->string('region'); // Costa o Sierra 
+            $table->string('months_xiii'); // Meses para el décimo tercero
+            $table->string('months_xiv'); // Meses para el décimo cuarto
+            $table->string('months_reserve_funds'); // Meses para fondos de reserva
             $table->timestamps();
         });
     }
@@ -65,5 +75,6 @@ return new class extends Migration
         Schema::dropIfExists('ivas');
         Schema::dropIfExists('withholdings');
         Schema::dropIfExists('iesses');
+        Schema::dropIfExists('payment_regimes');
     }
 };
