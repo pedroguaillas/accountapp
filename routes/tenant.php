@@ -3,15 +3,17 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\Landlord\PaymentRegimController;
 use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\HourController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\BranchController;
+use App\Http\Controllers\BoxController;
 use App\Http\Controllers\Landlord\IessController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\BankAccountController;
-use App\Http\Controllers\MovementTypeController;
+use App\Http\Controllers\Landlord\MovementTypeController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\EmployeeController;
@@ -29,7 +31,9 @@ use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\SettingAccountController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TransactionBoxController;
 use App\Http\Controllers\SettingRolController;
+use App\Http\Controllers\SettingBankController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -188,6 +192,11 @@ Route::middleware([
         Route::get('vinculacion-contable/roles', [SettingRolController::class, 'index'])->name('setting.account.rol.index');
         Route::put('settingaccountrol/update/{id}', [SettingRolController::class, 'updateRoleAccount'])->name('settingaccount.rol.update');
 
+        
+        // Emparejamiento de cuentas roles
+        Route::get('vinculacion-contable/bancos', [SettingBankController::class, 'index'])->name('setting.account.bank.index');
+        Route::put('settingaccountrol/update/{id}', [SettingBankController::class, 'updateBankAccount'])->name('settingaccount.bank.update');
+
         //bancos
         Route::get('bancos', [BankController::class, 'index'])->name('banks.index');
         Route::post('banks', [BankController::class, 'store'])->name('banks.store');
@@ -203,10 +212,10 @@ Route::middleware([
         Route::put('bankaccounts/{id}/state', [BankAccountController::class, 'updateState'])->name('bankaccounts.updateState');
 
         //tipos de movimiento
-        Route::get('tipos-movimientos-bancarios', [MovementTypeController::class, 'index'])->name('movementtypes.index');
-        Route::post('movementtypes', [MovementTypeController::class, 'store'])->name('movementtypes.store');
-        Route::put('movementtypes/{movementtype}', [MovementTypeController::class, 'update'])->name('movementtypes.update');
-        Route::delete('movementtypes/{movementtype}', [MovementTypeController::class, 'destroy'])->name('movementtypes.delete');
+        // Route::get('tipos-movimientos-bancarios', [MovementTypeController::class, 'index'])->name('movementtypes.index');
+        // Route::post('movementtypes', [MovementTypeController::class, 'store'])->name('movementtypes.store');
+        // Route::put('movementtypes/{movementtype}', [MovementTypeController::class, 'update'])->name('movementtypes.update');
+        // Route::delete('movementtypes/{movementtype}', [MovementTypeController::class, 'destroy'])->name('movementtypes.delete');
 
         //transacciones
         Route::get('movimientos-bancarios', [TransactionController::class, 'index'])->name('transactions.index');
@@ -237,6 +246,28 @@ Route::middleware([
 
         Route::get('ajustes/iess', [IessController::class, 'index'])->name('busssines.setting.iess.index');
         Route::post('iess', [IessController::class, 'store'])->name('busssines.setting.iess.store');
+
+        Route::get('ajustes/movimientos-bancarios', [MovementTypeController::class, 'index'])->name('busssines.setting.movementtypes.index');
+        Route::post('movementtypes', [MovementTypeController::class, 'store'])->name('busssines.setting.movementtypes.store');
+
+        Route::get('ajustes/regimen-pago', [PaymentRegimController::class, 'index'])->name('busssines.setting.paymentregims.index');
+        Route::post('paymentRegim', [PaymentRegimController::class, 'store'])->name('busssines.setting.paymentregims.store');
+
+        Route::get('cajas', [BoxController::class, 'index'])->name('boxes.index');
+        Route::post('boxes', [BoxController::class, 'store'])->name('boxes.store');
+        Route::put('boxes/{box}', [BoxController::class, 'update'])->name('boxes.update');
+        Route::delete('boxes/{box}', [BoxController::class, 'destroy'])->name('boxes.delete');
+        Route::post('boxes/{box}/open', [BoxController::class, 'open'])->name('boxes.open');
+        Route::get('/boxes/{box}/closeinformation', [BoxController::class, 'closeinformation'])->name('boxes.closeinformation');
+        Route::post('boxes/{box}/close', [BoxController::class, 'close'])->name('boxes.close');
+
+        //transacciones
+        Route::get('movimientos-cajas', [TransactionBoxController::class, 'index'])->name('transaction.boxes.index');
+        Route::get('movimientos-cajas/crear', action: [TransactionBoxController::class, 'create'])->name('transaction.boxes.create');
+        Route::post('transactionboxes', [TransactionBoxController::class, 'store'])->name('transaction.boxes.store');
+        Route::get('movimientos-cajas/editar/{transactionId}', [TransactionBoxController::class, 'edit'])->name('transaction.boxes.edit');
+        Route::put('transactionboxes/{transaction}', [TransactionBoxController::class, 'update'])->name('transaction.boxes.update');
+        Route::delete('transactionboxes/{transaction}', [TransactionBoxController::class, 'destroy'])->name('transaction.boxes.delete');
 
     });
 });

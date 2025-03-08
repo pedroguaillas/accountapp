@@ -5,14 +5,13 @@ import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { ref } from "vue";
 
 // Props
 defineProps({
-  movementtype: { type: Object, default: () => ({}) },
+  box: { type: Object, default: () => ({}) },
   error: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
 });
@@ -21,21 +20,12 @@ const { focusNextField } = useFocusNextField();
 
 // Emits
 defineEmits(["close", "save"]);
-
-const TypeOptions = [
-  { value: "Ingreso", label: "Ingreso" },
-  { value: "Egreso", label: "Egreso" },
-];
 </script>
 
 <template>
   <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">
     <template #title>
-      {{
-        `${
-          movementtype.id === undefined ? "Añadir" : "Editar"
-        } movimiento bancario`
-      }}
+      {{ `${box.id === undefined ? "Añadir" : "Editar"} cajas` }}
     </template>
     <template #content>
       <div class="mt-4">
@@ -44,25 +34,15 @@ const TypeOptions = [
           @keydown.enter.prevent="focusNextField"
         >
           <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="name" value="Nombre" />
+            <InputLabel for="name" value="Nombre de la caja" />
             <TextInput
-              v-model="movementtype.name"
+              v-model="box.name"
               type="text"
               class="mt-1 block w-full"
               min="1"
               max="999"
             />
             <InputError :message="error.name" class="mt-2" />
-          </div>
-
-          <div class="col-span-6 sm:col-span-4">
-            <InputLabel for="type" value="Tipo" />
-            <DynamicSelect
-              v-model="movementtype.type"
-              :options="TypeOptions"
-              placeholder="Seleccione un tipo"
-              class="mt-2 block w-full"
-            />
           </div>
         </form>
       </div>

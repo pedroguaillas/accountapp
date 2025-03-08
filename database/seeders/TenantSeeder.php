@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Company;
 use App\Models\ContributorType;
 use App\Models\EconomicActivity;
+use App\Models\TypeBank;
 use Illuminate\Database\Seeder;
 
 class TenantSeeder extends Seeder
@@ -56,15 +57,5 @@ class TenantSeeder extends Seeder
             ['name' => "Otros egresos", 'code' => 'OE', 'type' => 'fijo'],
         ]);
 
-        $company->movementtypes()->createMany([
-            ['name' => "Préstamo", 'type' => "Ingreso"],
-            ['name' => "Anticipo proveedor", 'type' => "Egreso"],
-            ['name' => "Anticipo cliente", 'type' => "Ingreso"],
-            ['name' => "Deposito", 'type' => "Ingreso"],
-            ['name' => "Retiro", 'type' => "Egreso"],
-            ['name' => "Pago préstamo", 'type' => "Egreso"],
-            ['name' => "Gastos no deducibles", 'type' => "Egreso"],
-            ['name' => "Gasto personal", 'type' => "Egreso"],
-        ]);
     }
 }

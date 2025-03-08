@@ -14,12 +14,14 @@ class BankAccount extends Model
         'bank_id',
         'account_number',
         'account_type',
+        'account_id',
         'current_balance',
         'state',
         'data_additional',
     ];
     protected $casts = [
         'current_balance' => 'float',
+        'account_id' => 'integer',
         'state' => 'boolean',
         'data_additional' => 'array',//devolver un array asociativo
     ];

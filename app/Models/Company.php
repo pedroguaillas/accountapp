@@ -122,4 +122,14 @@ class Company extends Model
     {
         return $this->hasMany(Person::class);
     }
+
+    public function paymentregim()  
+    {
+        return $this->hasMany(PaymentRegim::class);
+    }
+
+    public function boxes()  
+    {
+        return $this->hasMany(Box::class);
+    }
 }

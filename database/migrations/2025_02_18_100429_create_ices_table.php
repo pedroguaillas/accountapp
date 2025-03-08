@@ -55,7 +55,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('payment_regimes', function (Blueprint $table) {
+        Schema::create('payment_regims', function (Blueprint $table) {
             $table->id();
             $table->string('region'); // Costa o Sierra 
             $table->string('months_xiii'); // Meses para el décimo tercero
@@ -63,6 +63,18 @@ return new class extends Migration
             $table->string('months_reserve_funds'); // Meses para fondos de reserva
             $table->timestamps();
         });
+
+        Schema::create('movement_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('code')->unique();
+            $table->string('name'); // Movement type name 
+            $table->string('type'); // tipo de movimiento(ingreso o egreso)
+            $table->string('venue');//caja,banco,ambos
+            $table->timestamps();
+            $table->softDeletes();
+        });
+        
+        
     }
 
     /**

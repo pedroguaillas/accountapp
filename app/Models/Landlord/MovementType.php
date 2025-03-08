@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Landlord;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,9 +10,9 @@ class MovementType extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $connection = 'central'; // Forzar la conexión a la base global
+
     protected $fillable = [
-        'company_id',
-        'account_id', 
         'name', // Nombre comercial si tiene
         'code',//codigo
         'type', // tipo Ingreso oEgreso

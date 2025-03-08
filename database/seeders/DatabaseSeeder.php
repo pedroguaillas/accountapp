@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\MovementType;
+use App\Models\PaymentRegim;
 use App\Models\Tenant;
 use App\Models\Landlord\PayMethod;
 use App\Models\Landlord\Iva;
@@ -63,6 +65,9 @@ class DatabaseSeeder extends Seeder
         Iess::create(['code' => 'spa', 'type' => 'socio', 'name' => 'patronal', 'percentage' => 17.6,]);
         Iess::create(['code' => 'sac', 'type' => 'ambos', 'name' => 'conyuge', 'percentage' => 3.41,]);
         Iess::create(['code' => 'epa', 'type' => 'empleado', 'name' => 'patronal', 'percentage' => 12.15,]);
+
+        PaymentRegim::create(['region' => 'Sierra', 'months_xiii' => "Diciembre", 'months_xiv' => "Agosto", 'months_reserve_funds' => ""]);
+        PaymentRegim::create(['region' => 'Costa', 'months_xiii' => "Diciembre", 'months_xiv' => "Marzo", 'months_reserve_funds' => ""]);
 
         //NOTA ELIMINAR CUANDO SE VAYA A PRODUCCION
         Ice::create(['code' => 3011, 'name' => 'ICE Cigarrillos Rubios', 'percentage' => 0.17]);
@@ -196,5 +201,16 @@ class DatabaseSeeder extends Seeder
         Withholding::create(['code' => '521', 'name' => 'Pago a no residentes - Enajenación de derechos representativos de capital u otros derechos que permitan la exploración, explotación, concesión o similares de sociedades', 'percentage' => '1 o 10', 'type' => 'RENTA']);
         Withholding::create(['code' => '523A', 'name' => 'Pago a no residentes - Seguros y reaseguros (primas y cesiones)', 'percentage' => '0,22,37', 'type' => 'RENTA']);
         Withholding::create(['code' => '525', 'name' => 'Pago a no residentes- Donaciones en dinero -Impuesto a las donaciones', 'percentage' => 'Según art 36 LRTI literal d)', 'type' => 'RENTA']);
+
+        MovementType::create(['code' => 'P','name' => "Préstamo", 'type' => "Ingreso",'venue'=>'ambos']);
+        MovementType::create(['code' => 'AP','name' => "Anticipo proveedor", 'type' => "Egreso",'venue'=>'ambos']);
+        MovementType::create(['code' => 'AC','name' => "Anticipo cliente", 'type' => "Ingreso",'venue'=>'ambos']);
+        MovementType::create(['code' => 'OF','name' => "Operación de Financiamiento", 'type' => "Ingreso",'venue'=>'ambos']);
+        MovementType::create(['code' => 'RC','name' => "Retiro (Desembolso de caja)", 'type' => "Egreso",'venue'=>'bancos']);
+        MovementType::create(['code' => 'DB','name' => "Deposito (Desembolso de banco)", 'type' => "Egreso",'venue'=>'caja']);
+        MovementType::create(['code' => 'PP','name' => "Pago préstamo", 'type' => "Egreso",'venue'=>'bancos']);
+        MovementType::create(['code' => 'GND','name' => "Gastos no deducibles", 'type' => "Egreso",'venue'=>'ambos']);
+        MovementType::create(['code' => 'GP','name' => "Gasto personal", 'type' => "Egreso",'venue'=>'ambos']);
+        MovementType::create(['code' => 'RCC','name' => "Reposición Caja Chica", 'type' => "Egreso",'venue'=>'caja']);
     }
 }

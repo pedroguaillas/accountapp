@@ -29,6 +29,7 @@ class AccountController extends Controller
             })
             ->where('accounts.company_id', $company->id)
             ->groupBy('accounts.id', 'accounts.code', 'accounts.name', 'accounts.parent_id')
+            // ->orderByRaw('LENGTH(code) ')
             ->orderBy('accounts.code')
             ->get();
 
@@ -85,8 +86,9 @@ class AccountController extends Controller
         } else {
             // Recuperamos el último hijo de las cuentas con el prefijo del código actual
             $accountChild = Account::where('code', 'LIKE', $account->code . '.%')
-                ->orderBy('code', 'desc') // Ordenamos en orden descendente para obtener el último
-                ->first(); // Obtenemos el último registro
+                ->orderByRaw('LENGTH(code) DESC')  // Ordenar por longitud del código primero
+                ->orderBy('code', 'desc')          // Luego, ordenar por el valor del código
+                ->first();
 
             if ($accountChild) {
                 // Extraemos el último número del código del hijo más reciente
@@ -125,7 +127,7 @@ class AccountController extends Controller
         if (!$hasChildren) {
             $account->delete();
         } else {
-            return response()->json(["sms"=>"Error al eliminar porque es una cuenta superior"],400);
+            return response()->json(["sms" => "Error al eliminar porque es una cuenta superior"], 400);
         }
     }
 

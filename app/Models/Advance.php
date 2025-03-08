@@ -14,7 +14,7 @@ class Advance extends Model
         'detail',                 // Categoria del activo fijo
         'amount',    // Tiempo de depreciacion
         'employee_id',           // Vinculo con el empleado
-        'company_id',//cinculo con la compania
+        'company_id',//vinculo con la compania
         'type',//tipo sea salario o utilidad
         'payment_type',//tipo de pago
         'date',//fecha del anticipo
@@ -23,7 +23,5 @@ class Advance extends Model
 
     protected $casts = [
         'amount' => 'float',
-        'employee_id' => 'integer',
-        'company_id' => 'integer',
     ];
 }

@@ -17,6 +17,16 @@ return new class extends Migration {
             $table->softDeletes();
         });
 
+        Schema::create('type_banks', function (Blueprint $table) {
+            $table->id();
+            $table->string('code');
+            $table->string('name');
+            $table->string('type');//ingreso o egreso
+          
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
         Schema::create('contributor_types', function (Blueprint $table) {
             $table->id();
             $table->char('name'); // General, Negocio Popular, Emprendedor
@@ -26,7 +36,8 @@ return new class extends Migration {
 
         Schema::create('pay_methods', function (Blueprint $table) {
             $table->id();
-            $table->integer('code')->unique('code');;
+            $table->integer('code')->unique('code');
+            ;
             $table->string('name');
             $table->decimal('max')->nullable();
             $table->timestamps();
@@ -158,7 +169,7 @@ return new class extends Migration {
             $table->string('prefix')->nullable();
             $table->string('document_id')->nullable(); // Ej. ID compra
             $table->string('table')->nullable(); // shops
-        
+
             $table->timestamps();
             $table->softDeletes();
 
@@ -398,8 +409,11 @@ return new class extends Migration {
         Schema::create('movement_types', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id');
-            $table->string('name'); // Movement type name (e.g., debit card, client advance)
+            $table->string('code')->unique();
+            $table->string('name'); // Movement type name 
             $table->string('type'); // tipo de movimiento(ingreso o egreso)
+            $table->string('venue');//caja,banco,ambos
+            $table->bigInteger('account_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
@@ -425,6 +439,7 @@ return new class extends Migration {
             $table->string('account_type'); // Account type
             $table->decimal('current_balance', 15, 2)->default(0); // Current balance
             $table->boolean('state')->default(true); // Active/inactive state
+            $table->bigInteger('account_id')->nullable(); // cuenta de vinculacion
             $table->json('data_additional')->nullable();
 
             $table->timestamps();
@@ -447,7 +462,7 @@ return new class extends Migration {
             $table->date('cheque_date')->nullable(); // Fecha del cheque (solo cuando el método de pago sea cheque)
             $table->string('transfer_account')->nullable(); // numero de cuenta (solo cuando el método de pago sea diferente de cheque)
             $table->string('voucher_number')->nullable(); // Número de comprobante
-            $table->string('state_transaction'); // Completed/pending state
+            $table->string('state_transaction')->default('vigente'); //vigente o finalizado
             $table->json('data_additional')->nullable();
 
             $table->timestamps();
@@ -480,7 +495,7 @@ return new class extends Migration {
             $table->decimal('percentage');
             $table->timestamps();
         });
-        
+
         Schema::create('ices', function (Blueprint $table) {
             $table->id();
             $table->integer('code')->unique();
@@ -497,7 +512,7 @@ return new class extends Migration {
             $table->string('percentage');
             $table->string('type');
             $table->timestamps();
-        }); 
+        });
 
         Schema::create('iesses', function (Blueprint $table) {
             $table->id();
@@ -508,35 +523,96 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('payment_regimes', function (Blueprint $table) {
+        Schema::create('payment_regims', function (Blueprint $table) {
             $table->id();
             $table->bigInteger("company_id");
             $table->string('region'); // Costa o Sierra 
             $table->string('months_xiii'); // Meses para el décimo tercero
             $table->string('months_xiv'); // Meses para el décimo cuarto
-            $table->string('months_reserve_funds'); // Meses para fondos de reserva
+            $table->string('months_reserve_funds')->nullable(); // Meses para fondos de reserva
             $table->timestamps();
 
             $table->foreign('company_id')->references('id')->on('companies');
-           
-            
+
         });
 
         Schema::create('benefits_accumulation', function (Blueprint $table) {
             $table->id();
-            $table->string('employee_id'); // Número de identificación del empleado
+            $table->bigInteger('employee_id'); // Número de identificación del empleado
             $table->foreignId('regimen_id');//sierra o a costa
             $table->string('month'); // Mes de pago o acumulacion
             $table->decimal('value', 10, 2)->default(0.00);
             $table->string('type');
             $table->string('pay_status')->default("pendiente");//pendiente/pagado
-            
+
             $table->timestamps();
 
             $table->foreign('employee_id')->references('id')->on('employees');
-            $table->foreign('regimen_id')->references('id')->on('payment_regimes');
-            $table->unique(['employee_id', 'month','type']);
+            $table->foreign('regimen_id')->references('id')->on('payment_regims');
+            $table->unique(['employee_id', 'month', 'type']);
         });
+
+        Schema::create('boxes', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');//puede estar relacionada con establecimiento o centro de costo
+            $table->bigInteger('owner_id');
+            $table->string('name'); // Boxe name
+            $table->string('type'); // boxe type general crearce por defecto 
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+            $table->foreign('owner_id')->references('id')->on('employees');
+        });
+
+        Schema::create('cash_sessions', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('box_id');
+            $table->bigInteger('open_employee_id');
+            $table->bigInteger('close_employee_id')->nullable();
+            $table->decimal('initial_value', 10, 2);
+            $table->decimal('ingress', 10, 2)->default(0);
+            $table->decimal('egress', 10, 2)->default(0);
+            $table->decimal('balance', 10, 2)->default(0);
+            $table->string('state_box');//open,close
+
+            $table->timestamps();
+            $table->softDeletes();//
+
+            $table->foreign('box_id')->references('id')->on('boxes');
+            $table->foreign('open_employee_id')->references('id')->on('employees');
+        });
+
+        Schema::create('transaction_boxes', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('cash_session_id');
+            $table->bigInteger('movement_type_id');
+            $table->decimal('amount', 10, 2);
+            $table->string('description')->nullable();
+            $table->bigInteger('beneficiary_id')->nullable(); // Persona beneficiaria
+            $table->string('state_transaction')->nullable(); //vigente o finalizado
+            $table->json('data_additional')->nullable();
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('cash_session_id')->references('id')->on('cash_sessions');
+            $table->foreign('movement_type_id')->references('id')->on('movement_types');
+        });
+
+        //configuracion de cajas para poder continuar con el monto quedado en la caja cerrada anteriormente y un monto maximo que tenga cada caja para alertas
+        // Schema::create('setting_boxes', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->bigInteger('company_id');
+        //     $table->boolean('continue')->default(false);//ingresos y egresos
+        //     $table->decimal('max', 10, 2)->nullable();
+          
+        //     $table->timestamps();
+        //     $table->softDeletes();
+
+        //     $table->foreign('company_id')->references('id')->on('companies');
+        // });
+
     }
 
     /**
@@ -571,5 +647,7 @@ return new class extends Migration {
         Schema::dropIfExists('iesses');
         Schema::dropIfExists('payment_regimes');
         Schema::dropIfExists('employee_payments');
+        Schema::dropIfExists('boxes');
+        Schema::dropIfExists('boxes');
     }
 };
