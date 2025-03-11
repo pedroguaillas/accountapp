@@ -50,19 +50,24 @@ class TransactionController extends Controller
             ->get();
 
         // Obtenemos los tipos de movimiento de la compañía
-        $movementtypes = MovementType::where('company_id', $company->id)->get();
+        $movementtypes = MovementType::where('company_id', $company->id)
+            ->where(function ($query) {
+                $query->where('venue', 'ambos')
+                    ->orWhere('venue', 'bancos');
+            })
+            ->get();
+
         $peopleCount = Person::count();
         $people = [];
-        if ($peopleCount > 5) {
-            $people = Person::where('company_id', $company->id)->get();
-        }
+        $people = Person::where('company_id', $company->id)->get();
+       
         // Renderizamos la vista con los datos necesarios
         return Inertia::render('Transaction/Create', [
             'bankaccounts' => $bankAccounts,
             'movementtypes' => $movementtypes,
             //NOTA MAYORES A 500 VER COMO PAGINAR
             'people' => $people,
-            'countperson'=>$peopleCount,
+            'countperson' => $peopleCount,
         ]);
     }
 
@@ -122,7 +127,12 @@ class TransactionController extends Controller
             ->get();
 
         // Obtenemos los tipos de movimiento de la compañía
-        $movementtypes = MovementType::where('company_id', $company->id)->get();
+        $movementtypes = MovementType::where('company_id', $company->id)
+        ->where(function ($query) {
+            $query->where('venue', 'ambos')
+                ->orWhere('venue', 'bancos');
+        })
+        ->get();
 
         $people = Person::where('company_id', $company->id)->get();
         // Renderizamos la vista con los datos necesarios
@@ -144,22 +154,22 @@ class TransactionController extends Controller
             'bank_account_id' => 'required|exists:bank_accounts,id',
             'transaction_date' => 'required|date',
             'amount' => [
-                    'required',
-                    'numeric',
-                    'min:0.01',
-                    function ($attribute, $value, $fail) use ($diferent, $request, $type, $initialAmount) {
-                        // Obtener la cuenta bancaria usando el ID del request
-            
-                        $bankAccount = BankAccount::find($request->bank_account_id);
-                        // Validar si el monto supera el saldo disponible
-                        if ($type === "Egreso" && $initialAmount < $value && $bankAccount && $diferent > $bankAccount->current_balance) {
-                            $fail("El monto no puede ser mayor que el saldo disponible: " . ($bankAccount->current_balance + $initialAmount));
-                        }
-                        if ($type === "Ingreso" && $initialAmount > $value && $bankAccount && $diferent > $bankAccount->current_balance) {
-                            $fail("El monto no puede ser menor al saldo de: " . ($initialAmount - $bankAccount->current_balance));
-                        }
-                    },
-                ],
+                'required',
+                'numeric',
+                'min:0.01',
+                function ($attribute, $value, $fail) use ($diferent, $request, $type, $initialAmount) {
+                    // Obtener la cuenta bancaria usando el ID del request
+        
+                    $bankAccount = BankAccount::find($request->bank_account_id);
+                    // Validar si el monto supera el saldo disponible
+                    if ($type === "Egreso" && $initialAmount < $value && $bankAccount && $diferent > $bankAccount->current_balance) {
+                        $fail("El monto no puede ser mayor que el saldo disponible: " . ($bankAccount->current_balance + $initialAmount));
+                    }
+                    if ($type === "Ingreso" && $initialAmount > $value && $bankAccount && $diferent > $bankAccount->current_balance) {
+                        $fail("El monto no puede ser menor al saldo de: " . ($initialAmount - $bankAccount->current_balance));
+                    }
+                },
+            ],
         ]);
 
         //actulizar los establecimientos

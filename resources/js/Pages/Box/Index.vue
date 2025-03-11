@@ -1,8 +1,8 @@
 <script setup>
 // Imports
-import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
+import GeneralModal from "./GeneralModal.vue";
 import OpenModal from "./OpenModal.vue";
 import { router, useForm } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
@@ -12,6 +12,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { ref, reactive, watch } from "vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
 // Props
@@ -23,6 +24,7 @@ const props = defineProps({
 
 // Refs y estados
 const modal = ref(false);
+const modalgeneral = ref(false);
 const modal1 = ref(false);
 const modalopen = ref(false);
 const deleteid = ref(0);
@@ -30,7 +32,7 @@ const search = ref(props.filters.search);
 const loading = ref(false);
 
 // Para el formulario de crear/editar caja
-const initialBox = { name: "", owner_id: 0 };
+const initialBox = { name: "", owner_id: 0, type: "" ,isCajaChica:false};
 const box = useForm({ ...initialBox });
 const errorForm = reactive({ ...initialBox });
 
@@ -46,6 +48,12 @@ const newBox = () => {
     delete box.id;
   }
   Object.assign(box, initialBox);
+  if (props.boxes.data.length === 0) {
+    box.name = "CAJA GENERAL";
+    box.type = "general";
+  } else {
+    box.type = "otros";
+  }
   toggle();
 };
 
@@ -57,7 +65,12 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
+const togglegeneral = () => {
+  modalgeneral.value = !modalgeneral.value;
+};
+
 const save = () => {
+  // Asigna "Caja General" si el nombre está vacío
   const isUpdate = Boolean(box.id);
   const routeMethod = isUpdate ? "put" : "post";
   const routeName = isUpdate
@@ -178,7 +191,7 @@ const submitOpen = () => {
 
 // Función para invocar el modal de apertura (se usa en el botón "Abrir Caja")
 const openBox = (box) => {
-    showOpenModal(box);
+  showOpenModal(box);
 };
 
 // Nuevas referencias para el modal de cierre y los datos
@@ -264,12 +277,12 @@ const closeboxfinally = () => {
             class="border-t [&>td]:py-2"
           >
             <td>{{ i + 1 }}</td>
-            <td class="text-left ">{{ box.name }}</td>
+            <td class="text-left">{{ box.name }}</td>
             <td class="text-left ml-2">{{ box.employee_name }}</td>
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button
-                  v-if="box.state_box !== undefined && box.state_box!=='open'"
+                  v-if="box.state_box !== undefined && box.state_box !== 'open'"
                   class="rounded px-2 py-1 bg-green-600 hover:bg-green-700 text-white"
                   @click="openBox(box)"
                 >

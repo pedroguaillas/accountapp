@@ -65,6 +65,7 @@ class PersonController extends Controller
                     ->orWhere('identification', 'LIKE', "%{$search}%");
             })
             ->paginate($paginate); // Cambia el número de elementos por página si es necesario
+  
         return response()->json($people);
     }
 

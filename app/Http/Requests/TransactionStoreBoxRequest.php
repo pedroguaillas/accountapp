@@ -24,8 +24,6 @@ class TransactionStoreBoxRequest extends FormRequest
     {
         return [
             'cash_session_id' => 'required|exists:cash_sessions,id',
-            'transaction_date' => 'required|date',
-            
         ];
     }
 }

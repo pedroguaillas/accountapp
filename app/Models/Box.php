@@ -14,6 +14,8 @@ class Box extends Model
         'company_id', // ID Compania  backend
         'name',
         'owner_id',
+        'type',
+
     ];
 
     public function cashSessions()

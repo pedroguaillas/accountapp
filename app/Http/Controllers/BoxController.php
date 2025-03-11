@@ -48,12 +48,21 @@ class BoxController extends Controller
         //validacion de datos
         $request->validate([
             'name' => 'nullable|min:3|max:300',
+            'owner_id'=>'min:1',
         ]);
         //llamada a la compania
         $company = Company::first();
 
         //creacion de los estableicmientos 
         $company->boxes()->create($request->all());
+        if (($request->type==='general')&&($request->isCajaChica))
+        {
+            $company->boxes()->create([
+                'name'=>'CAJA CHICA',
+                'owner_id'=>$request->owner_id,
+                'type'=>'chica',
+                ]);
+        }
     }
 
     public function update(Request $request, Box $box)
@@ -106,12 +115,14 @@ class BoxController extends Controller
             ->orderBy('id', 'desc')
             ->first();
 
-        $ingres = (float) (TransactionBox::where('cash_session_id', $boxe->id)
-            ->where('type', 'Ingreso')
-            ->sum('amount') ?? 0);
+        $ingres = (float) (TransactionBox::join('movement_types as mt', 'mt.id', '=', 'transaction_boxes.movement_type_id')
+            ->where('transaction_boxes.cash_session_id', '=', $boxe->id)
+            ->where('mt.type', '=', 'Ingreso')
+            ->sum('transaction_boxes.amount') ?? 0);
 
-        $egres = (float) (TransactionBox::where('cash_session_id', $boxe->id)
-            ->where('type', 'Egreso')
+        $egres = (float) (TransactionBox::join('movement_types as mt', 'mt.id', '=', 'transaction_boxes.movement_type_id')
+            ->where('transaction_boxes.cash_session_id', '=', $boxe->id)
+            ->where('mt.type', 'Egreso')
             ->sum('amount') ?? 0);
 
         $initial_value = (float) $boxe->initial_value;  // Si initial_value también viene como string

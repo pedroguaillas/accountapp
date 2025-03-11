@@ -12,15 +12,15 @@ class TransactionBox extends Model
 
     protected $fillable = [
         'cash_session_id',
-        'transaction_date', // Transaction date and time
         'type',//ingresos y egresos
         'amount', 
+        'movement_type_id',
+        'beneficiary_id',
         'description',
         'data_additional',
     ];
     protected $casts = [
         'cash_session_id' => 'integer',
-        'transaction_date' => 'date',
         'amount'=>'float',
         'data_additional' => 'array',//devolver un array asociativo
     ];

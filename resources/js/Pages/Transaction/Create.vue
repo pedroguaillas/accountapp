@@ -33,13 +33,16 @@ const initialTransaction = {
   cheque_date: null,
   transfer_account: "",
   voucher_number: "",
-  state_transaction: "proceso",
+  state_transaction: "pendiente",
 };
 
 const bank_account_id =
   props.bankaccounts.length === 1 ? props.bankaccounts[0].id : 0;
+
+const beneficiary_id =
+  props.people.length === 1 ? props.people[0].id : 0;
 // Reactives
-const transaction = useForm({ ...initialTransaction, bank_account_id });
+const transaction = useForm({ ...initialTransaction, bank_account_id,beneficiary_id  });
 const errorForm = reactive({});
 
 const save = () => {
@@ -67,12 +70,6 @@ const handlePersonSelect = (person) => {
 const TypeOptions = [
   { value: "Ingreso", label: "Ingreso" },
   { value: "Egreso", label: "Egreso" },
-];
-
-const statusOptions = [
-  { value: "proceso", label: "En proceso" },
-  { value: "correcto", label: "Correcto" },
-  { value: "cancelado", label: "Cancelado" },
 ];
 
 const paymentMethodOptions = [
@@ -208,7 +205,7 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
 
         <!-- beneficiario-->
         <div v-if="props.countperson > 0" class="col-span-6 sm:col-span-4">
-          <InputLabel for="person_id" value="Benediciario" />
+          <InputLabel for="person_id" value="Beneficiario/Remitente" />
           <DynamicSelect
             v-if="props.countperson < 5"
             class="mt-2 block w-full"
@@ -221,6 +218,12 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
             @selectPerson="handlePersonSelect"
           />
           <InputError :message="errorForm.beneficiary_id" class="mt-2" />
+        </div>
+        <div v-else class="col-span-6 sm:col-span-4">
+          <p class="text-red-500 mt-2">
+            ⚠️ No hay personas disponibles para seleccionar como beneficiario o
+            remitente.
+          </p>
         </div>
 
         <div
@@ -235,13 +238,7 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
           />
         </div>
 
-        <div
-          class="col-span-6 sm:col-span-4"
-          v-if="
-            transaction.payment_method !== 'cheque' &&
-            transaction.payment_method !== ''
-          "
-        >
+        <div class="col-span-6 sm:col-span-4">
           <InputLabel for="transfer_account" value="Número de cuenta" />
           <TextInput
             type="text"
