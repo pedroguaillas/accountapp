@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Setting;
 
+use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\RoleIngress;
 use App\Models\RoleEgress;
@@ -9,7 +10,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class SettingRolController extends Controller
+class RolController extends Controller
 {
     public function index()
     {

@@ -77,6 +77,22 @@ defineProps({
                 Bancos
               </Link>
             </li>
+
+            <li>
+              <Link
+                class="pointer inline-block p-4 border-b-2 rounded-t-lg"
+                :href="route('setting.account.box.index')"
+                :class="{
+                  ' border-gray-300 dark:text-gray-300 text-xl pt-2':
+                    route().current('setting.account.box.index'),
+                  ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
+                    !route().current('setting.account.box.index'),
+                }"
+                type="button"
+              >
+                Cajas
+              </Link>
+            </li>
           </ul>
         </div>
         <div class="p-0 rounded-lg">

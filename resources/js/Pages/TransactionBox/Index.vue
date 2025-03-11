@@ -138,22 +138,7 @@ const handlePageChange = async (page) => {
             <td class="text-left p-1">{{ transaction.description }}</td>
             <td class="text-left p-1">{{ transaction.type }}</td>
             <td class="text-right p-1">{{ transaction.amount }}</td>
-            <td class="flex justify-end">
-              <div class="relative inline-flex gap-1">
-                <button
-                  class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="removeTransactionBox(transaction.id)"
-                >
-                  <TrashIcon class="size-6 text-white" />
-                </button>
-                <Link
-                  :href="route('transaction.boxes.edit', transaction.id)"
-                  class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                >
-                  <PencilIcon class="size-4 text-white" />
-                </Link>
-              </div>
-            </td>
+            
           </tr>
         </tbody>
       </Table>

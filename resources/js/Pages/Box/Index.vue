@@ -2,7 +2,6 @@
 // Imports
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
-import GeneralModal from "./GeneralModal.vue";
 import OpenModal from "./OpenModal.vue";
 import { router, useForm } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
@@ -32,7 +31,7 @@ const search = ref(props.filters.search);
 const loading = ref(false);
 
 // Para el formulario de crear/editar caja
-const initialBox = { name: "", owner_id: 0, type: "" ,isCajaChica:false};
+const initialBox = { name: "", owner_id: 0, type: "", isCajaChica: false };
 const box = useForm({ ...initialBox });
 const errorForm = reactive({ ...initialBox });
 

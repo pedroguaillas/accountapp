@@ -8,6 +8,7 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import DynamicSelect from "@/Components/DynamicSelect.vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
+import Checkbox from "@/Components/Checkbox.vue";
 import { ref, computed, watch } from "vue";
 
 // Props
@@ -34,7 +35,6 @@ const EmployeesOptions = computed(() =>
 
 // Seleccionar automáticamente el único empleado si hay solo uno
 const selectedEmployee = ref(props.box.owner_id || null);
-
 </script>
 
 <template>
@@ -48,16 +48,11 @@ const selectedEmployee = ref(props.box.owner_id || null);
           class="w-2xl grid grid-cols-1 gap-3"
           @keydown.enter.prevent="focusNextField"
         >
-        <div v-if="box.name==='CAJA GENERAL'" class="col-span-6 sm:col-span-4 flex items-center mt-2">
-            <input
-              id="caja-chica"
-              type="checkbox"
-              v-model="isCajaChica"
-              class="mr-2"
-            />
-            <label for="caja-chica" class="text-sm text-gray-700">
-              Caja chica
-            </label>
+          <div
+            v-if="box.name === 'CAJA GENERAL'"
+            class="col-span-6 sm:col-span-4 flex items-center mt-2"
+          >
+            <Checkbox v-model:checked="box.isCajaChica" label="Caja Chica" />
           </div>
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="name" value="Nombre de la caja" />

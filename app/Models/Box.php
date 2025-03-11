@@ -15,7 +15,7 @@ class Box extends Model
         'name',
         'owner_id',
         'type',
-
+        'account_id',
     ];
 
     public function cashSessions()

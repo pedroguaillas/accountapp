@@ -14,20 +14,18 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/outline";
 
 // Props
 const props = defineProps({
-  accountbanck: { type: Array, default: () => [] },
-  bankingres: { type: Array, default: () => [] },
-  bankegres: { type: Array, default: () => [] },
   accounts: { type: Array, default: () => [] },
-  boxes:{ type: Array, default: () => [] },
+  boxes: { type: Array, default: () => [] },
+  ingres: { type: Array, default: () => [] },
+  egres: { type: Array, default: () => [] },
 });
 
 // Refs
 const modal = ref(true);
 const modaldelete = ref(true);
-const bankId = ref(0);
-const bankName = ref("");
-const accounts = ref(props.accounts);
-const table = ref();
+const boxId = ref(0);
+const boxName = ref("");
+const boxtable=ref("");
 
 const toggle = () => {
   modal.value = !modal.value;
@@ -37,53 +35,43 @@ const toggle1 = () => {
   modaldelete.value = !modaldelete.value;
 };
 
-const editBankAccount = (bankIdEdit, bankNameEdit, tableEdit) => {
-  // Filtrar cuentas según el roleName
-  accounts.value = Array.isArray(props.accounts)
-    ? props.accounts.filter((acc) => {
-        const prefixes = bankNameEdit === "account_id" ? ["1", "2", "5"] : [];
-
-        return prefixes.some((prefix) => acc.code.startsWith(prefix));
-      })
-    : [];
-
+const editBoxAccount = (boxIdEdit, boxNameEdit,boxTableEdit) => {
   // Actualizar los valores según el tipo de cuenta
-  bankId.value = bankIdEdit;
-  bankName.value = bankNameEdit;
-  table.value = tableEdit;
-  console.log(table.value);
+  boxId.value = boxIdEdit;
+  boxName.value = boxNameEdit;
+  boxtable.value=boxTableEdit;
 
   // Alternar el estado de la modal
   toggle();
 };
 
 const selectAccount = (accountId) => {
-  console.log(bankName.value);
+  console.log(boxName.value);
   router.put(
-    route("settingaccount.bank.update", bankId.value),
-    { name: bankName.value, account_id: accountId, table: table.value },
+    route("settingaccount.box.update", boxId.value),
+    { name: boxName.value, account_id: accountId,table:boxtable.value },
     { preserveState: true }
   );
   toggle();
 };
 
-const removeVinculation = (bankIdD, bankNameD, tableD) => {
-  bankId.value = bankIdD;
-  bankName.value = bankNameD;
-  table.value = tableD;
+const removeVinculation = (boxIdD, boxNameD,boxtableD) => {
+  boxId.value = boxIdD;
+  boxName.value = boxNameD;
+  boxtable.value=boxtableD;
   toggle1();
 };
 
 const handleInputChange = () => {
   axios
     .put(
-      route("settingaccount.bank.update", bankId.value),
-      { name: bankName.value, account_id: null, table: table.value },
+      route("settingaccount.box.update", boxId.value),
+      { name: boxName.value, account_id: null,table:boxtable.value },
       { preserveState: true }
     ) // Eliminar centro de costos
     .then(() => {
       // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("setting.account.bank.index"));
+      router.visit(route("setting.account.box.index"));
     })
     .catch((error) => {
       console.error("Error al eliminar la vinculacion", error);
@@ -93,48 +81,37 @@ const handleInputChange = () => {
 
 <template>
   <AccountLinkLayout title="Vinculación de Cuentas">
-    <h2>CUENTAS BANCARIAS</h2>
+    <h2>CAJAS</h2>
     <Table>
       <thead>
         <tr>
           <th class="w-10">N.</th>
-          <th class="text-left">CUENTA</th>
+          <th class="text-left">CAJAS</th>
           <th class="text-left">CUENTA ASOCIADA</th>
         </tr>
       </thead>
       <tbody class="h-6">
-        <tr
-          v-for="(accountbanck, i) in props.accountbanck"
-          :key="`accountbanck-${i}`"
-        >
+        <tr v-for="(box, i) in props.boxes" :key="`box-${i}`">
           <td>{{ i + 1 }}</td>
           <td class="text-left">
-            {{ accountbanck.account_number + " " + accountbanck.bankname }}
+            {{ box.name }}
           </td>
           <td>
             <div class="flex h-8">
               <input
                 type="text"
-                :value="accountbanck.ap_info ?? ''"
+                :value="box.ap_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
                 disabled
               />
               <button
                 class="px-1 py-1 border border-red-400"
-                @click="
-                  removeVinculation(
-                    accountbanck.id,
-                    'account_id',
-                    'BankAccount'
-                  )
-                "
+                @click="removeVinculation(box.id, 'account_id', 'Box')"
               >
                 <TrashIcon class="size-6 text-red-400" />
               </button>
               <button
-                @click="
-                  editBankAccount(accountbanck.id, 'account_id', 'BankAccount')
-                "
+                @click="editBoxAccount(box.id, 'account_id', 'Box')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -155,39 +132,28 @@ const handleInputChange = () => {
         </tr>
       </thead>
       <tbody class="h-6">
-        <tr
-          v-for="(bankingIngress, i) in props.bankingres"
-          :key="`bankingIngress-${i}`"
-        >
+        <tr v-for="(ingress, i) in props.ingres" :key="`igress-${i}`">
           <td>{{ i + 1 }}</td>
-          <td class="text-left">{{ bankingIngress.name }}</td>
+          <td class="text-left">{{ ingress.name }}</td>
           <td>
             <div class="flex h-8">
               <input
                 type="text"
-                :value="bankingIngress.ap_info ?? ''"
+                :value="ingress.ap_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
                 disabled
               />
               <button
                 class="px-1 py-1 border border-red-400"
                 @click="
-                  removeVinculation(
-                    bankingIngress.id,
-                    'account_id',
-                    'MovementType'
-                  )
+                  removeVinculation(ingress.id, 'account_id', 'MovementType')
                 "
               >
                 <TrashIcon class="size-6 text-red-400" />
               </button>
               <button
                 @click="
-                  editBankAccount(
-                    bankingIngress.id,
-                    'account_id',
-                    'MovementType'
-                  )
+                  editBoxAccount(ingress.id, 'account_id', 'MovementType')
                 "
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
@@ -210,40 +176,27 @@ const handleInputChange = () => {
         </tr>
       </thead>
       <tbody class="h-6">
-        <tr
-          v-for="(bankingEgress, i) in props.bankegres"
-          :key="`bankingEgress-${i}`"
-        >
+        <tr v-for="(egress, i) in props.egres" :key="`egress-${i}`">
           <td>{{ i + 1 }}</td>
-          <td class="text-left">{{ bankingEgress.name }}</td>
+          <td class="text-left">{{ egress.name }}</td>
           <td>
             <div class="flex h-8">
               <input
                 type="text"
-                :value="bankingEgress.ap_info ?? ''"
+                :value="egress.ap_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
                 disabled
               />
               <button
                 class="px-1 py-1 border border-red-400"
                 @click="
-                  removeVinculation(
-                    bankingEgress.id,
-                    'account_id',
-                    'MovementType'
-                  )
+                  removeVinculation(egress.id, 'account_id', 'MovementType')
                 "
               >
                 <TrashIcon class="size-6 text-red-400" />
               </button>
               <button
-                @click="
-                  editBankAccount(
-                    bankingEgress.id,
-                    'account_id',
-                    'MovementType'
-                  )
-                "
+                @click="editBoxAccount(egress.id, 'account_id', 'MovementType')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
               >
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
@@ -257,7 +210,7 @@ const handleInputChange = () => {
 
   <ModalSelectAccount
     :show="modal"
-    :filteredAccountsFromMain="accounts"
+    :filteredAccountsFromMain="props.accounts"
     @close="toggle"
     @selectAccount="selectAccount"
   />
