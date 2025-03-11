@@ -180,6 +180,25 @@ const user = computed(() => page.props.auth.user);
                   Movimientos bancarios</Link
                 >
               </li>
+
+              <li>
+                <Link
+                  :href="route('boxes.index')"
+                  class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700"
+                >
+                  Cajas</Link
+                >
+              </li>
+
+              <li>
+                <Link
+                  :href="route('transaction.boxes.index')"
+                  class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700"
+                >
+                  Movimiento de cajas</Link
+                >
+              </li>
+
             </ul>
           </div>
         </li>

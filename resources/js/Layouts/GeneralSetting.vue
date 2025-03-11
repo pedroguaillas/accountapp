@@ -102,6 +102,38 @@ defineProps({
                 Retenciones
               </Link>
             </li>
+
+            <li>
+              <Link
+                class="pointer inline-block p-4 border-b-2 rounded-t-lg"
+                :href="route('busssines.setting.paymentregims.index')"
+                :class="{
+                  ' border-gray-300 dark:text-gray-300 text-xl pt-2':
+                    route().current('busssines.setting.paymentregims.index'),
+                  ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
+                    !route().current('busssines.setting.paymentregims.index'),
+                }"
+                type="button"
+              >
+                Pago de beneficios
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                class="pointer inline-block p-4 border-b-2 rounded-t-lg"
+                :href="route('busssines.setting.movementtypes.index')"
+                :class="{
+                  ' border-gray-300 dark:text-gray-300 text-xl pt-2':
+                    route().current('busssines.setting.movementtypes.index'),
+                  ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
+                    !route().current('busssines.setting.movementtypes.index'),
+                }"
+                type="button"
+              >
+                Movimientos financieros
+              </Link>
+            </li>
           </ul>
         </div>
         <div class="p-0 rounded-lg">

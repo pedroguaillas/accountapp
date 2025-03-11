@@ -58,9 +58,8 @@ const TypeOptions = [
 ];
 
 const statusOptions = [
-  { value: "proceso", label: "En proceso" },
-  { value: "correcto", label: "Correcto" },
-  { value: "cancelado", label: "Cancelado" },
+  { value: "pendiente", label: "Pendiente" },
+  { value: "finalizado", label: "Finalizado" },
 ];
 
 const paymentMethodOptions = [

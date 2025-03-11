@@ -1,76 +1,41 @@
 <script setup>
 import { ref } from "vue";
-import { router } from "@inertiajs/vue3";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
+import ModalMovementType from "./ModalMovementType.vue";
+import { router } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
-import IceSearch from "./IceSearch.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 
+// Recibes 'paymethods' desde Inertia
 const props = defineProps({
-  globalIces: { type: Array, default: () => [] },
-  ices: { type: Array, default: () => [] },
+  globalMovementTypes: { type: Array, default: () => [] },
+  movementTypes: { type: Array, default: () => [] },
 });
 
-// Variables para el formulario
-const code = ref("");
-const name = ref("");
-const percentage = ref("");
+const modal = ref(false);
 
-const showForm = ref(false); // Inicialmente oculto
-
-const toggleForm = () => {
-  showForm.value = !showForm.value; // Alternar visibilidad
+const toggle = () => {
+  modal.value = !modal.value;
 };
 
-// Método para guardar el ICE
-// Método para guardar el ICE
-const saveSelect = () => {
-  const ice= {
-    code: code.value,
-    name: name.value,
-    percentage: percentage.value,
-  };
-
-  router.post(route("busssines.setting.ices.store"), ice, {
+const selectedMovementType = (iva) => {
+  router.post(route("busssines.setting.movementtypes.store"), iva, {
     preserveState: true,
-    onSuccess: () => {
-      location.reload(); // Recarga la pantalla después de guardar correctamente
-    },
   });
-};
-
-// Método para recibir los datos seleccionados desde SearchWithholding.vue
-const handleAddIces = (ice) => {
-  console.log("Retención agregada desde modal:", ice);
-
-  code.value = ice.code;
-  name.value = ice.name;
-  percentage.value = ice.percentage;
-
-  saveSelect(); // Guarda automáticamente después de seleccionar
+  toggle();
 };
 </script>
 
 <template>
-  <GeneralSetting title="Ices">
+  <GeneralSetting title="Movimientos bancarios">
     <div class="p-4 bg-white rounded drop-shadow-md">
       <div class="w-full flex sm:justify-end">
         <button
-          @click="toggleForm"
+          @click="toggle"
           class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
         >
           +
         </button>
-      </div>
-
-      <!-- Formulario solo visible si modal es true -->
-      <div v-if="showForm" id="nuevo" class="mt-4">
-        <div v-if="showForm" id="nuevo" class="mt-4">
-        <IceSearch
-          :globalIces="props.globalIces"
-          @addIces="handleAddIces"
-        />
-      </div>
       </div>
 
       <div class="w-full overflow-x-auto">
@@ -81,26 +46,28 @@ const handleAddIces = (ice) => {
               <th class="w-1">N°</th>
               <th>CODIGO</th>
               <th class="text-left">NOMBRE</th>
+              <th>TIPO</th>
+              <th>CAJA/BANCOS</th>
               <th>ESTADO</th>
-              <th>%</th>
               <th class="w-1"></th>
             </tr>
           </thead>
           <tbody>
             <tr
-              v-for="(ice, i) in props.ices"
-              :key="ice.id"
+              v-for="(movementType, i) in props.movementTypes"
+              :key="movementType.id"
               class="border-t [&>td]:py-2"
             >
               <td>{{ i + 1 }}</td>
-              <td>{{ ice.code }}</td>
-              <td class="text-left">{{ ice.name }}</td>
+              <td>{{ movementType.code }}</td>
+              <td class="text-left">{{ movementType.name }}</td>
+              <td >{{ movementType.type }}</td>
+              <td >{{movementType.venue}}</td>
               <td>
                 <span class="rounded px-2 py-1 m-0 text-white bg-success">
                   Activo
                 </span>
               </td>
-              <td>{{ ice.percentage }}</td>
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
@@ -117,5 +84,12 @@ const handleAddIces = (ice) => {
       </div>
     </div>
   </GeneralSetting>
-</template>
 
+  <ModalMovementType
+    :show="modal"
+    :movementTypes="props.globalMovementTypes"
+    @close="toggle"
+    @save="save"
+    @selectedMovementType="selectedMovementType"
+  />
+</template>

@@ -3,7 +3,6 @@
 import DialogModal from "@/Components/DialogModal.vue";
 import InputError from "@/Components/InputError.vue";
 import TextInput from "@/Components/TextInput.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
