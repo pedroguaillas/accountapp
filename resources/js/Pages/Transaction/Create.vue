@@ -47,9 +47,9 @@ const errorForm = reactive({});
 
 const save = () => {
   transaction.post(route("transactions.store"), {
-    onSuccess: () => {
-      router.visit(route("transactions.index"));
-    },
+    // onSuccess: () => {
+    //  // router.visit(route("transactions.index"));
+    // },
     onError: (errors) => {
       Object.keys(errors).forEach((key) => {
         errorForm[key] = errors[key];

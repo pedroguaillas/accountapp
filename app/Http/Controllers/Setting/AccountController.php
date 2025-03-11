@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Setting;
 
+use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\ActiveType;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class SettingAccountController extends Controller
+class AccountController extends Controller
 {
     public function index()
     {

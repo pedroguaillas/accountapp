@@ -558,6 +558,7 @@ return new class extends Migration {
             $table->bigInteger('owner_id');
             $table->string('name'); // Boxe name
             $table->string('type'); // boxe type general crearce por defecto 
+            $table->bigInteger('account_id')->nullable(); // cuenta de vinculacion
             $table->timestamps();
             $table->softDeletes();
 

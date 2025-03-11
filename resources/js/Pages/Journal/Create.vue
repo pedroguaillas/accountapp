@@ -1,11 +1,10 @@
 <script setup>
-
 // Imports
 import { reactive, computed } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchAccount from "./SearchAccount.vue";
 import SearchCostCenter from "./SearchCostCenter.vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -22,6 +21,8 @@ const props = defineProps({
 });
 
 const date = new Date().toISOString().split("T")[0];
+const page = usePage();
+const errors = computed(() => page.props.errors);
 
 // Inicializador de objetos
 const initialJournal = {
@@ -31,12 +32,15 @@ const initialJournal = {
   cost_center_id: "",
   is_deductible: true,
 };
- const cost_center_id  =
- props.  costCenters.length === 1 ? props.costCenters[0].id : "";
-
+const cost_center_id =
+  props.costCenters.length === 1 ? props.costCenters[0].id : "";
 
 // Reactives
-const journal = useForm({ ...initialJournal,cost_center_id , description: props.countJournals === 0 ? "ASIENTO DE SITUACION INICIAL" : "" });
+const journal = useForm({
+  ...initialJournal,
+  cost_center_id,
+  description: props.countJournals === 0 ? "ASIENTO DE SITUACION INICIAL" : "",
+});
 const errorForm = reactive({});
 
 const eliminarCuenta = (index) => {
@@ -50,8 +54,7 @@ const save = () => {
   }
   // Verificar si los totales de "debe" y "haber" coinciden
   if (totalDebe.value !== totalHaver.value) {
-    errorForm.totalMismatch =
-      "El total del Debe y el Haber deben ser iguales.";
+    errorForm.totalMismatch = "El total del Debe y el Haber deben ser iguales.";
     return; // Salir sin guardar
   }
 
@@ -98,55 +101,81 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
 
 <template>
   <AdminLayout title="Asientos Contables">
+    <div v-if="errors?.warning" class="bg-red-500 text-white rounded mb-4 p-2">
+      {{ errors.warning }}
+    </div>
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
       <div class="flex justify-between items-center">
-        <h2 class="text-sm sm:text-lg font-bold">Registro de asiento contable</h2>
+        <h2 class="text-sm sm:text-lg font-bold">
+          Registro de asiento contable
+        </h2>
       </div>
 
       <!-- Formulario -->
       <div class="mt-4">
-
         <!-- Campos solo del journal -->
         <div class="grid grid-cols-1 gap-4 w-full sm:w-[50%]">
-
           <!-- Fecha -->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="date" value="Fecha" />
-            <TextInput v-model="journal.date" type="date" class="mt-2 block w-full" />
+            <TextInput
+              v-model="journal.date"
+              type="date"
+              class="mt-2 block w-full"
+            />
             <InputError :message="errorForm.date" class="mt-2" />
           </div>
 
           <!-- Descripción -->
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="description" value="Descripción" />
-            <TextInput v-model="journal.description" type="text" class="mt-2 block w-full"
-              :disabled="props.countJournals === 0" />
+            <TextInput
+              v-model="journal.description"
+              type="text"
+              class="mt-2 block w-full"
+              :disabled="props.countJournals === 0"
+            />
             <InputError :message="errorForm.description" class="mt-2" />
           </div>
 
           <!-- Centro de costos-->
           <div v-if="costCenters.length > 0" class="col-span-6 sm:col-span-4">
             <InputLabel for="cost_center_id" value="Centro de costo" />
-            <DynamicSelect v-if="costCenters.length <= 5" class="mt-2 block w-full" v-model="journal.cost_center_id"
-              :options="costcenterOptions" autofocus />
-            <SearchCostCenter v-else-if="costCenters.length > 5" :costCenters="costCenters"
-              @selectCostCenter="handleCostCenterSelect" />
+            <DynamicSelect
+              v-if="costCenters.length <= 5"
+              class="mt-2 block w-full"
+              v-model="journal.cost_center_id"
+              :options="costcenterOptions"
+              autofocus
+            />
+            <SearchCostCenter
+              v-else-if="costCenters.length > 5"
+              :costCenters="costCenters"
+              @selectCostCenter="handleCostCenterSelect"
+            />
             <InputError :message="errorForm.cost_center_id" class="mt-2" />
           </div>
 
           <!-- Es deducible -->
           <div class="col-span-6 sm:col-span-4">
             <div class="w-full">
-              <Checkbox v-model:checked="journal.is_deductible" label="¿Es deducible?" />
+              <Checkbox
+                v-model:checked="journal.is_deductible"
+                label="¿Es deducible?"
+              />
             </div>
           </div>
         </div>
 
         <!-- Cuentas -->
         <h3 class="font-bold mt-4">Cuentas</h3>
-        <SearchAccount :accounts="accounts" :journal="journal" @addJournalEntry="handleAddJournalEntry" />
+        <SearchAccount
+          :accounts="accounts"
+          :journal="journal"
+          @addJournalEntry="handleAddJournalEntry"
+        />
 
         <!--Component Table -->
         <Table>
@@ -160,13 +189,24 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(journalEntry, index) in journal.journalEntries" :key="index" class="border-t hover:bg-gray-100">
+            <tr
+              v-for="(journalEntry, index) in journal.journalEntries"
+              :key="index"
+              class="border-t hover:bg-gray-100"
+            >
               <td class="py-2 text-left w-24">{{ journalEntry.code }}</td>
               <td class="py-2 text-left">{{ journalEntry.name }}</td>
-              <td class="py-2 text-right w-24">{{ journalEntry.debit.toFixed(2) }}</td>
-              <td class="py-2 text-right w-24">{{ journalEntry.have.toFixed(2) }}</td>
+              <td class="py-2 text-right w-24">
+                {{ journalEntry.debit.toFixed(2) }}
+              </td>
+              <td class="py-2 text-right w-24">
+                {{ journalEntry.have.toFixed(2) }}
+              </td>
               <td class="py-2">
-                <button @click="eliminarCuenta(index)" class="text-red-500 hover:text-red-700">
+                <button
+                  @click="eliminarCuenta(index)"
+                  class="text-red-500 hover:text-red-700"
+                >
                   <TrashIcon class="size-6 text-red-500" />
                 </button>
               </td>
@@ -186,7 +226,11 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
         <InputError :message="errorForm.totalMismatch" class="mt-2" />
 
         <div class="mt-4 text-right">
-          <button @click="save" :disabled="journal.processing" class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
+          <button
+            @click="save"
+            :disabled="journal.processing"
+            class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded"
+          >
             Guardar
           </button>
         </div>

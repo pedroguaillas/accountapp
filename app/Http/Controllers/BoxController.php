@@ -48,20 +48,20 @@ class BoxController extends Controller
         //validacion de datos
         $request->validate([
             'name' => 'nullable|min:3|max:300',
-            'owner_id'=>'min:1',
+            'owner_id' => 'min:1',
         ]);
         //llamada a la compania
         $company = Company::first();
 
         //creacion de los estableicmientos 
         $company->boxes()->create($request->all());
-        if (($request->type==='general')&&($request->isCajaChica))
-        {
+
+        if (($request->type === 'general') && ($request->isCajaChica)) {
             $company->boxes()->create([
-                'name'=>'CAJA CHICA',
-                'owner_id'=>$request->owner_id,
-                'type'=>'chica',
-                ]);
+                'name' => 'CAJA CHICA',
+                'owner_id' => $request->owner_id,
+                'type' => 'chica',
+            ]);
         }
     }
 

@@ -3,17 +3,14 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\Landlord\PaymentRegimController;
 use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\HourController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\BoxController;
-use App\Http\Controllers\Landlord\IessController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\BankAccountController;
-use App\Http\Controllers\Landlord\MovementTypeController;
 use App\Http\Controllers\CostCenterController;
 use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\EmployeeController;
@@ -21,19 +18,26 @@ use App\Http\Controllers\PaymentRoleController;
 use App\Http\Controllers\AccountLinkController;
 use App\Http\Controllers\FixedAssetController;
 use App\Http\Controllers\IntangibleAssetController;
+use App\Http\Controllers\RoleIngressController;
+use App\Http\Controllers\RoleEgressController;
+use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\JournalController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\TransactionBoxController;
+
+use App\Http\Controllers\Landlord\PaymentRegimController;
+use App\Http\Controllers\Landlord\IessController;
+use App\Http\Controllers\Landlord\MovementTypeController;
 use App\Http\Controllers\Landlord\IvaController;
 use App\Http\Controllers\Landlord\WithholdingController;
 use App\Http\Controllers\Landlord\IceController;
-use App\Http\Controllers\RoleIngressController;
-use App\Http\Controllers\RoleEgressController;
 use App\Http\Controllers\Landlord\PayMethodController;
-use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\JournalController;
-use App\Http\Controllers\SettingAccountController;
-use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\TransactionBoxController;
-use App\Http\Controllers\SettingRolController;
-use App\Http\Controllers\SettingBankController;
+
+use App\Http\Controllers\Setting\AccountController as SettingAccountController;
+use App\Http\Controllers\Setting\RolController as SettingRolController;
+use App\Http\Controllers\Setting\BankController as SettingBankController;
+use App\Http\Controllers\Setting\BoxController as SettingBoxController;
+
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -192,10 +196,13 @@ Route::middleware([
         Route::get('vinculacion-contable/roles', [SettingRolController::class, 'index'])->name('setting.account.rol.index');
         Route::put('settingaccountrol/update/{id}', [SettingRolController::class, 'updateRoleAccount'])->name('settingaccount.rol.update');
 
-        
-        // Emparejamiento de cuentas roles
+        // Emparejamiento de cuentas bancos
         Route::get('vinculacion-contable/bancos', [SettingBankController::class, 'index'])->name('setting.account.bank.index');
-        Route::put('settingaccountrol/update/{id}', [SettingBankController::class, 'updateBankAccount'])->name('settingaccount.bank.update');
+        Route::put('settingaccountbank/update/{id}', [SettingBankController::class, 'updateBankAccount'])->name('settingaccount.bank.update');
+
+        // Emparejamiento de cuentas roles
+        Route::get('vinculacion-contable/cajas', [SettingBoxController::class, 'index'])->name('setting.account.box.index');
+        Route::put('settingaccountbox/update/{id}', [SettingBoxController::class, 'updateBoxAccount'])->name('settingaccount.box.update');
 
         //bancos
         Route::get('bancos', [BankController::class, 'index'])->name('banks.index');
@@ -211,19 +218,10 @@ Route::middleware([
         Route::delete('bankaccounts/{bankaccount}', [BankAccountController::class, 'destroy'])->name('bankaccounts.delete');
         Route::put('bankaccounts/{id}/state', [BankAccountController::class, 'updateState'])->name('bankaccounts.updateState');
 
-        //tipos de movimiento
-        // Route::get('tipos-movimientos-bancarios', [MovementTypeController::class, 'index'])->name('movementtypes.index');
-        // Route::post('movementtypes', [MovementTypeController::class, 'store'])->name('movementtypes.store');
-        // Route::put('movementtypes/{movementtype}', [MovementTypeController::class, 'update'])->name('movementtypes.update');
-        // Route::delete('movementtypes/{movementtype}', [MovementTypeController::class, 'destroy'])->name('movementtypes.delete');
-
         //transacciones
         Route::get('movimientos-bancarios', [TransactionController::class, 'index'])->name('transactions.index');
         Route::get('movimientos-bancarios/crear', [TransactionController::class, 'create'])->name('transactions.create');
         Route::post('transactions', [TransactionController::class, 'store'])->name('transactions.store');
-        Route::get('movimientos-bancarios/editar/{transactionId}', [TransactionController::class, 'edit'])->name('transactions.edit');
-        Route::put('transactions/{transaction}', [TransactionController::class, 'update'])->name('transactions.update');
-        Route::delete('transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.delete');
 
         //personas
         Route::get('personas', [PersonController::class, 'index'])->name('people.index');
@@ -265,9 +263,5 @@ Route::middleware([
         Route::get('movimientos-cajas', [TransactionBoxController::class, 'index'])->name('transaction.boxes.index');
         Route::get('movimientos-cajas/crear', action: [TransactionBoxController::class, 'create'])->name('transaction.boxes.create');
         Route::post('transactionboxes', [TransactionBoxController::class, 'store'])->name('transaction.boxes.store');
-        Route::get('movimientos-cajas/editar/{transactionId}', [TransactionBoxController::class, 'edit'])->name('transaction.boxes.edit');
-        Route::put('transactionboxes/{transaction}', [TransactionBoxController::class, 'update'])->name('transaction.boxes.update');
-        Route::delete('transactionboxes/{transaction}', [TransactionBoxController::class, 'destroy'])->name('transaction.boxes.delete');
-
     });
 });

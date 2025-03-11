@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\TransactionBox;
 use App\Models\CashSession;
+use App\Models\Box;
 use App\Models\MovementType;
+use App\Models\Journal;
 use App\Models\Person;
 use App\Models\Company;
 use App\Http\Requests\TransactionStoreBoxRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class TransactionBoxController extends Controller
 {
@@ -57,37 +60,41 @@ class TransactionBoxController extends Controller
         ]);
     }
 
-    public function store(TransactionStoreBoxRequest $request)
+    public function store(TransactionStoreBoxRequest $transactionStoreBoxRequest)
     {
+        //TODO validar el monto en trasactionStoreBoxRequest
         $company = Company::first();
+
+        $journal = Journal::where('description', 'ASIENTO DE SITUACION INICIAL')
+            ->where('company_id', $company->id)
+            ->first();
+
+        if ($journal === null) {
+            return to_route('journal.create');
+        }
+        // usuario autentificado
+        $user = auth()->user();
+        //fecha actual
+        $date = Carbon::now();
+
 
         $data = ["company_id" => $company->id];
 
         // Crear la transacción con los datos recibidos
-        TransactionBox::create([...$request->all(), 'data_additional' => $data]);
-    }
+        TransactionBox::create([...$transactionStoreBoxRequest->all(), 'data_additional' => $data]);
 
-    public function edit(int $transactionId)
-    {
-        $transaction = TransactionBox::findOrFail($transactionId);
-        $cash = CashSession::select('cash_sessions.id', 'cash_sessions.box_id', 'boxes.name')
-            ->join('boxes', 'boxes.id', '=', 'cash_sessions.box_id') // Aquí corriges la relación
-            ->where('cash_sessions.state_box', 'open')
-            ->get();
+        $movementtype= MovementType::find($transactionStoreBoxRequest->movement_type_id);
 
-        return Inertia::render('TransactionBox/Edit', [
-            'transaction' => $transaction,
-            'cashSessions' => $cash
-        ]);
-    }
+        // Actualizar el saldo de la cuenta bancaria restando el monto de la transacción
+        
+        $transaction = TransactionBox::where('company_id', $company->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        
+        $cash=CashSession::find($transaction->cash_session_id);
+        $box=Box::find($cash->box_id); 
+      
+        $movementtype=MovementType::find($transaction->movement_type_id);
 
-    public function update(Request $request, TransactionBox $transaction)
-    {
-        $transaction->update($request->all());
-    }
-
-    public function destroy(TransactionBox $transaction)
-    {
-        $transaction->delete();
     }
 }
