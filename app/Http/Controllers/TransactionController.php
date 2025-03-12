@@ -91,7 +91,9 @@ class TransactionController extends Controller
         ->get();
 
         if ($banckAccountValidate->count() > 0) {
-            return to_route('setting.account.bank.index');
+            return redirect()->route('setting.account.bank.index')->withErrors([
+                'warning' => 'Debes vincular las cuentas para continuar con el proceso. Por favor, vinculalas antes de avanzar.',
+            ]);
         }
            
         $movementTypeValidate = MovementType::whereNull('account_id')
@@ -102,7 +104,9 @@ class TransactionController extends Controller
             ->get();
 
         if ($movementTypeValidate->count() > 0) {
-            return to_route('setting.account.bank.index');
+            return redirect()->route('setting.account.bank.index')->withErrors([
+                'warning' => 'Debes vincular las cuentas para continuar con el proceso. Por favor, vinculalas antes de avanzar.',
+            ]);
         }
 
         // usuario autentificado,

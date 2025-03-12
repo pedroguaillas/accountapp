@@ -7,8 +7,8 @@ import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { Link, router } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { Link, router,usePage } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
 import axios from "axios";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/outline";
 
@@ -28,6 +28,8 @@ const bankId = ref(0);
 const bankName = ref("");
 const accounts = ref(props.accounts);
 const table = ref();
+const page = usePage();
+const errors = computed(() => page.props.errors);
 
 const toggle = () => {
   modal.value = !modal.value;
@@ -93,6 +95,9 @@ const handleInputChange = () => {
 
 <template>
   <AccountLinkLayout title="Vinculación de Cuentas">
+      <div v-if="errors?.warning" class="bg-red-500 text-white rounded mb-4 p-2">
+      {{ errors.warning }}
+    </div>
     <h2>CUENTAS BANCARIAS</h2>
     <Table>
       <thead>

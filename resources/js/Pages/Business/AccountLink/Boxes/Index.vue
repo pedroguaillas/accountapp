@@ -7,8 +7,8 @@ import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { Link, router } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { Link, router,usePage } from "@inertiajs/vue3";
+import { ref, computed} from "vue";
 import axios from "axios";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/outline";
 
@@ -25,7 +25,9 @@ const modal = ref(true);
 const modaldelete = ref(true);
 const boxId = ref(0);
 const boxName = ref("");
-const boxtable=ref("");
+const boxtable = ref("");
+const page = usePage();
+const errors = computed(() => page.props.errors);
 
 const toggle = () => {
   modal.value = !modal.value;
@@ -35,11 +37,11 @@ const toggle1 = () => {
   modaldelete.value = !modaldelete.value;
 };
 
-const editBoxAccount = (boxIdEdit, boxNameEdit,boxTableEdit) => {
+const editBoxAccount = (boxIdEdit, boxNameEdit, boxTableEdit) => {
   // Actualizar los valores según el tipo de cuenta
   boxId.value = boxIdEdit;
   boxName.value = boxNameEdit;
-  boxtable.value=boxTableEdit;
+  boxtable.value = boxTableEdit;
 
   // Alternar el estado de la modal
   toggle();
@@ -49,16 +51,16 @@ const selectAccount = (accountId) => {
   console.log(boxName.value);
   router.put(
     route("settingaccount.box.update", boxId.value),
-    { name: boxName.value, account_id: accountId,table:boxtable.value },
+    { name: boxName.value, account_id: accountId, table: boxtable.value },
     { preserveState: true }
   );
   toggle();
 };
 
-const removeVinculation = (boxIdD, boxNameD,boxtableD) => {
+const removeVinculation = (boxIdD, boxNameD, boxtableD) => {
   boxId.value = boxIdD;
   boxName.value = boxNameD;
-  boxtable.value=boxtableD;
+  boxtable.value = boxtableD;
   toggle1();
 };
 
@@ -66,7 +68,7 @@ const handleInputChange = () => {
   axios
     .put(
       route("settingaccount.box.update", boxId.value),
-      { name: boxName.value, account_id: null,table:boxtable.value },
+      { name: boxName.value, account_id: null, table: boxtable.value },
       { preserveState: true }
     ) // Eliminar centro de costos
     .then(() => {
@@ -81,6 +83,9 @@ const handleInputChange = () => {
 
 <template>
   <AccountLinkLayout title="Vinculación de Cuentas">
+    <div v-if="errors?.warning" class="bg-red-500 text-white rounded mb-4 p-2">
+      {{ errors.warning }}
+    </div>
     <h2>CAJAS</h2>
     <Table>
       <thead>

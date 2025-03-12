@@ -70,31 +70,83 @@ class TransactionBoxController extends Controller
             ->first();
 
         if ($journal === null) {
-            return to_route('journal.create');
+            return redirect()->route('journal.create')->withErrors([
+                'warning' => 'Debes crear el asiento inicial para continuar con el proceso. Por favor, regístralo antes de avanzar.',
+            ]);
         }
+        $boxAccountValidate =Box::whereNull('account_id')
+        ->where('boxes.company_id', $company->id)
+        ->get();
+
+        if ($boxAccountValidate->count() > 0) {
+
+            return redirect()->route('setting.account.box.index')->withErrors([
+                'warning' => 'Debes vincular las cuentas para continuar con el proceso. Por favor, vinculalas antes de avanzar.',
+            ]);
+        }
+           
+        $movementTypeValidate = MovementType::whereNull('account_id')
+            ->where(function ($query) {
+                $query->where('venue', 'ambos')
+                    ->orWhere('venue', 'caja');
+            })
+            ->get();
+
+        if ($movementTypeValidate->count() > 0) {
+            return redirect()->route('setting.account.box.index')->withErrors([
+                'warning' => 'Debes vincular las cuentas para continuar con el proceso. Por favor, vinculalas antes de avanzar.',
+            ]);
+        }
+
         // usuario autentificado
         $user = auth()->user();
         //fecha actual
         $date = Carbon::now();
 
-
+        $journalEntries = [];
         $data = ["company_id" => $company->id];
 
         // Crear la transacción con los datos recibidos
-        TransactionBox::create([...$transactionStoreBoxRequest->all(), 'data_additional' => $data]);
-
-        $movementtype= MovementType::find($transactionStoreBoxRequest->movement_type_id);
-
-        // Actualizar el saldo de la cuenta bancaria restando el monto de la transacción
-        
-        $transaction = TransactionBox::where('company_id', $company->id)
-            ->orderBy('created_at', 'desc')
-            ->first();
+        $transaction= TransactionBox::create([...$transactionStoreBoxRequest->all(), 'data_additional' => $data]);
+        $movementType= MovementType::find($transactionStoreBoxRequest->movement_type_id);
         
         $cash=CashSession::find($transaction->cash_session_id);
         $box=Box::find($cash->box_id); 
-      
-        $movementtype=MovementType::find($transaction->movement_type_id);
+
+        if ($movementType->type === 'Ingreso') {
+            $journalEntries[] = [
+                'account_id' => $box->account_id,
+                'debit' => $transaction->amount,
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $movementType->account_id,
+                'debit' => 0,
+                'have' => $transaction->amount,
+            ];
+        } else {
+            $journalEntries[] = [
+                'account_id' => $movementType->account_id,
+                'debit' => $transaction->amount,
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $box->account_id,
+                'debit' => 0,
+                'have' => $transaction->amount,
+            ];
+        }
+        // Crear el diario
+        $inputs = [
+            'description' => "Movimiento Caja " . $transaction->description,
+            'date' => $date,
+            'user_id' => $user->id,
+            'document_id' => $transaction->id,
+            'table' => 'transaction_boxes',
+        ];
+
+        $journal = $company->journals()->create($inputs);
+        $journal->journalentries()->createMany($journalEntries);
 
     }
 }

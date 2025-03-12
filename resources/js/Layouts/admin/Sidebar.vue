@@ -47,7 +47,10 @@ const user = computed(() => page.props.auth.user);
         x
       </button>
     </header>
-    <nav class="p-2">
+    <nav
+      class="p-2 max-h-[100%] overflow-y-auto bg-scroll"
+      style="scrollbar-color: #7da8ce transparent; scrollbar-width: thin"
+    >
       <ul
         v-show="current_tenant_id !== null"
         class="[&>li>a]:text-white [&>li>a]:inline-block [&>li>a]:w-full [&>li>a]:py-2 [&>li>a>i]:stroke-white"
@@ -198,7 +201,6 @@ const user = computed(() => page.props.auth.user);
                   Movimiento de cajas</Link
                 >
               </li>
-
             </ul>
           </div>
         </li>

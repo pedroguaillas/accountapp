@@ -21,7 +21,10 @@ class BoxController extends Controller
         )
             ->leftJoin('accounts AS ap', 'movement_types.account_id', '=', 'ap.id')
             ->whereIn('movement_types.type', ["Ingreso", "Egreso"])
-            ->where('venue', 'caja')
+            ->where(function ($query) {
+                $query->where('venue', 'ambos')
+                    ->orWhere('venue', 'bancos');
+            })
             ->orderBy('movement_types.id')
             ->get();
 
