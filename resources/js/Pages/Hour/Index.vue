@@ -23,7 +23,6 @@ const props = defineProps({
 // Refs
 const modal = ref(false);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 const modal1 = ref(false);
 
 const date = new Date().toISOString().split("T")[0];
@@ -33,11 +32,10 @@ const initialHour = {
   amount: "",
   employee_id: "",
   type: "",
-  date,
 };
 
 // Reactives
-const hour = useForm({ ...initialHour });
+const hour = useForm({ ...initialHour, date });
 const errorForm = reactive({});
 const deleteid = ref(0);
 
@@ -46,9 +44,9 @@ const newHour = () => {
   if (hour.id !== undefined) {
     delete hour.id;
   }
-  Object.assign(hour, initialHour);
+  Object.assign(hour, { ...initialHour, date });
 
-  Object.assign(errorForm, { ...initialHour, date: "" });
+  resetErrorForm();
   // Muestro el modal
   toggle();
 };
@@ -77,12 +75,9 @@ const save = () => {
   hour[routeMethod](routeName, {
     onSuccess: () => {
       toggle(); // Cerrar modal o reiniciar estados
-      resetErrorForm(); // Limpiar errores del formulario
       router.reload({ only: ["horas"] }); // Recargar datos
     },
     onError: (error) => {
-      resetErrorForm(); // Asegurarte de limpiar los errores previos
-
       // Iterar sobre los errores recibidos del servidor
       Object.entries(error).forEach(([key, value]) => {
         errorForm[key] = value; // Mostrar el primer error asociado a cada campo
@@ -117,12 +112,9 @@ const deletehour = () => {
 
 watch(
   search,
-
   async (newQuery) => {
     const url = route("hours.index");
-    loading.value = true;
     console.log("si entra");
-
     try {
       await router.get(
         url,
@@ -131,9 +123,7 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
-    }
+    } 
   },
   { immediate: false }
 );
@@ -141,7 +131,6 @@ watch(
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
   const url = route("hours.index"); // Ruta hacia el backend
-  loading.value = true;
 
   try {
     await router.get(
@@ -151,9 +140,7 @@ const handlePageChange = async (page) => {
     );
   } catch (error) {
     console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
+  } 
 };
 </script>
 
@@ -180,7 +167,7 @@ const handlePageChange = async (page) => {
         <button
           @click="newHour"
           class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-          >
+        >
           +
         </button>
       </div>
@@ -238,6 +225,7 @@ const handlePageChange = async (page) => {
     :hour="hour"
     :error="errorForm"
     :employees="props.employees"
+    :date="date"
     @close="toggle"
     @save="save"
   />
@@ -249,9 +237,7 @@ const handlePageChange = async (page) => {
       <SecondaryButton @click="modal1 = !modal1" class="mr-2"
         >Cancelar</SecondaryButton
       >
-      <PrimaryButton type="button" @click="deletehour"
-        >Aceptar</PrimaryButton
-      >
+      <PrimaryButton type="button" @click="deletehour">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

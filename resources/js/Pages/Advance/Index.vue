@@ -46,9 +46,8 @@ const newAdvance = () => {
   if (advance.id !== undefined) {
     delete advance.id;
   }
-  Object.assign(advance, initialAdvance);
-
-  Object.assign(errorForm, { ...initialAdvance, date: "" });
+  Object.assign(advance, { ...initialAdvance, date });
+  resetErrorForm();
   // Muestro el modal
   toggle();
 };
@@ -238,6 +237,7 @@ const handlePageChange = async (page) => {
     :advance="advance"
     :error="errorForm"
     :employees="props.employees"
+    :date="date"
     @close="toggle"
     @save="save"
   />

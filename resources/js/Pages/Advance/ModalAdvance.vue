@@ -15,6 +15,7 @@ const props = defineProps({
   error: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
   employees: { type: Array, default: () => [] },
+  date: { type: String, default: "" },
 });
 
 const { focusNextField } = useFocusNextField();
@@ -120,6 +121,7 @@ if (!props.advance.date) {
               v-model="advance.date"
               type="date"
               class="mt-1 block w-full"
+              :max="props.date"
             />
             <InputError :message="error.date" class="mt-2" />
           </div>

@@ -8,7 +8,7 @@ use App\Models\MovementType;
 use App\Models\Journal;
 use App\Models\BankAccount;
 use App\Models\Company;
-use App\Http\Requests\TransactionStoreRequest;
+use App\Http\Requests\TransactionRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -72,7 +72,7 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function store(TransactionStoreRequest $transactionStoreRequest)
+    public function store(TransactionRequest $transactionStoreRequest)
     {
         // Llamada a la compañía
         $company = Company::first();
@@ -82,20 +82,22 @@ class TransactionController extends Controller
             ->first();
 
         if ($journal === null) {
-            return redirect()->route('journal.create')->withErrors([
-                'warning' => 'Debes crear el asiento inicial para continuar con el proceso. Por favor, regístralo antes de avanzar.',
-            ]);
+
+            // return redirect()->route('journal.create')->withErrors([
+            //     'warning' => 'Debes crear el asiento inicial para continuar con el proceso. Por favor, regístralo antes de avanzar.',
+            // ]);
         }
-        $banckAccountValidate =BankAccount::whereNull('account_id')
-        ->where('bank_accounts.data_additional->company_id', $company->id)
-        ->get();
+        $banckAccountValidate = BankAccount::whereNull('account_id')
+            ->where('bank_accounts.data_additional->company_id', $company->id)
+            ->get();
 
         if ($banckAccountValidate->count() > 0) {
-            return redirect()->route('setting.account.bank.index')->withErrors([
-                'warning' => 'Debes vincular las cuentas para continuar con el proceso. Por favor, vinculalas antes de avanzar.',
-            ]);
+            return back()->withErrors(['error' => 'Debes vincular las cuentas.', 'redirect' => true]);
+            // return redirect()->route('setting.account.bank.index')->withErrors([
+            //     'warning' => 'Debes vincular las cuentas para continuar con el proceso. Por favor, vinculalas antes de avanzar.',
+            // ]);
         }
-           
+
         $movementTypeValidate = MovementType::whereNull('account_id')
             ->where(function ($query) {
                 $query->where('venue', 'ambos')
