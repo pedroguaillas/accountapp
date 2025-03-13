@@ -34,11 +34,10 @@ const initialAdvance = {
   employee_id: "",
   type: "",
   payment_type: "",
-  date,
 };
 
 // Reactives
-const advance = useForm({ ...initialAdvance });
+const advance = useForm({ ...initialAdvance,date });
 const errorForm = reactive({});
 const deleteid = ref(0);
 

@@ -87,6 +87,7 @@ const selectedEmployee = ref(props.box.owner_id || null);
       </SecondaryButton>
       <PrimaryButton
         @click="$emit('save')"
+         :disabled="box.processing"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"
       >
         Guardar

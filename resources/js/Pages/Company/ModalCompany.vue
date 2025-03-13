@@ -45,7 +45,10 @@ const contributorTypeOptions = props.contributorTypes.map(
     </template>
     <template #content>
       <div class="mt-4">
-        <form class="w-2xl grid grid-cols-1 gap-3"  @keydown.enter.prevent="focusNextField">
+        <form
+          class="w-2xl grid grid-cols-1 gap-3"
+          @keydown.enter.prevent="focusNextField"
+        >
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="ruc" value="RUC" />
 
@@ -109,6 +112,7 @@ const contributorTypeOptions = props.contributorTypes.map(
       >
       <PrimaryButton
         @click="$emit('save')"
+        :disabled="company.processing"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"
       >
         Guardar

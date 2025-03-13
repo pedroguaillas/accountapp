@@ -47,8 +47,28 @@ class AdvanceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'amount' => 'required|min:1',
+            'employee_id' => 'required|exists:employees,id',
         ]);
+        $request->validate([
+            'amount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+                
+                function ($attribute, $value, $fail) use ($request) {
+                    // Buscar el empleado por ID
+                    $employee = Employee::find($request->employee_id);
+        
+                    // Validar si el monto supera el saldo disponible
+                    $maxAmount = $employee->salary * 2;
+        
+                    if ($value > $maxAmount) {
+                        $fail("El monto no puede ser mayor a dos salarios: {$maxAmount}");
+                    }
+                },
+            ],
+        ]);
+        
         $company = Company::first();
 
         $company->advances()->create($request->all());

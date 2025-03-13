@@ -84,8 +84,6 @@ if (!props.advance.date) {
               v-model="advance.amount"
               type="number"
               class="mt-1 block w-full"
-              minlength="3"
-              maxlength="300"
               required
             />
             <InputError :message="error.amount" class="mt-2" />
@@ -134,6 +132,7 @@ if (!props.advance.date) {
       >
       <PrimaryButton
         @click="$emit('save')"
+        :disabled="advance.processing"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"
       >
         Guardar
