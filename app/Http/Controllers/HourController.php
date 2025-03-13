@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class HourController extends Controller
 {
@@ -46,19 +47,27 @@ class HourController extends Controller
     public function store(Request $request)
     {
         //poner el campo requerido
+        $date = Carbon::now();
         $request->validate([
+            'employee_id' => 'required|exists:employees,id',
             'amount' => 'required|min:1',
+            //TODO poner el inimo segun la configuracion de la generacion del rol
+            'date' => "required|before_or_equal:$date",
+            'type' => 'required',
         ]);
         $company = Company::first();
 
         $company->hours()->create($request->all());
-
     }
 
     public function update(Request $request, Hour $hour)
     {
+        $date = Carbon::now();
         $request->validate([
+            'employee_id' => 'required|exists:employees,id',
             'amount' => 'required|min:1',
+            'date' => "required|before_or_equal:$date",
+            'type' => 'required',
         ]);
         $hour->update($request->all());
     }

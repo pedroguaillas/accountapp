@@ -4,7 +4,7 @@ import { reactive, computed, ref } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchBankAccount from "./SearchBankAccount.vue";
 import SearchPerson from "./SearchPerson.vue";
-import { useForm, router } from "@inertiajs/vue3";
+import { useForm, router, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
@@ -19,6 +19,8 @@ const props = defineProps({
   countperson: { type: Number, default: () => 0 },
 });
 
+const page = usePage();
+const errors = computed(() => page.props.errors);
 const date = new Date().toISOString().split("T")[0];
 
 // Inicializador de objetos
@@ -39,10 +41,13 @@ const initialTransaction = {
 const bank_account_id =
   props.bankaccounts.length === 1 ? props.bankaccounts[0].id : 0;
 
-const beneficiary_id =
-  props.people.length === 1 ? props.people[0].id : 0;
+const beneficiary_id = props.people.length === 1 ? props.people[0].id : 0;
 // Reactives
-const transaction = useForm({ ...initialTransaction, bank_account_id,beneficiary_id  });
+const transaction = useForm({
+  ...initialTransaction,
+  bank_account_id,
+  beneficiary_id,
+});
 const errorForm = reactive({});
 
 const save = () => {
@@ -51,6 +56,11 @@ const save = () => {
     //  // router.visit(route("transactions.index"));
     // },
     onError: (errors) => {
+      
+      if (errors.redirect) {
+        console.log(errors.redirect);
+        window.open(route("setting.account.bank.index"), "_blank");
+      }
       Object.keys(errors).forEach((key) => {
         errorForm[key] = errors[key];
       });
@@ -106,6 +116,9 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
+      <div v-if="errors?.error" class="bg-red-500 text-white rounded mb-4 p-2">
+        {{ errors.error }}
+      </div>
       <div class="flex justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold">
           Registro movimientos bancarios

@@ -34,11 +34,10 @@ const initialAdvance = {
   employee_id: "",
   type: "",
   payment_type: "",
-  date,
 };
 
 // Reactives
-const advance = useForm({ ...initialAdvance });
+const advance = useForm({ ...initialAdvance,date });
 const errorForm = reactive({});
 const deleteid = ref(0);
 
@@ -47,9 +46,8 @@ const newAdvance = () => {
   if (advance.id !== undefined) {
     delete advance.id;
   }
-  Object.assign(advance, initialAdvance);
-
-  Object.assign(errorForm, { ...initialAdvance, date: "" });
+  Object.assign(advance, { ...initialAdvance, date });
+  resetErrorForm();
   // Muestro el modal
   toggle();
 };
@@ -239,6 +237,7 @@ const handlePageChange = async (page) => {
     :advance="advance"
     :error="errorForm"
     :employees="props.employees"
+    :date="date"
     @close="toggle"
     @save="save"
   />

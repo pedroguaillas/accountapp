@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdvanceRequest;
 use App\Models\Advance;
 use App\Models\Company;
 use App\Models\Employee;
@@ -43,32 +44,20 @@ class AdvanceController extends Controller
         ]);
     }
 
-
-    public function store(Request $request)
+    public function store(AdvanceRequest $advanceRequest)
     {
-        $request->validate([
-            'amount' => 'required|min:1',
-        ]);
         $company = Company::first();
 
-        $company->advances()->create($request->all());
+        $company->advances()->create($advanceRequest->all());
     }
 
-    public function update(Request $request, Advance $advance)
+    public function update(AdvanceRequest $advanceRequest, Advance $advance)
     {
-        $request->validate([
-            'amount' => 'required|min:1',
-        ]);
-        $advance->update($request->all());
+        $advance->update($advanceRequest->all());
     }
 
     public function destroy(Advance $advance)
     {
         $advance->delete(); // Esto usará SoftDeletes
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Adelanto eliminado correctamente.',
-        ]);
     }
 }
