@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->string('code');
             $table->string('name');
             $table->string('type');//ingreso o egreso
-          
+
             $table->timestamps();
             $table->softDeletes();
         });
@@ -607,7 +607,7 @@ return new class extends Migration {
         //     $table->bigInteger('company_id');
         //     $table->boolean('continue')->default(false);//ingresos y egresos
         //     $table->decimal('max', 10, 2)->nullable();
-          
+
         //     $table->timestamps();
         //     $table->softDeletes();
 

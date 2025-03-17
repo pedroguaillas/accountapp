@@ -36,6 +36,11 @@ class CostCenterController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+        ]);
+
         $company = Company::first();
 
         //crear el costcenter
@@ -44,6 +49,10 @@ class CostCenterController extends Controller
 
     public function update(Request $request, CostCenter $costCenter)
     {
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+        ]);
         //actualizar constcenter
         $costCenter->update($request->all());
     }

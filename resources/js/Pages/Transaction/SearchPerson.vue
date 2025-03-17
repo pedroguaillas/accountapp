@@ -49,10 +49,11 @@ const handlePersonSelect = (person) => {
 watch(search, async (newValue) => {
   if (!newValue) {
     selectedPerson.value = null;
-    suggestion.value = [];
+    suggestion.value = { data: [] }; // Asegura que suggestion.data siempre existe
     return;
   }
-  suggestion.value = await fetchPeople(newValue, 1, 3); // Paginate = 3 para sugerencias
+  const response = await fetchPeople(newValue, 1, 3); // Paginate = 3 para sugerencias
+  suggestion.value = response ?? { data: [] }; // Asegura que siempre tenga data
   isDropdownOpen.value = search.value.length > 0 && !selectedPerson.value;
 });
 //para cargar el inicio
@@ -121,7 +122,7 @@ const emit = defineEmits(["selectPerson"]);
           @focus="isDropdownOpen = true"
         />
         <ul
-          v-if="isDropdownOpen && suggestion.data.length"
+          v-if="isDropdownOpen && suggestion?.data?.length"
           class="absolute z-10 bg-white border-b border-x border-gray-300 rounded-b w-full max-h-40 overflow-y-auto shadow-lg"
         >
           <li

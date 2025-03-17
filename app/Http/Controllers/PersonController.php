@@ -57,7 +57,7 @@ class PersonController extends Controller
 
         // Obtener el término de búsqueda si existe
         $search = $request->input('search');
-        $paginate= $request->input('paginate',10);
+        $paginate = $request->input('paginate', 10);
         // Obtener los datos con filtro y paginación
         $people = Person::where('company_id', $company->id)
             ->when($search, function ($query, $search) {
@@ -65,7 +65,7 @@ class PersonController extends Controller
                     ->orWhere('identification', 'LIKE', "%{$search}%");
             })
             ->paginate($paginate); // Cambia el número de elementos por página si es necesario
-  
+
         return response()->json($people);
     }
 
@@ -108,8 +108,9 @@ class PersonController extends Controller
     {
         $request->validate([
             'name' => 'nullable|min:3|max:300',
+            'email' => 'required|email|unique:people,email',
+            'identification' => 'required|string|unique:people,identification',
         ]);
-
         //actulizar los establecimientos
         $person->update($request->all());
     }

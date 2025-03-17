@@ -37,12 +37,22 @@ class RoleEgressController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'code' => 'required|min:2|max:300',
+            'name' => 'required',
+            'type' => 'required',
+        ]);
         $company = Company::first();
         RoleEgress::create([...$request->all(), 'company_id' => $company->id]);
     }
 
     public function update(Request $request, RoleEgress $roleegress)
     {
+        $request->validate([
+            'code' => 'required|min:2|max:300',
+            'name' => 'required',
+            'type' => 'required',
+        ]);
         $roleegress->update($request->all());
     }
 

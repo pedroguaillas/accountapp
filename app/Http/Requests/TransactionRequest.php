@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\MovementType;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\BankAccount;
 use Carbon\Carbon;
@@ -27,16 +28,14 @@ class TransactionRequest extends FormRequest
         $date = Carbon::now()->toDateString(); // Fecha actual
 
         return [
-            'bank_account_id' => 'required|exists:bank_accounts,id',
             'transaction_date' => "required|date|before_or_equal:$date",
-            'movement_type_id' => 'required|exists:movement_types,id',
+            'payment_method' => 'required',
             'amount' => [
                 'required',
                 'numeric',
                 'min:0.01',
             ],
-            'payment_method'=> 'required',
-            'beneficiary_id'=> 'required|exists:people,id', 
+            'beneficiary_id' => 'required|exists:people,id',
         ];
     }
 
@@ -44,11 +43,18 @@ class TransactionRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $bankAccount = BankAccount::find($this->bank_account_id);
+            $movementType = MovementType::find($this->movement_type_id);
 
-            if ($bankAccount) {
-                if ($this->amount > $bankAccount->current_balance) {
-                    $validator->errors()->add('amount', "El monto no puede ser mayor que el saldo disponible: $bankAccount->current_balance");
-                }
+            if (!$movementType) {
+                $validator->errors()->add('movement_type_id', "Seleccionar movimiento");
+            }
+
+            if (!$bankAccount) {
+                $validator->errors()->add('bank_account_id', "Seleccione la cuenta bancaria");
+            }
+
+            if ($movementType && $bankAccount && $movementType->type === 'Egreso' && $this->amount > $bankAccount->current_balance) {
+                $validator->errors()->add('amount', "El monto no puede ser mayor que el saldo disponible: $bankAccount->current_balance");
             }
         });
     }

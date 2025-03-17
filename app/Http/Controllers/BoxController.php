@@ -47,9 +47,11 @@ class BoxController extends Controller
     {
         //validacion de datos
         $request->validate([
-            'name' => 'nullable|min:3|max:300',
-            'owner_id' => 'min:1',
+            'owner_id' => 'required|exists:employees,id',
+            'name' => 'required',
+            'type' => 'required',
         ]);
+
         //llamada a la compania
         $company = Company::first();
 
@@ -67,10 +69,12 @@ class BoxController extends Controller
 
     public function update(Request $request, Box $box)
     {
+        //validacion de datos
         $request->validate([
-            'name' => 'nullable|min:3|max:300',
+            'owner_id' => 'required|exists:employees,id',
+            'name' => 'required',
+            'type' => 'required',
         ]);
-
         //actulizar los establecimientos
         $box->update($request->all());
     }

@@ -24,6 +24,8 @@ class TransactionStoreBoxRequest extends FormRequest
     {
         return [
             'cash_session_id' => 'required|exists:cash_sessions,id',
+            'movement_type_id' => 'required|exists:movement_types,id',
+            'amount' => 'required|min:0.01',
         ];
     }
 }

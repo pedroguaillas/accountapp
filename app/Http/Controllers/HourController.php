@@ -46,7 +46,6 @@ class HourController extends Controller
 
     public function store(Request $request)
     {
-        //poner el campo requerido
         $date = Carbon::now();
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
