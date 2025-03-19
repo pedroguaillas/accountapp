@@ -38,7 +38,10 @@ class BankAccountController extends Controller
     {
         //validacion de datos
         $request->validate([
+            'bank_id'=> 'required|exists:banks,id',
             'account_number' => 'required|min:1|max:999',
+            'account_type' =>'required|min:1|max:999',
+
         ]);
 
         $company = Company::first();
@@ -53,7 +56,10 @@ class BankAccountController extends Controller
     public function update(Request $request, BankAccount $bankaccount)
     {
         $request->validate([
+            'bank_id'=> 'required|exists:banks,id',
             'account_number' => 'required|min:1|max:999',
+            'account_type' =>'required|min:1|max:999',
+
         ]);
 
         //actulizar los establecimientos

@@ -3,7 +3,7 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import OpenModal from "./OpenModal.vue";
-import { router, useForm } from "@inertiajs/vue3";
+import { useForm } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
@@ -23,12 +23,10 @@ const props = defineProps({
 
 // Refs y estados
 const modal = ref(false);
-const modalgeneral = ref(false);
-const modal1 = ref(false);
-const modalopen = ref(false);
+const modalDeleteBox = ref(false);
+const modalOpenBox = ref(false);
 const deleteid = ref(0);
 const search = ref(props.filters.search);
-const loading = ref(false);
 
 // Para el formulario de crear/editar caja
 const initialBox = { name: "", owner_id: 0, type: "", isCajaChica: false };
@@ -37,7 +35,14 @@ const errorForm = reactive({ ...initialBox });
 
 // Para el modal de apertura de caja (cash_session)
 // Usamos openForm para almacenar el monto inicial
-const openForm = useForm({ initial_value: "" });
+const openForm = useForm({
+  initial_value: "",
+  ingress: 0,
+  egress: 0,
+  balance: 0,
+  real_balance: 0,
+  cash_difference: 0,
+});
 // Variable para almacenar el id de la caja que se va a abrir
 const currentBoxId = ref(null);
 
@@ -62,10 +67,6 @@ const resetErrorForm = () => {
 
 const toggle = () => {
   modal.value = !modal.value;
-};
-
-const togglegeneral = () => {
-  modalgeneral.value = !modalgeneral.value;
 };
 
 const save = () => {
@@ -105,12 +106,12 @@ const update = (boxEdit) => {
 };
 
 const removeBox = (boxId) => {
-  toggle1();
+  toggleDeleteBox();
   deleteid.value = boxId;
 };
 
-const toggle1 = () => {
-  modal1.value = !modal1.value;
+const toggleDeleteBox = () => {
+  modalDeleteBox.value = !modalDeleteBox.value;
 };
 
 const deletebox = () => {
@@ -128,7 +129,6 @@ watch(
   search,
   async (newQuery) => {
     const url = route("boxes.index");
-    loading.value = true;
     try {
       await router.get(
         url,
@@ -137,8 +137,6 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
     }
   },
   { immediate: false }
@@ -146,7 +144,6 @@ watch(
 
 const handlePageChange = async (page) => {
   const url = route("boxes.index");
-  loading.value = true;
   try {
     await router.get(
       url,
@@ -155,8 +152,6 @@ const handlePageChange = async (page) => {
     );
   } catch (error) {
     console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -168,24 +163,17 @@ const showOpenModal = (boxItem) => {
   currentBoxId.value = boxItem.id;
   openForm.initial_value = "";
   openForm.name = boxItem.name; // Si deseas mostrar el nombre en el modal
-  modalopen.value = true;
+  modalOpenBox.value = true;
 };
 
 // Función que se ejecuta al enviar el formulario de apertura.
 // Envía el monto (desde openForm.initial_value) al endpoint para abrir la caja.
 const submitOpen = () => {
-  console.log(route("boxes.open", currentBoxId.value));
-  axios
-    .post(route("boxes.open", currentBoxId.value), {
-      initial_value: openForm.initial_value,
-    })
-    .then(() => {
-      modalopen.value = false;
-      router.reload({ only: ["boxes"] });
-    })
-    .catch((error) => {
-      console.error("Error al abrir la caja", error);
-    });
+  openForm.post(route("boxes.open", currentBoxId.value), {
+    onSuccess: () => {
+      modalOpenBox.value = false;
+    },
+  });
 };
 
 // Función para invocar el modal de apertura (se usa en el botón "Abrir Caja")
@@ -196,24 +184,22 @@ const openBox = (box) => {
 // Nuevas referencias para el modal de cierre y los datos
 const closeModal = ref(false);
 const boxid = ref("");
-const closeData = reactive({
-  ingres: 0,
-  egres: 0,
-  balance: 0,
-  initial_value: 0,
-});
 
+watch(
+  () => openForm.real_balance,
+  (newValue) => {
+    openForm.cash_difference = newValue - openForm.balance;
+  }
+);
 // Función para cerrar caja y obtener los datos
 const closeBox = (boxId) => {
   boxid.value = boxId;
   axios
     .get(route("boxes.closeinformation", boxId))
     .then((response) => {
-      const { ingres, egres, balance, initial_value } = response.data;
-      closeData.ingres = ingres;
-      closeData.egres = egres;
-      closeData.balance = balance;
-      closeData.initial_value = initial_value;
+      Object.assign(openForm, response.data);
+      openForm.real_balance = response.data.balance;
+      openForm.cash_difference = 0;
       closeModal.value = true; // Mostrar el modal después de actualizar los datos
     })
     .catch((error) => {
@@ -222,18 +208,11 @@ const closeBox = (boxId) => {
 };
 
 const closeboxfinally = () => {
-  axios
-    .post(route("boxes.close", { id: boxid.value }), {
-      ingress: closeData.ingres,
-      egress: closeData.egres,
-    })
-    .then(() => {
+  openForm.post(route("boxes.close", boxid.value), {
+    onSuccess: () => {
       closeModal.value = false;
-      router.reload({ only: ["boxes"] });
-    })
-    .catch((error) => {
-      console.error("Error al cerrar definitivamente la caja", error);
-    });
+    },
+  });
 };
 </script>
 
@@ -266,6 +245,7 @@ const closeboxfinally = () => {
             <th class="w-1">N°</th>
             <th class="text-left">NOMBRE</th>
             <th class="text-left">RESPONSABLE</th>
+            <th class="text-left">SALDO</th>
             <th></th>
           </tr>
         </thead>
@@ -278,6 +258,8 @@ const closeboxfinally = () => {
             <td>{{ i + 1 }}</td>
             <td class="text-left">{{ box.name }}</td>
             <td class="text-left ml-2">{{ box.employee_name }}</td>
+            <td class="text-left ml-2">{{ box.balance || 0 }}</td>
+
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button
@@ -327,19 +309,19 @@ const closeboxfinally = () => {
 
   <!-- Modal para abrir caja (cash_session) -->
   <OpenModal
-    :show="modalopen"
+    :show="modalOpenBox"
     :openForm="openForm"
     :error="errorForm"
-    @close="modalopen = false"
+    @close="modalOpenBox = false"
     @save="submitOpen"
   />
 
   <!-- Modal de confirmación para eliminar caja -->
-  <ConfirmationModal :show="modal1">
+  <ConfirmationModal :show="modalDeleteBox">
     <template #title>ELIMINAR CAJAS</template>
     <template #content>¿Está seguro de eliminar la caja?</template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2">
+      <SecondaryButton @click="modalDeleteBox = !modalDeleteBox" class="mr-2">
         Cancelar
       </SecondaryButton>
       <PrimaryButton type="button" @click="deletebox"> Aceptar </PrimaryButton>
@@ -350,21 +332,30 @@ const closeboxfinally = () => {
     <template #title>Resumen de Cierre</template>
     <template #content>
       <p class="text-justify">
-        <strong>Valor Inicial:</strong> {{ closeData.initial_value.toFixed(2) }}
+        <strong>Valor Inicial:</strong> {{ openForm.initial_value.toFixed(2) }}
       </p>
       <p class="text-justify">
-        <strong>Ingresos:</strong> {{ closeData.ingres.toFixed(2) }}
+        <strong>Ingresos:</strong> {{ openForm.ingress.toFixed(2) }}
       </p>
       <p class="text-justify">
-        <strong>Egresos:</strong> {{ closeData.egres.toFixed(2) }}
+        <strong>Egresos:</strong> {{ openForm.egress.toFixed(2) }}
       </p>
       <p class="text-justify">
-        <strong>Balance:</strong> {{ closeData.balance.toFixed(2) }}
+        <strong>Saldo de caja(sistema):</strong>
+        {{ openForm.balance.toFixed(2) }}
+      </p>
+      <p class="text-justify">
+        <strong>Saldo de caja(real):</strong>
+        <input type="number" v-model="openForm.real_balance" />
+      </p>
+      <p class="text-justify">
+        <strong>Diferencia:</strong> {{ openForm.cash_difference.toFixed(2) }}
       </p>
     </template>
     <template #footer>
+   
       <SecondaryButton @click="closeModal = false">Cancelar</SecondaryButton>
-      <PrimaryButton @click="closeboxfinally">Cerrar Caja</PrimaryButton>
+      <PrimaryButton @click="closeboxfinally" :disabled="openForm.processing">Cerrar Caja</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

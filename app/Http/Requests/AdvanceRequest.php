@@ -29,7 +29,6 @@ class AdvanceRequest extends FormRequest
         return [
             'employee_id' => 'required|exists:employees,id',
             'date' => "required|date|before_or_equal:$date",
-            'type' => 'required',
             'amount' => [
                 'required',
                 'numeric',
@@ -44,6 +43,7 @@ class AdvanceRequest extends FormRequest
             $employee = Employee::find($this->employee_id);
             
             if ($employee) {
+                //TODO verrificar que la sumatoria de los adelantos realizados en el mes no supere los dos sueldos caso contrario mostrar el saldo disponible
                 $maxAmount = $employee->salary * 2;
                 if ($this->amount > $maxAmount) {
                     $validator->errors()->add('amount', "El monto no puede ser mayor a dos salarios: $maxAmount");

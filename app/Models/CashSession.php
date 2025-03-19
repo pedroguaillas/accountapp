@@ -15,19 +15,20 @@ class CashSession extends Model
         'open_employee_id',
         'close_employee_id',
         'initial_value',
-        'ingress', 
+        'ingress',
         'egress',
         'balance',
         'state_box',
+        'real_balance',
+        'cash_difference',
     ];
     protected $casts = [
-        'box_id'=>'integer',
-        'open_employee_id'=>'integer',
-        'owner_id'=>'integer',
-        'close_employee_id'=>'integer',
-        'initial_value'=> 'float',
-        'ingress'=> 'float',
-        'egress'=> 'float',
+        'close_employee_id' => 'integer',
+        'initial_value' => 'float',
+        'ingress' => 'float',
+        'egress' => 'float',
         'balance' => 'float',
+        'real_balance' => 'float',
+        'cash_difference' => 'float',
     ];
 }

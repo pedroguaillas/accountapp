@@ -1,6 +1,6 @@
 <script setup>
 // Imports
-import { reactive, computed, ref } from "vue";
+import { reactive, computed, ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchBankAccount from "./SearchBankAccount.vue";
 import SearchPerson from "./SearchPerson.vue";
@@ -21,6 +21,21 @@ const props = defineProps({
 
 const page = usePage();
 const errors = computed(() => page.props.errors);
+const showErrorModal = ref(false); // Estado del modal de error
+const redirect=ref("");
+
+// Observa si hay errores y muestra el modal automáticamente
+watch(errors, (newErrors) => {
+  if (newErrors?.error) {
+    showErrorModal.value = true;
+  }
+});
+
+const closeErrorModal = () => {
+  showErrorModal.value = false;
+  window.open(route(redirect.value), "_blank");
+};
+
 const date = new Date().toISOString().split("T")[0];
 
 // Inicializador de objetos
@@ -56,10 +71,9 @@ const save = () => {
     //  // router.visit(route("transactions.index"));
     // },
     onError: (errors) => {
-      
-      if (errors.redirect) {
-        console.log(errors.redirect);
-        window.open(route("setting.account.bank.index"), "_blank");
+      if(errors.redirect)
+      {
+        redirect.value=errors.redirect;
       }
       Object.keys(errors).forEach((key) => {
         errorForm[key] = errors[key];
@@ -115,9 +129,23 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
   <AdminLayout title="Asientos Contables">
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
-      <!-- Card Header -->
-      <div v-if="errors?.error" class="bg-red-500 text-white rounded mb-4 p-2">
-        {{ errors.error }}
+      <!-- Modal de error -->
+      <div
+        v-if="showErrorModal"
+        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+      >
+        <div class="bg-white p-6 rounded shadow-lg w-96">
+          <h2 class="text-lg font-bold text-red-600">Error</h2>
+          <p class="mt-2 text-gray-700">{{ errors.error }}</p>
+          <div class="mt-4 text-right">
+            <button
+              @click="closeErrorModal"
+              class="px-4 py-2 bg-red-500 text-white rounded"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
       </div>
       <div class="flex justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold">

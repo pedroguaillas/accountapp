@@ -57,10 +57,13 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|min:3|max:300',
-            'cuit' => 'required|min:10|max:13',
+            'name' => 'required|string|min:3|max:300',
+            'cuit' => 'required',
+            'position' => 'required|string|min:3|max:300',
+            'days' => 'required|integer|min:1',
+            'date_start' => 'required|date'
         ]);
-
+        
         //crear un vector inputs para ingresar 
         $inputs = [...$request->all(), 'salary' => $request->salary ?? 0, 'days' => $request->days ?? 0, 'porcent_aportation' => $request->porcent_aportation ?? 0];
 
@@ -104,8 +107,11 @@ class EmployeeController extends Controller
     public function update(Request $request, Employee $employee)
     {
         $request->validate([
-            'name' => 'nullable|min:3|max:300',
-            'cuit' => 'required|min:10|max:13',
+            'name' => 'required|string|min:3|max:300',
+            'cuit' => 'required',
+            'position' => 'required|string|min:3|max:300',
+            'days' => 'required|integer|min:1',
+            'date_start' => 'required|date'
         ]);
 
         $inputs = [...$request->all(), 'salary' => $request->salary ?? 0, 'days' => $request->days ?? 0, 'porcent_aportation' => $request->porcent_aportation ?? 0];

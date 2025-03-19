@@ -23,7 +23,7 @@ class BoxController extends Controller
             ->whereIn('movement_types.type', ["Ingreso", "Egreso"])
             ->where(function ($query) {
                 $query->where('venue', 'ambos')
-                    ->orWhere('venue', 'bancos');
+                    ->orWhere('venue', 'caja');
             })
             ->orderBy('movement_types.id')
             ->get();

@@ -56,6 +56,7 @@ class TransactionController extends Controller
                 $query->where('venue', 'ambos')
                     ->orWhere('venue', 'bancos');
             })
+            ->whereNotIn('code',['AEU','AES'])
             ->get();
 
         $peopleCount = Person::count();
@@ -82,20 +83,14 @@ class TransactionController extends Controller
             ->first();
 
         if ($journal === null) {
-
-            // return redirect()->route('journal.create')->withErrors([
-            //     'warning' => 'Debes crear el asiento inicial para continuar con el proceso. Por favor, regístralo antes de avanzar.',
-            // ]);
+            return back()->withErrors(['error' => 'Por favor, crea el asiento inicial. Haz clic en "Aceptar" para continuar.', 'redirect' => 'journal.create']);
         }
         $banckAccountValidate = BankAccount::whereNull('account_id')
             ->where('bank_accounts.data_additional->company_id', $company->id)
             ->get();
 
         if ($banckAccountValidate->count() > 0) {
-            return back()->withErrors(['error' => 'Debes vincular las cuentas.', 'redirect' => true]);
-            // return redirect()->route('setting.account.bank.index')->withErrors([
-            //     'warning' => 'Debes vincular las cuentas para continuar con el proceso. Por favor, vinculalas antes de avanzar.',
-            // ]);
+            return back()->withErrors(['error' => 'Por favor, vincula las cuentas para poder utilizar todas las funcionalidades. Haz clic en "Aceptar" para continuar.', 'redirect' => 'setting.account.bank.index']);
         }
 
         $movementTypeValidate = MovementType::whereNull('account_id')
@@ -106,9 +101,7 @@ class TransactionController extends Controller
             ->get();
 
         if ($movementTypeValidate->count() > 0) {
-            return redirect()->route('setting.account.bank.index')->withErrors([
-                'warning' => 'Debes vincular las cuentas para continuar con el proceso. Por favor, vinculalas antes de avanzar.',
-            ]);
+            return back()->withErrors(['error' => 'Por favor, vincula las cuentas para poder utilizar todas las funcionalidades. Haz clic en "Aceptar" para continuar.', 'redirect' => 'setting.account.bank.index']);
         }
 
         // usuario autentificado,

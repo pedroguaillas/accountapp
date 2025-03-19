@@ -104,6 +104,13 @@ class AccountController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+            //EL TIPO SE ASIGNA DESPUES
+            //'type' => 'required',
+        ]);
+        
         $company = Company::first();
         $inputs = [
             ...$request->all(),
@@ -118,6 +125,10 @@ class AccountController extends Controller
 
     public function update(Request $request, Account $account)
     {
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+        ]);
         $account->update($request->all());
     }
 

@@ -1,5 +1,5 @@
 <script setup>
-import PersonSelectModal from "./PersonSelectModal.vue";
+import PersonSelectModal from "./EmployeeSelectModal.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import { ref, computed, watch } from "vue";
 import axios from "axios";

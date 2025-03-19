@@ -36,12 +36,22 @@ class RoleIngressController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'code' => 'required|min:2|max:300',
+            'name' => 'required',
+            'type' => 'required',
+        ]);
         $company = Company::first();
         RoleIngress::create([...$request->all(), 'company_id' => $company->id]);
     }
 
     public function update(Request $request, RoleIngress $roleingress)
     {
+        $request->validate([
+            'code' => 'required|min:2|max:300',
+            'name' => 'required',
+            'type' => 'required',
+        ]);
         $roleingress->update($request->all());
     }
 
