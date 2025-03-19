@@ -44,12 +44,12 @@ class TransactionBoxController extends Controller
         $movementtypes = MovementType::where('company_id', $company->id)
             ->where(function ($query) {
                 $query->where('venue', 'ambos')
-                    ->orWhere('venue', 'caja');
+                    ->orWhere('venue', 'caja');      
             })
+            ->whereNotIn('code',['FC','SC','AEU','AES'])
             ->get();
 
         $peopleCount = Person::count();
-        $people = [];
         $people = Person::where('company_id', $company->id)->get();
 
         return Inertia::render('TransactionBox/Create', [
@@ -64,6 +64,7 @@ class TransactionBoxController extends Controller
     {
         //TODO validar el monto en trasactionStoreBoxRequest
         $company = Company::first();
+
 
         $journal = Journal::where('description', 'ASIENTO DE SITUACION INICIAL')
             ->where('company_id', $company->id)
@@ -114,6 +115,7 @@ class TransactionBoxController extends Controller
         $box=Box::find($cash->box_id); 
 
         if ($movementType->type === 'Ingreso') {
+            $cash->increment('ingress', $transaction->amount);
             $journalEntries[] = [
                 'account_id' => $box->account_id,
                 'debit' => $transaction->amount,
@@ -125,6 +127,7 @@ class TransactionBoxController extends Controller
                 'have' => $transaction->amount,
             ];
         } else {
+            $cash->increment('egress', $transaction->amount);
             $journalEntries[] = [
                 'account_id' => $movementType->account_id,
                 'debit' => $transaction->amount,
@@ -145,6 +148,9 @@ class TransactionBoxController extends Controller
             'table' => 'transaction_boxes',
         ];
 
+        $cash->update([
+            'balance' => $cash->initial_value + $cash->ingress - $cash->egress
+        ]);
         $journal = $company->journals()->create($inputs);
         $journal->journalentries()->createMany($journalEntries);
 

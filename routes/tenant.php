@@ -113,8 +113,7 @@ Route::middleware([
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
-        Route::resource('accounts', AccountController::class)->only(['store', 'update', 'destroy']);
-        // Route::post('accounts', [AccountController::class, 'store'])->name('accounts.store');
+        Route::resource('accounts', AccountController::class)->only(['store','update', 'destroy']);
         Route::get('accounts/create/{account}', [AccountController::class, 'create'])->name('accounts.create');
 
         // Journals
@@ -153,6 +152,7 @@ Route::middleware([
 
         //adelantos
         Route::get('adelantos', [AdvanceController::class, 'index'])->name('advances.index');
+        Route::get('adelantos/crear', [AdvanceController::class, 'create'])->name('advances.create');
         Route::post('advances', [AdvanceController::class, 'store'])->name('advances.store');
         Route::put('advances/{advance}', [AdvanceController::class, 'update'])->name('advances.update');
         Route::delete('advances/{advance}', [AdvanceController::class, 'destroy'])->name('advances.delete');

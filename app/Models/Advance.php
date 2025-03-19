@@ -15,13 +15,15 @@ class Advance extends Model
         'amount',    // Tiempo de depreciacion
         'employee_id',           // Vinculo con el empleado
         'company_id',//vinculo con la compania
-        'type',//tipo sea salario o utilidad
-        'payment_type',//tipo de pago
+        'movement_type_id',//tipo sea salario o utilidad
         'date',//fecha del anticipo
-
+        'payment_type',//banco o caja
+        'payment_method_id',//identificador de caja o banco
     ];
 
     protected $casts = [
         'amount' => 'float',
+        'date' =>'date',
+        'payment_method_id'=>'integer',
     ];
 }

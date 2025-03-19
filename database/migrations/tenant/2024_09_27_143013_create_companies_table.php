@@ -297,22 +297,6 @@ return new class extends Migration {
             $table->unique(['company_id', 'cuit']);
         });
 
-        Schema::create('advances', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('company_id');
-            $table->bigInteger('employee_id');
-            $table->string('detail')->nullable();
-            $table->decimal('amount', 14, 2)->default(0);
-            $table->date('date');
-            $table->string('type');
-            $table->string('payment_type')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-
-            $table->foreign('employee_id')->references('id')->on('employees');
-            $table->foreign('company_id')->references('id')->on('companies');
-        });
-
         Schema::create('role_ingresses', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id');
@@ -576,6 +560,8 @@ return new class extends Migration {
             $table->decimal('egress', 10, 2)->default(0);
             $table->decimal('balance', 10, 2)->default(0);
             $table->string('state_box');//open,close
+            $table->decimal('real_balance', 10, 2)->default(0);
+            $table->decimal('cash_difference', 10, 2)->default(0);
 
             $table->timestamps();
             $table->softDeletes();//
@@ -598,6 +584,24 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign('cash_session_id')->references('id')->on('cash_sessions');
+            $table->foreign('movement_type_id')->references('id')->on('movement_types');
+        });
+
+        Schema::create('advances', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->bigInteger('employee_id');
+            $table->bigInteger('movement_type_id');
+            $table->string('detail')->nullable();
+            $table->decimal('amount', 14, 2)->default(0);
+            $table->date('date');
+            $table->string('payment_type');//banco o caja
+            $table->bigInteger('payment_method_id');//identificador de caja o banco
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('employee_id')->references('id')->on('employees');
+            $table->foreign('company_id')->references('id')->on('companies');
             $table->foreign('movement_type_id')->references('id')->on('movement_types');
         });
 

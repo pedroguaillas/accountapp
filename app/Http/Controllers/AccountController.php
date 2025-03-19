@@ -107,9 +107,10 @@ class AccountController extends Controller
         $request->validate([
             'code' => 'required',
             'name' => 'required',
-            'type' => 'required',
+            //EL TIPO SE ASIGNA DESPUES
+            //'type' => 'required',
         ]);
-
+        
         $company = Company::first();
         $inputs = [
             ...$request->all(),
@@ -127,7 +128,6 @@ class AccountController extends Controller
         $request->validate([
             'code' => 'required',
             'name' => 'required',
-            'type' => 'required',
         ]);
         $account->update($request->all());
     }

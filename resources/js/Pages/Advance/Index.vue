@@ -3,7 +3,7 @@
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import ModalAdvance from "./ModalAdvance.vue";
-import { router, useForm } from "@inertiajs/vue3";
+import { router, useForm, Link } from "@inertiajs/vue3";
 import axios from "axios";
 import Table from "@/Components/Table.vue";
 import TextInput from "@/Components/TextInput.vue";
@@ -176,12 +176,12 @@ const handlePageChange = async (page) => {
             placeholder="Buscar..."
           />
         </div>
-        <button
-          @click="newAdvance"
+         <Link
+          :href="route('advances.create')"
           class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-          >
+        >
           +
-        </button>
+        </Link>
       </div>
 
       <!-- Resposive -->

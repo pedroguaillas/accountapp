@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Box;
 use App\Models\CashSession;
 use App\Models\Company;
+use App\Models\MovementType;
 use App\Models\Employee;
 use App\Models\TransactionBox;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class BoxController extends Controller
 {
@@ -18,7 +20,7 @@ class BoxController extends Controller
         $search = $request->input('search', '');
 
         $boxes = Box::query()
-            ->select('boxes.id', 'boxes.name', 'employees.name as employee_name', 'cash_sessions.state_box')
+            ->select('boxes.id', 'boxes.name', 'employees.name as employee_name', 'cash_sessions.state_box', 'cash_sessions.balance')
             ->leftJoin('cash_sessions', function ($query) {
                 $query->on('boxes.id', 'box_id')
                     ->where('state_box', 'open');
@@ -104,11 +106,6 @@ class BoxController extends Controller
             'balance' => $request->initial_value,
             'state_box' => 'open',//poner en espaniol
         ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Caja abierta correctamente.',
-        ]);
     }
 
     //metodo para traer datos de la seccion de cjas y las transacciones
@@ -135,8 +132,8 @@ class BoxController extends Controller
 
         // Retornar los datos como JSON
         return response()->json([
-            'ingres' => $ingres,
-            'egres' => $egres,
+            'ingress' => $ingres,
+            'egress' => $egres,
             'balance' => $balance,
             'initial_value' => $initial_value
         ]);
@@ -148,8 +145,7 @@ class BoxController extends Controller
     public function close(Request $request, Box $box)
     {
         $request->validate([
-            'ingress' => 'required|numeric|min:0',
-            'egress' => 'required|numeric|min:0',
+            'real_balance' => 'required|numeric|min:0',
         ]);
 
         $cashSession = CashSession::where(['box_id' => $box->id, 'state_box' => 'open'])
@@ -163,25 +159,65 @@ class BoxController extends Controller
             ], 404);
         }
 
-        $ingress = $request->input('ingress');
-        $egress = $request->input('egress');
-        $initialValue = $cashSession->initial_value;
-        $balance = $initialValue + $ingress - $egress;
-
         // TODO Asumimos que el empleado que cierra la caja se obtiene del usuario autenticado.
         $closeEmployeeId = auth()->user()->employee_id ?? null;
-
         $cashSession->update([
-            'ingress' => $ingress,
-            'egress' => $egress,
-            'balance' => $balance,
+            ...$request->all(),
+            'state_box' => 'close',
             'close_employee_id' => $closeEmployeeId,
-            'state_box' => 'close',//cerrar
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Caja cerrada correctamente.',
-        ]);
+        $company = Company::first();
+
+        //asiento cuando existe sobrante o faltante de dinero
+        if ($request->balance === $request->real_balance)
+            return;
+        $journalEntries = [];
+        if ($request->balance < $request->real_balance)//(50<60)
+        {
+            $movementType = MovementType::where(['code' => 'SC', 'company_id' => $company->id])->first();
+
+            $journalEntries[] = [
+                'account_id' => $box->account_id,
+                'debit' => $request->cash_difference,
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $movementType->account_id,
+                'debit' => 0,
+                'have' => $request->cash_difference,
+            ];
+            $description = "Sobrante en caja";
+
+        } else {
+
+            $movementType = MovementType::where(['code' => 'FC', 'company_id' => $company->id])->first();
+
+            $journalEntries[] = [
+                'account_id' => $movementType->account_id,
+                'debit' => abs($request->cash_difference),
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $box->account_id,
+                'debit' => 0,
+                'have' => abs($request->cash_difference),
+            ];
+            $description = "Faltante en caja";
+        }
+
+        $user = auth()->user();
+        //fecha actual
+        $date = Carbon::now();
+
+        $inputs = [
+            'description' => $description,
+            'date' => $date,
+            'user_id' => $user->id,
+            'document_id' => $box->id,
+            'table' => 'transaction_boxes',
+        ];
+        $journal = $company->journals()->create($inputs);
+        $journal->journalentries()->createMany($journalEntries);
     }
 }

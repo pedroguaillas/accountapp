@@ -56,6 +56,7 @@ class TransactionController extends Controller
                 $query->where('venue', 'ambos')
                     ->orWhere('venue', 'bancos');
             })
+            ->whereNotIn('code',['AEU','AES'])
             ->get();
 
         $peopleCount = Person::count();

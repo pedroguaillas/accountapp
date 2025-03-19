@@ -202,15 +202,20 @@ class DatabaseSeeder extends Seeder
         Withholding::create(['code' => '523A', 'name' => 'Pago a no residentes - Seguros y reaseguros (primas y cesiones)', 'percentage' => '0,22,37', 'type' => 'RENTA']);
         Withholding::create(['code' => '525', 'name' => 'Pago a no residentes- Donaciones en dinero -Impuesto a las donaciones', 'percentage' => 'Según art 36 LRTI literal d)', 'type' => 'RENTA']);
 
-        MovementType::create(['code' => 'P','name' => "Préstamo", 'type' => "Ingreso",'venue'=>'ambos']);
-        MovementType::create(['code' => 'AP','name' => "Anticipo proveedor", 'type' => "Egreso",'venue'=>'ambos']);
-        MovementType::create(['code' => 'AC','name' => "Anticipo cliente", 'type' => "Ingreso",'venue'=>'ambos']);
-        MovementType::create(['code' => 'OF','name' => "Operación de Financiamiento", 'type' => "Ingreso",'venue'=>'ambos']);
-        MovementType::create(['code' => 'RC','name' => "Retiro (Desembolso de caja)", 'type' => "Egreso",'venue'=>'bancos']);
-        MovementType::create(['code' => 'DB','name' => "Deposito (Desembolso de banco)", 'type' => "Egreso",'venue'=>'caja']);
-        MovementType::create(['code' => 'PP','name' => "Pago préstamo", 'type' => "Egreso",'venue'=>'bancos']);
-        MovementType::create(['code' => 'GND','name' => "Gastos no deducibles", 'type' => "Egreso",'venue'=>'ambos']);
-        MovementType::create(['code' => 'GP','name' => "Gasto personal", 'type' => "Egreso",'venue'=>'ambos']);
-        MovementType::create(['code' => 'RCC','name' => "Reposición Caja Chica", 'type' => "Egreso",'venue'=>'caja']);
+        MovementType::create(['code' => 'P', 'name' => "Préstamo", 'type' => "Ingreso", 'venue' => 'ambos']);
+        MovementType::create(['code' => 'AP', 'name' => "Anticipo proveedor", 'type' => "Egreso", 'venue' => 'ambos']);
+        MovementType::create(['code' => 'AC', 'name' => "Anticipo cliente", 'type' => "Ingreso", 'venue' => 'ambos']);
+        MovementType::create(['code' => 'OF', 'name' => "Operación de Financiamiento", 'type' => "Ingreso", 'venue' => 'ambos']);
+        MovementType::create(['code' => 'RC', 'name' => "Retiro (Desembolso de caja)", 'type' => "Egreso", 'venue' => 'bancos']);
+        MovementType::create(['code' => 'DB', 'name' => "Deposito (Desembolso de banco)", 'type' => "Egreso", 'venue' => 'caja']);
+        MovementType::create(['code' => 'PP', 'name' => "Pago préstamo", 'type' => "Egreso", 'venue' => 'bancos']);
+        MovementType::create(['code' => 'GND', 'name' => "Gastos no deducibles", 'type' => "Egreso", 'venue' => 'ambos']);
+        MovementType::create(['code' => 'GP', 'name' => "Gasto personal", 'type' => "Egreso", 'venue' => 'ambos']);
+        MovementType::create(['code' => 'RCC', 'name' => "Reposición Caja Chica", 'type' => "Egreso", 'venue' => 'caja']);
+        MovementType::create(['code' => 'FC', 'name' => "Faltante de Caja", 'type' => "Egreso", 'venue' => 'caja']);
+        MovementType::create(['code' => 'SC', 'name' => "Sobrante de Caja", 'type' => "Ingreso", 'venue' => 'caja']);
+        MovementType::create(['code' => 'AEU', 'name' => "Anticipo empleado utilidad", 'type' => "Ingreso", 'venue' => 'ambos']);
+        MovementType::create(['code' => 'AES', 'name' => "Anticipo empleado sueldo", 'type' => "Ingreso", 'venue' => 'ambos']);
+        
     }
 }
