@@ -55,8 +55,6 @@ const newBox = () => {
   if (props.boxes.data.length === 0) {
     box.name = "CAJA GENERAL";
     box.type = "general";
-  } else {
-    box.type = "otros";
   }
   toggle();
 };

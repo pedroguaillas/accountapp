@@ -597,6 +597,7 @@ return new class extends Migration {
             $table->date('date');
             $table->string('payment_type');//banco o caja
             $table->bigInteger('payment_method_id');//identificador de caja o banco
+            $table->string('receipt_number')->nullable();//numero de comprobante
             $table->timestamps();
             $table->softDeletes();
 

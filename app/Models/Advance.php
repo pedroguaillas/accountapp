@@ -19,6 +19,7 @@ class Advance extends Model
         'date',//fecha del anticipo
         'payment_type',//banco o caja
         'payment_method_id',//identificador de caja o banco
+        'receipt_number',//numero de documento
     ];
 
     protected $casts = [

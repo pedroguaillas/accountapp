@@ -35,6 +35,12 @@ const EmployeesOptions = computed(() =>
 
 // Seleccionar automáticamente el único empleado si hay solo uno
 const selectedEmployee = ref(props.box.owner_id || null);
+
+const TypeOptions = [
+  { value: "chica", label: "Chica" },
+  { value: "otras", label: "Otras" },
+];
+
 </script>
 
 <template>
@@ -52,7 +58,6 @@ const selectedEmployee = ref(props.box.owner_id || null);
             v-if="box.name === 'CAJA GENERAL'"
             class="col-span-6 sm:col-span-4 flex items-center mt-2"
           >
-            <Checkbox v-model:checked="box.isCajaChica" label="Caja Chica" />
           </div>
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="name" value="Nombre de la caja" />
@@ -77,6 +82,18 @@ const selectedEmployee = ref(props.box.owner_id || null);
               :required="true"
             />
             <InputError :message="error.owner_id" class="mt-2" />
+          </div>
+
+          <div  v-if="box.name !== 'CAJA GENERAL'" class="col-span-6 sm:col-span-4">
+            <InputLabel for="owner_id" value="Tipo" />
+            <DynamicSelect
+              class="mt-1 block w-full"
+              v-model="box.type"
+              :options="TypeOptions"
+              autofocus
+              :required="true"
+            />
+            <InputError :message="error.type" class="mt-2" />
           </div>
         </form>
       </div>

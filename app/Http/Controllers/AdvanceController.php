@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AdvanceRequest;
 use App\Models\Advance;
 use App\Models\Company;
+use App\Models\Box;
 use App\Models\Employee;
 use App\Models\MovementType;
 use App\Models\CashSession;
 use App\Models\BankAccount;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class AdvanceController extends Controller
 {
@@ -56,9 +58,6 @@ class AdvanceController extends Controller
             $employees = Employee::where('company_id', $company->id)
                 ->get();
         }
-        $movementTypes = MovementType::where('company_id', $company->id)
-            ->whereIn('code', ['AEU', 'AES'])
-            ->get();
         $cash = CashSession::select('cash_sessions.id', 'cash_sessions.box_id', 'boxes.name')
             ->join('boxes', 'boxes.id', '=', 'cash_sessions.box_id') // Aquí corriges la relación
             ->where('cash_sessions.state_box', 'open')
@@ -70,7 +69,6 @@ class AdvanceController extends Controller
 
         return Inertia::render('Advance/Create', [
             'employees' => $employees,
-            'movementTypes' => $movementTypes,
             'cash' => $cash,
             'bankAccounts' => $bankAccounts,
             'optimum' => $optimum,
@@ -79,21 +77,134 @@ class AdvanceController extends Controller
 
     public function store(AdvanceRequest $advanceRequest)
     {
-
         $company = Company::first();
 
-        $company->advances()->create($advanceRequest->all());
+        $movementType = MovementType::where('company_id', $company->id)
+            ->where('code', 'AES')
+            ->first();
+
+        $company->advances()->create(
+            [...$advanceRequest->all(), 'movement_type_id' => $movementType->id]
+        );
+        $journalEntries = [];
+        if ($advanceRequest->payment_type === 'banco') {
+            $bankAccount = BankAccount::where('bank_accounts.data_additional->company_id', $company->id)
+                ->where('id', $advanceRequest->payment_method_id)
+                ->first();
+            $bankAccount->decrement('current_balance', abs($advanceRequest->amount));
+            $journalEntries[] = [
+                'account_id' => $movementType->account_id,
+                'debit' => $advanceRequest->amount,
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $bankAccount->account_id,
+                'debit' => 0,
+                'have' => $advanceRequest->amount,
+            ];
+        } else {
+            $cash = CashSession::where('id', $advanceRequest->payment_method_id)
+                ->first();
+            $cash->increment('egress', $advanceRequest->amount);
+            $cash->update([
+                'balance' => $cash->initial_value + $cash->ingress - $cash->egress
+            ]);
+
+            $box = Box::where('company_id', $company->id)
+                ->where('id', $cash->box_id)
+                ->first();
+            $journalEntries[] = [
+                'account_id' => $movementType->account_id,
+                'debit' => $advanceRequest->amount,
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $box->account_id,
+                'debit' => 0,
+                'have' => $advanceRequest->amount,
+            ];
+        }
+
+        $user = auth()->user();
+        //fecha actual
+        $date = Carbon::now();
+
+        $inputs = [
+            'description' => "Adelanto empleado",
+            'date' => $date,
+            'user_id' => $user->id,
+            'document_id' => $advanceRequest->id,
+            'table' => 'advances',
+        ];
+
+        $journal = $company->journals()->create($inputs);
+        $journal->journalentries()->createMany($journalEntries);
 
         return redirect()->route('advances.index');
     }
 
-    public function update(AdvanceRequest $advanceRequest, Advance $advance)
-    {
-        $advance->update($advanceRequest->all());
-    }
-
     public function destroy(Advance $advance)
     {
+        $company = Company::first();
+
+        $movementType = MovementType::where('company_id', $company->id)
+            ->where('code', 'AES')
+            ->first();
+
+        $journalEntries = [];
+        if ($advance->payment_type === 'banco') {
+            $bankAccount = BankAccount::where('bank_accounts.data_additional->company_id', $company->id)
+                ->where('id', $advance->payment_method_id)
+                ->first();
+            $bankAccount->increment('current_balance', abs($advance->amount));
+            $journalEntries[] = [
+                'account_id' => $bankAccount->account_id,
+                'debit' => $advance->amount,
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $movementType->account_id,
+                'debit' => 0,
+                'have' => $advance->amount,
+
+            ];
+        } else {
+            $cash = CashSession::where('id', $advance->payment_method_id)
+                ->first();
+            $cash->decrement('egress', $advance->amount);
+            $cash->update([
+                'balance' => $cash->initial_value + $cash->ingress - $cash->egress
+            ]);
+
+            $box = Box::where('company_id', $company->id)
+                ->where('id', $cash->box_id)
+                ->first();
+            $journalEntries[] = [
+                'account_id' => $box->account_id,
+                'debit' => $advance->amount,
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $movementType->account_id,
+                'debit' => 0,
+                'have' => $advance->amount,
+            ];
+        }
+
+        $user = auth()->user();
+        //fecha actual
+        $date = Carbon::now();
+
+        $inputs = [
+            'description' => "Ajuste Adelanto empleado",
+            'date' => $date,
+            'user_id' => $user->id,
+            'document_id' => $advance->id,
+            'table' => 'advances',
+        ];
+
+        $journal = $company->journals()->create($inputs);
+        $journal->journalentries()->createMany($journalEntries);
         $advance->delete(); // Esto usará SoftDeletes
     }
 }
