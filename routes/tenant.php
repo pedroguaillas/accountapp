@@ -149,6 +149,7 @@ Route::middleware([
         Route::delete('employees/{employee}', [EmployeeController::class, 'destroy'])->name('employee.delete');
         Route::resource('employee', EmployeeController::class)->only(['store', 'update']);
         Route::put('employees/{id}/state', [EmployeeController::class, 'updateState'])->name('employee.updateState');
+        Route::get('employees', [EmployeeController::class, 'getEmployees'])->name('employees.filters.index');
 
         //adelantos
         Route::get('adelantos', [AdvanceController::class, 'index'])->name('advances.index');

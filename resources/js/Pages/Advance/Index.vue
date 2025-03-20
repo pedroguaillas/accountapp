@@ -216,12 +216,6 @@ const handlePageChange = async (page) => {
                   >
                     <TrashIcon class="size-6 text-white" />
                   </button>
-                  <button
-                    class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                    @click="update(advance)"
-                  >
-                    <PencilIcon class="size-4 text-white" />
-                  </button>
                 </div>
               </td>
             </tr>

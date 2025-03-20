@@ -59,14 +59,6 @@ class BoxController extends Controller
 
         //creacion de los estableicmientos 
         $company->boxes()->create($request->all());
-
-        if (($request->type === 'general') && ($request->isCajaChica)) {
-            $company->boxes()->create([
-                'name' => 'CAJA CHICA',
-                'owner_id' => $request->owner_id,
-                'type' => 'chica',
-            ]);
-        }
     }
 
     public function update(Request $request, Box $box)

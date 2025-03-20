@@ -75,6 +75,23 @@ class EmployeeController extends Controller
         return to_route('employee.index');
     }
 
+    public function getEmployees(Request $request)
+    {
+        $company = Company::first();
+
+        // Obtener el término de búsqueda si existe
+        $search = $request->input('search');
+        $paginate = $request->input('paginate', 10);
+        // Obtener los datos con filtro y paginación
+        $employee = Employee::where('company_id', $company->id)
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('cuit', 'LIKE', "%{$search}%");
+            })
+            ->paginate($paginate); // Cambia el número de elementos por página si es necesario
+
+        return response()->json($employee);
+    }
     public function edit(int $employeeId)
     {
         $employee = Employee::selectRaw("

@@ -2,7 +2,7 @@
 // Imports
 import { reactive, computed, ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import SearchPerson from "./SearchEmployee.vue";
+import SearchEmployee from "./SearchEmployee.vue";
 import { useForm, router, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
@@ -13,7 +13,6 @@ import { TrashIcon } from "@heroicons/vue/24/outline";
 // Props
 const props = defineProps({
   bankAccounts: { type: Array, default: () => [] },
-  movementTypes: { type: Array, default: () => [] },
   employees: { type: Array, default: () => [] },
   cash: { type: Array, default: () => [] },
   optimum: { type: Boolean, default: () => false },
@@ -42,10 +41,10 @@ const initialAdvance = {
   detail: "",
   amount: "",
   employee_id: 0,
-  movement_type_id: 0,
   payment_type: "",
   payment_method_id: 0, //identificador de caja o banco
-  date:"",
+  date: "",
+  receipt_number: "",
 };
 
 const employee_id = props.employees.length === 1 ? props.employees[0].id : 0;
@@ -79,19 +78,30 @@ const handleEmployeeSelect = (employee) => {
   advance.employee_id = employee.id; // Asignar el centro de costo al objeto journal
 };
 
-const TypeOptions = [
-  { value: "caja", label: "Caja" },
-  { value: "banco", label: "Bancos" },
-];
+const TypeOptions = ref(); 
 
-const paymentMethodOptions = props.bankAccounts.map((bankAccount) => ({
+watch(
+  () => advance.amount, // Observa cambios en el monto
+  (newAmount) => {
+    if (newAmount >= 500) {
+      TypeOptions.value = [{ value: "banco", label: "Bancos" }];
+    } else {
+      TypeOptions.value = [
+        { value: "caja", label: "Caja" },
+        { value: "banco", label: "Bancos" },
+      ];
+    }
+  }
+);
+
+const paymentMethodOptionsBank = props.bankAccounts.map((bankAccount) => ({
   value: bankAccount.id,
   label: `${bankAccount.name} ${bankAccount.account_number}`,
 }));
 
-const movementTypeOptions = props.movementTypes.map((type) => ({
-  value: type.id,
-  label: type.name,
+const paymentMethodOptionsBox = props.cash.map((box) => ({
+  value: box.id,
+  label: box.name,
 }));
 
 const employeeOptions = props.employees.map((person) => ({
@@ -137,6 +147,7 @@ const employeeOptions = props.employees.map((person) => ({
             v-model="advance.date"
             type="date"
             class="mt-2 block w-full"
+            :max="date"
           />
           <InputError :message="errorForm.date" class="mt-2" />
         </div>
@@ -170,25 +181,33 @@ const employeeOptions = props.employees.map((person) => ({
           <DynamicSelect
             class="mt-2 block w-full"
             v-model="advance.payment_method_id"
-            :options="paymentMethodOptions"
+            :options="
+              advance.payment_type === 'banco'
+                ? paymentMethodOptionsBank
+                : paymentMethodOptionsBox
+            "
             autofocus
           />
           <InputError :message="errorForm.payment_method_id" class="mt-2" />
         </div>
 
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="movement_type_id" value="Tipo de Movimiento" />
-          <DynamicSelect
-            v-model="advance.movement_type_id"
-            :options="movementTypeOptions"
-            placeholder="Seleccione un tipo de movimiento"
-            class="mt-2 block w-full"
+        <div
+          v-show="advance.payment_type === 'banco'"
+          class="col-span-6 sm:col-span-4"
+        >
+          <InputLabel for="receipt_number" value="Numero de comprobante" />
+          <TextInput
+            v-model="advance.receipt_number"
+            type="text"
+            class="mt-1 block w-full"
+            minlength="3"
+            maxlength="300"
           />
-          <InputError :message="errorForm.movement_type_id" class="mt-2" />
+          <InputError :message="errorForm.receipt_number" class="mt-2" />
         </div>
 
         <!-- beneficiario-->
-        <div  class="col-span-6 sm:col-span-4">
+        <div class="col-span-6 sm:col-span-4">
           <InputLabel for="employee_id" value="Empleado" />
           <DynamicSelect
             v-if="props.optimum"
@@ -197,10 +216,10 @@ const employeeOptions = props.employees.map((person) => ({
             :options="employeeOptions"
             autofocus
           />
-          <!-- <SearchPerson
-            v-else-if="people.length > 5"
-            @selectPerson="handlePersonSelect"
-          /> -->
+          <SearchEmployee
+            v-else
+            @selectEmployees="handleEmployeeSelect"
+          />
           <InputError :message="errorForm.employee_id" class="mt-2" />
         </div>
 
@@ -215,6 +234,7 @@ const employeeOptions = props.employees.map((person) => ({
           />
           <InputError :message="errorForm.detail" class="mt-2" />
         </div>
+
         <div class="mt-4 text-right">
           <button
             @click="save"
