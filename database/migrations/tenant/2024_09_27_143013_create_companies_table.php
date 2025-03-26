@@ -558,6 +558,7 @@ return new class extends Migration {
             $table->decimal('initial_value', 10, 2);
             $table->decimal('ingress', 10, 2)->default(0);
             $table->decimal('egress', 10, 2)->default(0);
+
             $table->decimal('balance', 10, 2)->default(0);
             $table->string('state_box');//open,close
             $table->decimal('real_balance', 10, 2)->default(0);
@@ -576,6 +577,8 @@ return new class extends Migration {
             $table->bigInteger('movement_type_id');
             $table->decimal('amount', 10, 2);
             $table->string('description')->nullable();
+            $table->bigInteger('box_id')->nullable();
+            $table->string('document')->nullable();
             $table->bigInteger('beneficiary_id')->nullable(); // Persona beneficiaria
             $table->string('state_transaction')->nullable(); //vigente o finalizado
             $table->json('data_additional')->nullable();

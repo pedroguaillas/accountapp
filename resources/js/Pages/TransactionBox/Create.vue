@@ -21,8 +21,9 @@ const initialTransaction = {
   amount: "",
   beneficiary_id: "",
   description: "",
-  state_transaction: "pendiente",   
-
+  state_transaction: "pendiente",
+  box_id: "",
+  document: "",
 };
 const cash_session_id =
   props.cashSessions.length === 1 ? props.cashSessions[0].id : 0;
@@ -45,12 +46,46 @@ const movementTypeOptions = props.movementtypes.map((type) => ({
   value: type.id,
   label: type.name,
   type: type.type,
+  code: type.code,
 }));
+
+const selectedBoxType = computed(() => {
+  const selectedSession = props.cashSessions.find(
+    (session) => session.id == transaction.cash_session_id
+  );
+  return selectedSession ? selectedSession.box_type : null;
+});
+
+const selectedMovementTypecode = computed(() => {
+  const selectedSession = props.movementtypes.find(
+    (session) => session.id == transaction.movement_type_id
+  );
+  return selectedSession ? selectedSession.code : null;
+});
 
 const selectedType = ref("");
 
 const filteredMovementTypes = computed(() => {
-  return movementTypeOptions.filter((type) => type.type === selectedType.value);
+  if (selectedBoxType.value === "general") {
+    return movementTypeOptions.filter(
+      (type) =>
+        type.type === selectedType.value && !["DCG", "RFA"].includes(type.code)
+    );
+  } else {
+    if (selectedBoxType.value === "chica") {
+      return movementTypeOptions.filter(
+        (type) =>
+          type.type === selectedType.value && ["RFA"].includes(type.code)
+      );
+    } else {
+      if (selectedBoxType.value === "otras") {
+        return movementTypeOptions.filter(
+          (type) =>
+            type.type === selectedType.value && ["DCG"].includes(type.code)
+        );
+      }
+    }
+  }
 });
 
 const peopleOptions = props.people.map((person) => ({
@@ -61,7 +96,26 @@ const peopleOptions = props.people.map((person) => ({
 const cashSessionOptions = props.cashSessions.map((session) => ({
   value: session.id,
   label: `${session.id} - ${session.name}`, // 🔥 Aquí la interpolación es correcta
+  type: session.box_type,
 }));
+
+const filteredCashSessions = computed(() => {
+  console.log();
+  if (
+    selectedBoxType.value === "general" &&
+    selectedMovementTypecode.value === "RCC"
+  ) {
+    return cashSessionOptions.filter((type) => type.type === "chica");
+  } else {
+    if (
+      selectedBoxType.value === "general" &&
+      selectedMovementTypecode.value === "PF"
+    ) {
+      return cashSessionOptions.filter((type) => type.type === "otras");
+    }
+  }
+  return cashSessionOptions;
+});
 
 const save = () => {
   transaction.post(route("transaction.boxes.store"), {
@@ -114,6 +168,37 @@ const save = () => {
             class="mt-2 block w-full"
           />
           <InputError :message="errorForm.movement_type_id" class="mt-2" />
+        </div>
+
+        <div
+          v-if="
+            selectedMovementTypecode === 'RCC' ||
+            selectedMovementTypecode === 'PF'
+          "
+          class="col-span-6 sm:col-span-4"
+        >
+          <InputLabel for="type" value="Lista de Cajas" />
+          <DynamicSelect
+            v-model="transaction.box_id"
+            :options="filteredCashSessions"
+            placeholder="Seleccione una caja"
+            class="mt-2 block w-full"
+          />
+        </div>
+
+        <div
+          v-if="selectedBoxType === 'chica'"
+          class="col-span-6 sm:col-span-4"
+        >
+          <InputLabel for="document" value="Numero de comprobante" />
+          <TextInput
+            v-model="transaction.document"
+            type="number"
+            class="mt-1 block w-full"
+            min="0"
+            step="0.01"
+          />
+          <InputError :message="errorForm.document" class="mt-2" />
         </div>
 
         <div class="col-span-6 sm:col-span-4">

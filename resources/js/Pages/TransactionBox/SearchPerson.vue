@@ -8,7 +8,7 @@ import axios from "axios";
 const modal = ref(false);
 const search = ref(""); // Texto del input
 const searchModal = ref(""); // Texto del input
-//const identification = ref(""); // Identificación de la persona seleccionada
+const identification = ref(""); // Identificación de la persona seleccionada
 const people = ref({}); // Sugerencias obtenidas del backend
 const suggestion = ref([]);
 const isDropdownOpen = ref(false);
@@ -37,7 +37,7 @@ const toggleModal = () => {
 const handlePersonSelect = (person) => {
   modal.value = false;
   search.value = person.name;
-  //identification.value = person.identification;
+  identification.value = person.identification;
   isDropdownOpen.value = false;
   people.value = {}; // Limpiar sugerencias
   selectedPerson.value = person; // Marcar persona como seleccionada
@@ -104,13 +104,6 @@ const emit = defineEmits(["selectPerson"]);
 <template>
   <div class="block w-full mt-2">
     <div class="flex">
-      <!-- Campo para identificación -->
-      <div
-        class="w-[10em] border-y border-l border-gray-300 text-gray-500 px-4 py-2"
-      >
-        {{ selectedPerson?.value?.identification ?? "Identificación" }}
-      </div>
-
       <!-- Campo de búsqueda con sugerencias -->
       <div class="flex-1 relative">
         <input

@@ -24,8 +24,7 @@ class BoxController extends Controller
             ->where(function ($query) {
                 $query->where('venue', 'ambos')
                     ->orWhere('venue', 'caja')
-                    ->whereNot('code','RCc');
-                    
+                    ->whereNotIn('movement_types.code',['RCC','DCG','RFA','PF']);
             })
             ->orderBy('movement_types.id')
             ->get();
