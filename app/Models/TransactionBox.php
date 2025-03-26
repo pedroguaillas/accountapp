@@ -18,6 +18,9 @@ class TransactionBox extends Model
         'beneficiary_id',
         'description',
         'data_additional',
+        'box_id',
+        'document',
+
     ];
     protected $casts = [
         'cash_session_id' => 'integer',
