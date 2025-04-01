@@ -214,11 +214,5 @@ class DatabaseSeeder extends Seeder
         MovementType::create(['code' => 'FC', 'name' => "Faltante de Caja", 'type' => "Egreso", 'venue' => 'caja']);
         MovementType::create(['code' => 'SC', 'name' => "Sobrante de Caja", 'type' => "Ingreso", 'venue' => 'caja']);
         MovementType::create(['code' => 'AES', 'name' => "Anticipo empleado sueldo", 'type' => "Ingreso", 'venue' => 'ambos']);
-        //Movimientos entre cajas
-        MovementType::create(['code' => 'RCC', 'name' => "Reposición", 'type' => "Egreso", 'venue' => 'caja']);
-        MovementType::create(['code' => 'PF', 'name' => "Provisición de fondos", 'type' => "Egreso", 'venue' => 'caja']);
-        MovementType::create(['code' => 'DCG', 'name' => "Deposito a caja general", 'type' => "Egreso", 'venue' => 'caja']);
-        MovementType::create(['code' => 'RFA', 'name' => "Reintegro de fondos sobrantes", 'type' => "Egreso", 'venue' => 'caja']);
-
     }
 }

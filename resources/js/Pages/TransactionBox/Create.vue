@@ -187,7 +187,8 @@ const save = () => {
         </div>
 
         <div
-          v-if="selectedBoxType === 'chica'"
+          v-if="
+            selectedMovementTypecode !== 'RFA'"
           class="col-span-6 sm:col-span-4"
         >
           <InputLabel for="document" value="Numero de comprobante" />

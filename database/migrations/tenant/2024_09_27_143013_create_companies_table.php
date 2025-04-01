@@ -404,6 +404,16 @@ return new class extends Migration {
             $table->foreign('company_id')->references('id')->on('companies');
         });
 
+        Schema::create('expenses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->string('name'); // Movement type name 
+            $table->bigInteger('account_id')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
         Schema::create('banks', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id');
@@ -547,7 +557,7 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign('company_id')->references('id')->on('companies');
-            $table->foreign('owner_id')->references('id')->on('employees');
+            //$table->foreign('owner_id')->references('id')->on('employees');
         });
 
         Schema::create('cash_sessions', function (Blueprint $table) {

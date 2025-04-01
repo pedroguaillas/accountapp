@@ -32,6 +32,7 @@ use App\Http\Controllers\Landlord\IvaController;
 use App\Http\Controllers\Landlord\WithholdingController;
 use App\Http\Controllers\Landlord\IceController;
 use App\Http\Controllers\Landlord\PayMethodController;
+use App\Http\Controllers\Landlord\ExpenseController;
 
 use App\Http\Controllers\Setting\AccountController as SettingAccountController;
 use App\Http\Controllers\Setting\RolController as SettingRolController;
@@ -248,6 +249,9 @@ Route::middleware([
 
         Route::get('ajustes/movimientos-bancarios', [MovementTypeController::class, 'index'])->name('busssines.setting.movementtypes.index');
         Route::post('movementtypes', [MovementTypeController::class, 'store'])->name('busssines.setting.movementtypes.store');
+
+        Route::get('ajustes/gastos', [ExpenseController::class, 'index'])->name('busssines.setting.expenses.index');
+        Route::post('expenses', [ExpenseController::class, 'store'])->name('busssines.setting.expenses.store');
 
         Route::get('ajustes/regimen-pago', [PaymentRegimController::class, 'index'])->name('busssines.setting.paymentregims.index');
         Route::post('paymentRegim', [PaymentRegimController::class, 'store'])->name('busssines.setting.paymentregims.store');

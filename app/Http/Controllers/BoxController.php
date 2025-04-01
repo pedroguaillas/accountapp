@@ -6,6 +6,7 @@ use App\Models\Box;
 use App\Models\CashSession;
 use App\Models\Company;
 use App\Models\MovementType;
+use App\Models\Journal;
 use App\Models\Employee;
 use App\Models\TransactionBox;
 use Illuminate\Http\Request;
@@ -89,15 +90,76 @@ class BoxController extends Controller
             'initial_value' => 'required|numeric|min:0',
         ]);
 
-        $box->cashSessions()->create([
-            'open_employee_id' => 1,//TODO revisar id
-            'close_employee_id' => null,
-            'initial_value' => $request->initial_value,
-            'ingress' => 0,
-            'egress' => 0,
-            'balance' => $request->initial_value,
-            'state_box' => 'open',//poner en espaniol
-        ]);
+        $company = Company::first();
+
+        $journal = Journal::where('description', 'ASIENTO DE SITUACION INICIAL')
+            ->where('company_id', $company->id)
+            ->first();
+
+        if (!$journal) {
+            return redirect()->route('journal.create')->withErrors([
+                'warning' => 'Debes crear el asiento inicial antes de continuar.',
+            ]);
+        }
+
+        $boxAccountValidate = Box::whereNull('account_id')
+            ->where('boxes.company_id', $company->id)
+            ->exists();
+
+        if ($boxAccountValidate) {
+            return redirect()->route('setting.account.box.index')->withErrors([
+                'warning' => 'Debes vincular las cuentas antes de continuar.',
+            ]);
+        }
+
+        $general = Box::where('name', 'Caja General')->first();
+
+        $cashgeneral = CashSession::where('box_id', $general->id)
+            ->where('state_box', 'open')
+            ->latest()
+            ->first();
+
+        if ($request->initial_value <= $cashgeneral->balance) {
+            $box->cashSessions()->create([
+                'open_employee_id' => 1,//TODO revisar id
+                'close_employee_id' => null,
+                'initial_value' => $request->initial_value,
+                'ingress' => 0,
+                'egress' => 0,
+                'balance' => $request->initial_value,
+                'state_box' => 'open',//poner en espaniol
+            ]);
+            $cashgeneral->increment('egress', $request->initial_value);
+            $cashgeneral->update([
+                'balance' => $cashgeneral->initial_value + $cashgeneral->ingress - $cashgeneral->egress
+            ]);
+
+            $journalEntries = [];
+            $journalEntries[] = [
+                'account_id' => $box->account_id,
+                'debit' => $request->initial_value,
+                'have' => 0,
+            ];
+            $journalEntries[] = [
+                'account_id' => $general->account_id,
+                'debit' => 0,
+                'have' => $request->initial_value,
+            ];
+            $description = "Desenbolso o reposición de caja";
+            $user = auth()->user();
+            //fecha actual
+            $date = Carbon::now();
+
+            $inputs = [
+                'description' => $description,
+                'date' => $date,
+                'user_id' => $user->id,
+                'document_id' => $box->id,
+                'table' => 'transaction_boxes',
+            ];
+            $journal = $company->journals()->create($inputs);
+            $journal->journalentries()->createMany($journalEntries);
+        }
     }
 
     //metodo para traer datos de la seccion de cjas y las transacciones
@@ -153,13 +215,48 @@ class BoxController extends Controller
 
         // TODO Asumimos que el empleado que cierra la caja se obtiene del usuario autenticado.
         $closeEmployeeId = auth()->user()->employee_id ?? null;
+        $company = Company::first();
+        $general = Box::where('name', 'Caja General')->first();
+
+        $cashgeneral = CashSession::where('box_id', $general->id)
+            ->where('state_box', 'open')
+            ->latest()
+            ->first();
+        $cashgeneral->increment('ingress', $request->initial_value);
+        $cashgeneral->update([
+            'balance' => $cashgeneral->initial_value + $cashgeneral->ingress - $cashgeneral->egress
+        ]);
+
+        $journalEntries = [];
+        $journalEntries[] = [
+            'account_id' => $general->account_id,
+            'debit' => $request->balance,
+            'have' => 0,
+        ];
+        $journalEntries[] = [
+            'account_id' => $box->account_id,
+            'debit' => 0,
+            'have' => $request->balance,
+        ];
+        $description = "Cierre de caja ";
+        $user = auth()->user();
+        //fecha actual
+        $date = Carbon::now();
+
+        $inputs = [
+            'description' => $description,
+            'date' => $date,
+            'user_id' => $user->id,
+            'document_id' => $box->id,
+            'table' => 'transaction_boxes',
+        ];
+        $journal = $company->journals()->create($inputs);
+        $journal->journalentries()->createMany($journalEntries);
         $cashSession->update([
             ...$request->all(),
             'state_box' => 'close',
             'close_employee_id' => $closeEmployeeId,
         ]);
-
-        $company = Company::first();
 
         //asiento cuando existe sobrante o faltante de dinero
         if ($request->balance === $request->real_balance)

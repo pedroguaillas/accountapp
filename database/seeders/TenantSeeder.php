@@ -57,5 +57,10 @@ class TenantSeeder extends Seeder
             ['name' => "Otros egresos", 'code' => 'OE', 'type' => 'fijo'],
         ]);
 
+
+        $company->boxes()->createMany([
+            ['name'=> 'Caja General','owner_id'=> 1,'type'=>'general']
+        ]);
+
     }
 }
