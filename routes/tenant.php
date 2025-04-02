@@ -24,6 +24,7 @@ use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransactionBoxController;
+use App\Http\Controllers\TransactionExpenseController;
 
 use App\Http\Controllers\Landlord\PaymentRegimController;
 use App\Http\Controllers\Landlord\IessController;
@@ -32,11 +33,13 @@ use App\Http\Controllers\Landlord\IvaController;
 use App\Http\Controllers\Landlord\WithholdingController;
 use App\Http\Controllers\Landlord\IceController;
 use App\Http\Controllers\Landlord\PayMethodController;
+use App\Http\Controllers\Landlord\ExpenseController;
 
 use App\Http\Controllers\Setting\AccountController as SettingAccountController;
 use App\Http\Controllers\Setting\RolController as SettingRolController;
 use App\Http\Controllers\Setting\BankController as SettingBankController;
 use App\Http\Controllers\Setting\BoxController as SettingBoxController;
+use App\Http\Controllers\Setting\ExpenseController as SettingExpenseController;
 
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -113,7 +116,7 @@ Route::middleware([
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');
         Route::post('accounts/import', [AccountController::class, 'import'])->name('accounts.import');
-        Route::resource('accounts', AccountController::class)->only(['store','update', 'destroy']);
+        Route::resource('accounts', AccountController::class)->only(['store', 'update', 'destroy']);
         Route::get('accounts/create/{account}', [AccountController::class, 'create'])->name('accounts.create');
 
         // Journals
@@ -205,6 +208,10 @@ Route::middleware([
         Route::get('vinculacion-contable/cajas', [SettingBoxController::class, 'index'])->name('setting.account.box.index');
         Route::put('settingaccountbox/update/{id}', [SettingBoxController::class, 'updateBoxAccount'])->name('settingaccount.box.update');
 
+        // Emparejamiento de cuentas roles
+        Route::get('vinculacion-contable/gastos', [SettingExpenseController::class, 'index'])->name('setting.account.expenses.index');
+        Route::put('settingaccountexpense/update/{id}', [SettingExpenseController::class, 'updateExpenseAccount'])->name('settingaccount.expenses.update');
+
         //bancos
         Route::get('bancos', [BankController::class, 'index'])->name('banks.index');
         Route::post('banks', [BankController::class, 'store'])->name('banks.store');
@@ -249,6 +256,9 @@ Route::middleware([
         Route::get('ajustes/movimientos-bancarios', [MovementTypeController::class, 'index'])->name('busssines.setting.movementtypes.index');
         Route::post('movementtypes', [MovementTypeController::class, 'store'])->name('busssines.setting.movementtypes.store');
 
+        Route::get('ajustes/gastos', [ExpenseController::class, 'index'])->name('busssines.setting.expenses.index');
+        Route::post('expenses', [ExpenseController::class, 'store'])->name('busssines.setting.expenses.store');
+
         Route::get('ajustes/regimen-pago', [PaymentRegimController::class, 'index'])->name('busssines.setting.paymentregims.index');
         Route::post('paymentRegim', [PaymentRegimController::class, 'store'])->name('busssines.setting.paymentregims.store');
 
@@ -264,5 +274,11 @@ Route::middleware([
         Route::get('movimientos-cajas', [TransactionBoxController::class, 'index'])->name('transaction.boxes.index');
         Route::get('movimientos-cajas/crear', action: [TransactionBoxController::class, 'create'])->name('transaction.boxes.create');
         Route::post('transactionboxes', [TransactionBoxController::class, 'store'])->name('transaction.boxes.store');
+    
+        Route::get('movimientos-gastos', [TransactionExpenseController::class, 'index'])->name('transaction.expenses.index');
+        Route::get('movimientos-gastos/crear', action: [TransactionExpenseController::class, 'create'])->name('transaction.expenses.create');
+        Route::post('transactionexpenses', [TransactionExpenseController::class, 'store'])->name('transaction.expenses.store');
+    
+    
     });
 });

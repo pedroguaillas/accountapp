@@ -28,7 +28,7 @@ class TransactionService
         $data = ["company_id" => $company->id];
 
         $transaction = TransactionBox::create([...$transactionStoreBoxRequest->all(), 'data_additional' => $data]);
-
+     
 
         $journalEntries = $this->processTransaction($transaction);
 
@@ -62,7 +62,6 @@ class TransactionService
 
         $movementTypeValidate = MovementType::whereNull('account_id')
             ->where(fn($query) => $query->where('venue', 'ambos')->orWhere('venue', 'caja'))
-            ->whereNotIn('code', ['RCC', 'PF', 'DCG', 'RFA'])
             ->exists();
 
         if ($movementTypeValidate) {
@@ -99,12 +98,7 @@ class TransactionService
             $cash->increment('egress', $transaction->amount);
             $journalEntries[] = ['account_id' => $movementType->account_id, 'debit' => $transaction->amount, 'have' => 0];
             $journalEntries[] = ['account_id' => $box->account_id, 'debit' => 0, 'have' => $transaction->amount];
-        } else {
-            if (in_array($movementType->code, ['RCC', 'PF'])) {
-                $cash->increment('egress', $transaction->amount);
-                $this->transferFunds($transaction, $box, $journalEntries);
-            }
-        }
+        } 
     }
 
     private function handleChicaBoxTransaction($transaction, $cash, $box, $movementType, &$journalEntries)

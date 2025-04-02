@@ -404,6 +404,17 @@ return new class extends Migration {
             $table->foreign('company_id')->references('id')->on('companies');
         });
 
+        Schema::create('expenses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('company_id');
+            $table->string('name'); // Movement type name 
+            $table->bigInteger('account_id')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('company_id')->references('id')->on('companies');
+        });
+
         Schema::create('banks', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id');
@@ -547,7 +558,7 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign('company_id')->references('id')->on('companies');
-            $table->foreign('owner_id')->references('id')->on('employees');
+            //$table->foreign('owner_id')->references('id')->on('employees');
         });
 
         Schema::create('cash_sessions', function (Blueprint $table) {
@@ -588,6 +599,23 @@ return new class extends Migration {
 
             $table->foreign('cash_session_id')->references('id')->on('cash_sessions');
             $table->foreign('movement_type_id')->references('id')->on('movement_types');
+        });
+
+        Schema::create('transaction_expenses', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('expense_id');
+            $table->string('payment_type');//caja o banco
+            $table->bigInteger('payment_method_id');//id
+            $table->decimal('amount', 10, 2);
+            $table->string('description')->nullable();
+            $table->string('document')->nullable();
+            $table->date('date_expense')->nullable();
+            $table->json('data_additional')->nullable();
+
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->foreign('expense_id')->references('id')->on('expenses');
         });
 
         Schema::create('advances', function (Blueprint $table) {
