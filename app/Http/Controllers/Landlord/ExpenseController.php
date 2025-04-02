@@ -23,6 +23,9 @@ class ExpenseController extends Controller
     // Método para guardar en el tenant los métodos seleccionados
     public function store(Request $request)
     {
+        $request ->validate([
+            'name' => 'required|min:3|max:300',
+        ]);
         $company = Company::first();
 
         Expense::create(['company_id' => $company->id, 'name' => $request->name]);

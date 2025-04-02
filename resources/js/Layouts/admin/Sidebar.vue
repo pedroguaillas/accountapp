@@ -201,6 +201,14 @@ const user = computed(() => page.props.auth.user);
                   Movimiento de cajas</Link
                 >
               </li>
+              <li>
+                <Link
+                  :href="route('transaction.expenses.index')"
+                  class="transition duration-75 rounded-lg pl-11 group text-white hover:bg-sky-900 dark:text-white dark:hover:bg-gray-700"
+                >
+                  Gastos</Link
+                >
+              </li>
             </ul>
           </div>
         </li>
