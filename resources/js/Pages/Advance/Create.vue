@@ -78,7 +78,7 @@ const handleEmployeeSelect = (employee) => {
   advance.employee_id = employee.id; // Asignar el centro de costo al objeto journal
 };
 
-const TypeOptions = ref(); 
+const TypeOptions = ref();
 
 watch(
   () => advance.amount, // Observa cambios en el monto
@@ -140,95 +140,98 @@ const employeeOptions = props.employees.map((person) => ({
 
       <!-- Formulario -->
       <div class="mt-4">
-        <!-- Fecha -->
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="date" value="Fecha" />
-          <TextInput
-            v-model="advance.date"
-            type="date"
-            class="mt-2 block w-full"
-            :max="date"
-          />
-          <InputError :message="errorForm.date" class="mt-2" />
+        <!--fila 1-->
+        <div class="sm:flex gap-4 mt-4">
+          <!-- Fecha -->
+          <div class="w-full">
+            <InputLabel for="date" value="Fecha" />
+            <TextInput
+              v-model="advance.date"
+              type="date"
+              class="mt-1 w-full"
+              :max="date"
+            />
+            <InputError :message="errorForm.date" class="mt-2" />
+          </div>
+
+          <!-- Campo de Monto -->
+          <div class="w-full mt-4 sm:mt-0">
+            <InputLabel for="amount" value="Monto" />
+            <TextInput
+              v-model="advance.amount"
+              type="number"
+              class="mt-1 w-full"
+              min="0"
+              step="0.01"
+            />
+            <InputError :message="errorForm.amount" class="mt-2" />
+          </div>
         </div>
 
-        <!-- Campo de Monto -->
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="amount" value="Monto" />
-          <TextInput
-            v-model="advance.amount"
-            type="number"
-            class="mt-1 block w-full"
-            min="0"
-            step="0.01"
-          />
-          <InputError :message="errorForm.amount" class="mt-2" />
+        <!--fila 2-->
+        <div class="sm:flex gap-4 mt-4">
+          <div class="w-full">
+            <InputLabel for="type" value="Tipo de pago" />
+            <DynamicSelect
+              v-model="advance.payment_type"
+              :options="TypeOptions"
+              placeholder="Seleccione un tipo"
+              class="mt-1 w-full"
+            />
+          </div>
+
+          <!-- Cuenta de bancos-->
+          <div class="w-full mt-4 sm:mt-0 ">
+            <InputLabel for="payment_method_id" value="Formas de pago" />
+            <DynamicSelect
+              class="mt-1 w-full"
+              v-model="advance.payment_method_id"
+              :options="
+                advance.payment_type === 'banco'
+                  ? paymentMethodOptionsBank
+                  : paymentMethodOptionsBox
+              "
+              autofocus
+            />
+            <InputError :message="errorForm.payment_method_id" class="mt-2" />
+          </div>
         </div>
 
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="type" value="Tipo de pago" />
-          <DynamicSelect
-            v-model="advance.payment_type"
-            :options="TypeOptions"
-            placeholder="Seleccione un tipo"
-            class="mt-2 block w-full"
-          />
+        <!--fila 3-->
+        <div class="sm:flex gap-4 mt-4">
+          <!-- beneficiario-->
+          <div class="w-full sm:w-[50%] " :class="advance.payment_type !== 'banco'?'sm:pr-2':''">
+            <InputLabel for="employee_id" value="Empleado" />
+            <DynamicSelect
+              v-if="props.optimum"
+              class="mt-1 w-full"
+              v-model="advance.employee_id"
+              :options="employeeOptions"
+              autofocus
+            />
+            <SearchEmployee v-else @selectEmployees="handleEmployeeSelect" />
+            <InputError :message="errorForm.employee_id" class="mt-2" />
+          </div>
+
+           <div v-show="advance.payment_type === 'banco'" class="w-full  sm:w-[50%] mt-4 sm:mt-0">
+            <InputLabel for="receipt_number" value="Numero de comprobante" />
+            <TextInput
+              v-model="advance.receipt_number"
+              type="text"
+              class="mt-1 w-full"
+              minlength="3"
+              maxlength="300"
+            />
+            <InputError :message="errorForm.receipt_number" class="mt-2" />
+          </div>
         </div>
 
-        <!-- Cuenta de bancos-->
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="payment_method_id" value="Formas de pago" />
-          <DynamicSelect
-            class="mt-2 block w-full"
-            v-model="advance.payment_method_id"
-            :options="
-              advance.payment_type === 'banco'
-                ? paymentMethodOptionsBank
-                : paymentMethodOptionsBox
-            "
-            autofocus
-          />
-          <InputError :message="errorForm.payment_method_id" class="mt-2" />
-        </div>
-
-        <div
-          v-show="advance.payment_type === 'banco'"
-          class="col-span-6 sm:col-span-4"
-        >
-          <InputLabel for="receipt_number" value="Numero de comprobante" />
-          <TextInput
-            v-model="advance.receipt_number"
-            type="text"
-            class="mt-1 block w-full"
-            minlength="3"
-            maxlength="300"
-          />
-          <InputError :message="errorForm.receipt_number" class="mt-2" />
-        </div>
-
-        <!-- beneficiario-->
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="employee_id" value="Empleado" />
-          <DynamicSelect
-            v-if="props.optimum"
-            class="mt-2 block w-full"
-            v-model="advance.employee_id"
-            :options="employeeOptions"
-            autofocus
-          />
-          <SearchEmployee
-            v-else
-            @selectEmployees="handleEmployeeSelect"
-          />
-          <InputError :message="errorForm.employee_id" class="mt-2" />
-        </div>
-
-        <div class="col-span-6 sm:col-span-4">
+        <div class="w-full mt-4 sm:mt-0">
           <InputLabel for="detail" value="Detalle" />
           <TextInput
             v-model="advance.detail"
             type="text"
-            class="mt-1 block w-full"
+            class="mt-1 w-full"
             minlength="3"
             maxlength="300"
           />

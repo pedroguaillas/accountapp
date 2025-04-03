@@ -104,77 +104,85 @@ watch(
 
       <!-- Formulario -->
       <form @submit.prevent="save" @keydown.enter.prevent="focusNextField">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Primera columna -->
-          <div class="grid grid-cols-1 gap-4">
-            <div class="col-span-6 sm:col-span-4">
+        <div class="mt-4">
+          <!--fila 1-->
+          <div class="sm:flex gap-4 mt-4">
+            <div class="w-full">
               <Checkbox
                 v-model:checked="fixedAsset.is_depretation_a"
                 label="¿Posee depreciación acelerada?"
               />
             </div>
 
-            <div class="col-span-6 sm:col-span-4">
+            <div class="w-full mt-4 sm:mt-0">
               <Checkbox
                 v-model:checked="fixedAsset.is_legal"
                 label="¿Tiene sustento legal de compra?"
               />
             </div>
+          </div>
 
+          <!--fila 1-->
+          <div class="sm:flex gap-4 mt-4">
+            <div class="w-full sm:w-[50%]" :class="!fixedAsset.is_legal?'sm:pr-2':''">
+              <InputLabel for="date_acquisition" value="Fecha de adquisición" />
+              <TextInput
+                v-model="fixedAsset.date_acquisition"
+                type="date"
+                class="mt-1 w-full"
+                required
+              />
+              <InputError :message="errorForm.date_acquisition" class="mt-2" />
+            </div>
             <div
               :hidden="fixedAsset.is_legal !== true"
-              class="col-span-6 sm:col-span-4"
+              class="w-full sm:w-[50%] mt-4 sm:mt-0"
             >
               <InputLabel for="is_legal" value="Número de documento" />
               <TextInput
                 v-model="fixedAsset.vaucher"
                 type="text"
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 placeholder="001-001-098765432"
                 maxlength="17"
               />
               <InputError :message="errorForm.vaucher" class="mt-2" />
             </div>
+          </div>
 
-            <div class="col-span-6 sm:col-span-4">
-              <InputLabel for="date_acquisition" value="Fecha de adquisición" />
-              <TextInput
-                v-model="fixedAsset.date_acquisition"
-                type="date"
-                class="mt-1 block w-full"
-                required
-              />
-              <InputError :message="errorForm.date_acquisition" class="mt-2" />
-            </div>
-
-            <div class="col-span-6 sm:col-span-4">
+          <!--fila 1-->
+          <div class="sm:flex gap-4 mt-4">
+            <div class="w-full">
               <InputLabel for="detail" value="Detalle" />
               <TextInput
                 v-model="fixedAsset.detail"
                 type="text"
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 maxlength="300"
                 required
               />
               <InputError :message="errorForm.detail" class="mt-2" />
             </div>
 
-            <div class="col-span-6 sm:col-span-4">
+            <div class="w-full mt-4 sm:mt-0">
               <InputLabel for="code" value="Código" />
               <TextInput
                 v-model="fixedAsset.code"
                 type="text"
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 maxlength="50"
                 required
               />
               <InputError :message="errorForm.code" class="mt-2" />
             </div>
+          </div>
 
-            <div class="col-span-6 sm:col-span-4">
+          <!--fila 1-->
+          <div class="sm:flex gap-4 mt-4">
+            <div class="w-full">
               <InputLabel for="active_type_id" value="Tipo de activo fijo" />
               <DynamicSelect
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 v-model="fixedAsset.active_type_id"
                 :options="activeTypeOptions"
                 :seleccione="false"
@@ -183,80 +191,82 @@ watch(
               />
               <InputError :message="errorForm.activeType" class="mt-2" />
             </div>
-          </div>
 
-          <!-- Segunda columna -->
-          <div class="grid grid-cols-1 gap-4">
-            <div class="col-span-6 sm:col-span-4">
+            <div class="w-full mt-4 sm:mt-0">
               <InputLabel for="adress" value="Dirección del activo fijo" />
               <TextInput
                 v-model="fixedAsset.address"
                 type="text"
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 maxlength="300"
                 required
               />
               <InputError :message="errorForm.address" class="mt-2" />
             </div>
+          </div>
 
-            <div class="col-span-6 sm:col-span-4">
+          <!--fila 1-->
+          <div class="sm:flex gap-4 mt-4">
+            <div class="w-full">
               <InputLabel for="period" value="Periodo de depreciación" />
               <TextInput
                 v-model="fixedAsset.period"
                 type="number"
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 disabled
                 required
               />
               <InputError :message="errorForm.period" class="mt-2" />
             </div>
 
-            <div class="col-span-6 sm:col-span-4">
+            <div class="w-full mt-4 sm:mt-0">
               <InputLabel for="value" value="Valor del activo fijo" />
               <TextInput
                 v-model="fixedAsset.value"
                 type="number"
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 min="0,00"
               />
               <InputError :message="errorForm.value" class="mt-2" />
             </div>
-
-            <div class="col-span-6 sm:col-span-4">
+          </div>
+          <!--fila 1-->
+          <div class="sm:flex gap-4 mt-4">
+            <div class="w-full">
               <InputLabel for="residual_value" value="Valor residual" />
               <TextInput
                 v-model="fixedAsset.residual_value"
                 type="number"
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 min="0,00"
                 :max="fixedAsset.value"
               />
               <InputError :message="errorForm.residual_value" class="mt-2" />
             </div>
 
-            <div class="col-span-6 sm:col-span-4">
+            <div class="w-full mt-4 sm:mt-0">
               <InputLabel for="date_end" value="Fecha final de depreciación" />
               <TextInput
                 :value="fixedAsset.date_end"
                 v-model="fixedAsset.date_end"
                 type="date"
-                class="mt-1 block w-full"
+                class="mt-1 w-full"
                 disabled
                 required
               />
               <InputError :message="errorForm.date_end" class="mt-2" />
             </div>
+          </div>
 
-            <div class="col-span-6 sm:col-span-4">
-              <InputLabel for="pay_method" value="Metodo de pago" />
-              <DynamicSelect
-                class="mt-1 block w-full"
-                v-model="fixedAsset.pay_method_id"
-                :options="payMethodOptions"
-                :seleccione="false"
-              />
-              <InputError :message="errorForm.pay_method_id" class="mt-2" />
-            </div>
+          <div class="col-span-6 sm:col-span-4 mt-4 sm:mt-0">
+            <InputLabel for="pay_method" value="Metodo de pago" />
+            <DynamicSelect
+              class="mt-1 w-full"
+              v-model="fixedAsset.pay_method_id"
+              :options="payMethodOptions"
+              :seleccione="false"
+            />
+            <InputError :message="errorForm.pay_method_id" class="mt-2" />
           </div>
         </div>
 
