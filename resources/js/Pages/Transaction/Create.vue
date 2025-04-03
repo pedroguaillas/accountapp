@@ -22,7 +22,7 @@ const props = defineProps({
 const page = usePage();
 const errors = computed(() => page.props.errors);
 const showErrorModal = ref(false); // Estado del modal de error
-const redirect=ref("");
+const redirect = ref("");
 
 // Observa si hay errores y muestra el modal automáticamente
 watch(errors, (newErrors) => {
@@ -71,9 +71,8 @@ const save = () => {
     //  // router.visit(route("transactions.index"));
     // },
     onError: (errors) => {
-      if(errors.redirect)
-      {
-        redirect.value=errors.redirect;
+      if (errors.redirect) {
+        redirect.value = errors.redirect;
       }
       Object.keys(errors).forEach((key) => {
         errorForm[key] = errors[key];
@@ -155,149 +154,166 @@ const bankacountOptions = props.bankaccounts.map((bankacount) => ({
 
       <!-- Formulario -->
       <div class="mt-4">
-        <!-- Fecha -->
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="date" value="Fecha" />
-          <TextInput
-            v-model="transaction.transaction_date"
-            type="date"
-            class="mt-2 block w-full"
-          />
-          <InputError :message="errorForm.date" class="mt-2" />
+        <!--fila 1-->
+        <div class="sm:flex gap-4 mt-4">
+          <!-- Fecha -->
+          <div class="w-full">
+            <InputLabel for="date" value="Fecha" />
+            <TextInput
+              v-model="transaction.transaction_date"
+              type="date"
+              class="mt-1 w-full"
+            />
+            <InputError :message="errorForm.date" class="mt-2" />
+          </div>
+
+          <div class="w-full mt-4 sm:mt-0">
+            <InputLabel for="type" value="Tipo" />
+            <DynamicSelect
+              v-model="selectedType"
+              :options="TypeOptions"
+              placeholder="Seleccione un tipo"
+              class="mt-1 w-full"
+            />
+          </div>
         </div>
 
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="type" value="Tipo" />
-          <DynamicSelect
-            v-model="selectedType"
-            :options="TypeOptions"
-            placeholder="Seleccione un tipo"
-            class="mt-2 block w-full"
-          />
+        <!--fila 2-->
+        <div class="sm:flex gap-4 mt-4">
+          <div class="w-full">
+            <InputLabel for="movement_type" value="Tipo de Movimiento" />
+            <DynamicSelect
+              v-model="transaction.movement_type_id"
+              :options="filteredMovementTypes"
+              placeholder="Seleccione un tipo de movimiento"
+              class="mt-1 w-full"
+            />
+            <InputError :message="errorForm.movement_type_id" class="mt-2" />
+          </div>
+
+          <!-- Cuenta de bancos-->
+          <div v-if="bankaccounts.length > 0" class="w-full mt-4 sm:mt-0">
+            <InputLabel for="bankaccount_id" value="Cuenta de banco" />
+            <DynamicSelect
+              v-if="bankaccounts.length <= 5"
+              class="mt-1 w-full"
+              v-model="transaction.bank_account_id"
+              :options="bankacountOptions"
+              autofocus
+            />
+            <SearchBankAccount
+              v-else-if="bankaccounts.length > 5"
+              :bankaccounts="bankaccounts"
+              @selectBankAccount="handleBankAccountSelect"
+            />
+            <InputError :message="errorForm.bank_account_id" class="mt-2" />
+          </div>
         </div>
 
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="movement_type" value="Tipo de Movimiento" />
-          <DynamicSelect
-            v-model="transaction.movement_type_id"
-            :options="filteredMovementTypes"
-            placeholder="Seleccione un tipo de movimiento"
-            class="mt-2 block w-full"
-          />
-          <InputError :message="errorForm.movement_type_id" class="mt-2" />
+        <!--fila 3-->
+        <div class="sm:flex gap-4 mt-4">
+          <!-- Campo de Descripción -->
+          <div class="w-full">
+            <InputLabel for="voucher_number" value="Número de comprobante" />
+
+            <TextInput
+              type="text"
+              v-model="transaction.voucher_number"
+              class="mt-1 w-full"
+              placeholder="Ingrese el número de comprobante"
+            />
+          </div>
+
+          <!-- Campo de Monto -->
+          <div class="w-full mt-4 sm:mt-0">
+            <InputLabel for="amount" value="Monto" />
+            <TextInput
+              v-model="transaction.amount"
+              type="number"
+              class="mt-1 w-full"
+              min="0"
+              step="0.01"
+            />
+            <InputError :message="errorForm.amount" class="mt-2" />
+          </div>
         </div>
 
-        <!-- Cuenta de bancos-->
-        <div v-if="bankaccounts.length > 0" class="col-span-6 sm:col-span-4">
-          <InputLabel for="bankaccount_id" value="Cuenta de banco" />
-          <DynamicSelect
-            v-if="bankaccounts.length <= 5"
-            class="mt-2 block w-full"
-            v-model="transaction.bank_account_id"
-            :options="bankacountOptions"
-            autofocus
-          />
-          <SearchBankAccount
-            v-else-if="bankaccounts.length > 5"
-            :bankaccounts="bankaccounts"
-            @selectBankAccount="handleBankAccountSelect"
-          />
-          <InputError :message="errorForm.bank_account_id" class="mt-2" />
-        </div>
-
-        <!-- Campo de Descripción -->
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="description" value="Descripción" />
-          <TextInput
-            v-model="transaction.description"
-            type="text"
-            class="mt-1 block w-full"
-            minlength="3"
-            maxlength="300"
-          />
-          <InputError :message="errorForm.description" class="mt-2" />
-        </div>
-
-        <!-- Campo de Monto -->
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="amount" value="Monto" />
-          <TextInput
-            v-model="transaction.amount"
-            type="number"
-            class="mt-1 block w-full"
-            min="0"
-            step="0.01"
-          />
-          <InputError :message="errorForm.amount" class="mt-2" />
-        </div>
-
-        <div class="col-span-6 sm:col-span-4">
-          <div class="col-span-6 sm:col-span-4">
+        <!--fila 4-->
+        <div class="sm:flex gap-4 mt-4">
+          <div
+            class="w-full sm:w-[50%]"
+            :class="transaction.payment_method !== '1' ? 'sm:pr-2' : ''"
+          >
             <InputLabel for="payment_method" value="Tipo de pago" />
             <DynamicSelect
               id="payment_method"
               v-model="transaction.payment_method"
               :options="paymentMethodOptions"
               placeholder="Seleccione un método de pago"
-              class="mt-2 block w-full"
+              class="mt-1 w-full"
+            />
+          </div>
+
+          <div
+            class="w-full sm:w-[50%] mt-4 sm:mt-0"
+            v-if="transaction.payment_method === '1'"
+          >
+            <InputLabel for="cheque_date" value="Fecha del cheque" />
+            <TextInput
+              type="date"
+              v-model="transaction.cheque_date"
+              class="mt-1 w-full"
             />
           </div>
         </div>
 
-        <!-- beneficiario-->
-        <div v-if="props.countperson > 0" class="col-span-6 sm:col-span-4">
-          <InputLabel for="person_id" value="Beneficiario/Remitente" />
-          <DynamicSelect
-            v-if="props.countperson < 5"
-            class="mt-2 block w-full"
-            v-model="transaction.beneficiary_id"
-            :options="peopleOptions"
-            autofocus
-          />
-          <SearchPerson
-            v-else-if="people.length > 5"
-            @selectPerson="handlePersonSelect"
-          />
-          <InputError :message="errorForm.beneficiary_id" class="mt-2" />
-        </div>
-        <div v-else class="col-span-6 sm:col-span-4">
-          <p class="text-red-500 mt-2">
-            ⚠️ No hay personas disponibles para seleccionar como beneficiario o
-            remitente.
-          </p>
-        </div>
+        <!--fila 5-->
 
-        <div
-          class="col-span-6 sm:col-span-4"
-          v-if="transaction.payment_method === '1'"
-        >
-          <InputLabel for="cheque_date" value="Fecha del cheque" />
-          <TextInput
-            type="date"
-            v-model="transaction.cheque_date"
-            class="mt-1 block w-full"
-          />
-        </div>
+        <div class="sm:flex gap-4 mt-4">
+          <!-- beneficiario-->
+          <div v-if="props.countperson > 0" class="w-full">
+            <InputLabel for="person_id" value="Beneficiario/Remitente" />
+            <DynamicSelect
+              v-if="props.countperson < 5"
+              class="mt-1 w-full"
+              v-model="transaction.beneficiary_id"
+              :options="peopleOptions"
+              autofocus
+            />
+            <SearchPerson
+              v-else-if="people.length > 5"
+              @selectPerson="handlePersonSelect"
+            />
+            <InputError :message="errorForm.beneficiary_id" class="mt-2" />
+          </div>
+          <div v-else class="col-span-6 sm:col-span-4">
+            <p class="text-red-500 mt-2">
+              ⚠️ No hay personas disponibles para seleccionar como beneficiario
+              o remitente.
+            </p>
+          </div>
 
-        <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="transfer_account" value="Número de cuenta" />
-          <TextInput
-            type="text"
-            v-model="transaction.transfer_account"
-            class="mt-1 block w-full"
-            placeholder="Ingrese el número de cuenta"
-          />
+          <div class="w-full mt-4 sm:mt-0">
+            <InputLabel for="transfer_account" value="Número de cuenta" />
+            <TextInput
+              type="text"
+              v-model="transaction.transfer_account"
+              class="mt-1 w-full"
+              placeholder="Ingrese el número de cuenta"
+            />
+          </div>
         </div>
 
         <div class="col-span-6 sm:col-span-4">
-          <InputLabel for="voucher_number" value="Número de comprobante" />
-
+          <InputLabel for="description" value="Descripción" />
           <TextInput
+            v-model="transaction.description"
             type="text"
-            v-model="transaction.voucher_number"
-            class="mt-1 block w-full"
-            placeholder="Ingrese el número de comprobante"
+            class="mt-1 w-full"
+            minlength="3"
+            maxlength="300"
           />
+          <InputError :message="errorForm.description" class="mt-2" />
         </div>
 
         <div class="mt-4 text-right">
