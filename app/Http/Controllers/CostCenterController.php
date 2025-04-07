@@ -63,10 +63,7 @@ class CostCenterController extends Controller
         $costCenter = CostCenter::findOrFail($costCenterId);
         $costCenter->delete(); // Esto usará SoftDeletes
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Centro de costo eliminado correctamente.',
-        ]);
+        return redirect()->route('costcenter.index');
     }
 
     public function updateState($id)

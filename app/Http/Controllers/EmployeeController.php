@@ -141,10 +141,7 @@ class EmployeeController extends Controller
     {
         $employee->delete(); // Esto usará SoftDeletes
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Empleado eliminado correctamente.',
-        ]);
+        return redirect()->route('employee.index');
     }
 
     public function updateState($id)

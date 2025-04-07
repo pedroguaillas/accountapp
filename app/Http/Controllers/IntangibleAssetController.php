@@ -117,9 +117,6 @@ class IntangibleAssetController extends Controller
         $intangibleasset = IntangibleAsset::findOrFail($intangibleassetId);
         $intangibleasset->delete(); // Esto usará SoftDeletes
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Activo fijo eliminado correctamente.',
-        ]);
+        return redirect()->route('intangibleassets.index');
     }
 }

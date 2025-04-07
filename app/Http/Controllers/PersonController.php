@@ -119,9 +119,6 @@ class PersonController extends Controller
     {
         $person->delete(); // Esto usará SoftDeletes
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Persona eliminada correctamente.',
-        ]);
+        return redirect()->route('people.index');
     }
 }

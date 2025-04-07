@@ -73,10 +73,7 @@ class CompanyController extends Controller
     {
         $company = Company::findOrFail($companyId);
         $company->delete(); // Esto usará SoftDeletes
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Compania eliminado correctamente.',
-        ]);
+        
+        return redirect()->route('rucs.index');
     }
 }

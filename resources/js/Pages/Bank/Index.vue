@@ -100,15 +100,14 @@ const removeBank = (bankId) => {
 };
 
 const deletebank = () => {
-  axios
-    .delete(route("banks.delete", deleteid.value)) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("banks.index"));
-    })
-    .catch((error) => {
+    router.delete(route("banks.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
       console.error("Error al eliminar el banco", error);
-    });
+    },
+  });
 };
 
 watch(

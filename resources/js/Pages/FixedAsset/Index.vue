@@ -37,14 +37,14 @@ const removeFixedAsset = (fixedAssetId) => {
 };
 
 const deletefixed = () => {
-  axios
-    .delete(route("fixedassets.delete", deleteid.value))
-    .then(() => {
-      router.visit(route("fixedassets.index")); // Redirige a la ruta deseada
-    })
-    .catch((error) => {
+  router.delete(route("fixedassets.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
       console.error("Error al eliminar el activo fijo", error);
-    });
+    },
+  });
 };
 
 const reloadPage = async (url) => {

@@ -73,12 +73,10 @@ class BranchController extends Controller
 
     public function destroy(Branch $branch)
     {
-        $branch->delete(); // Esto usará SoftDeletes
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Establecimiento eliminado correctamente.',
-        ]);
+        $branch = Branch::findOrFail($branch->id);
+        $branch->delete();
+    
+        return redirect()->route('branch.index');
     }
 
     public function updateState($id)

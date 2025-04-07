@@ -261,9 +261,6 @@ class JournalController extends Controller
         $journal->delete(); // Esto usará SoftDeletes
 
         JournalEntry::where('journal_id', $journal->id)->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Asiento  contable eliminado correctamente.',
-        ]);
+        return redirect()->route('journal.index');
     }
 }

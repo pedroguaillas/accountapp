@@ -1,6 +1,6 @@
 <script setup>
 // Imports
-import { ref, reactive, watch,computed } from "vue";
+import { ref, reactive, watch, computed } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import { router, useForm } from "@inertiajs/vue3";
@@ -17,7 +17,7 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 const props = defineProps({
   bankaccounts: { type: Object, default: () => ({}) },
   filters: { type: Object, default: () => ({}) },
-  bank:{ type: Object, default: () => ({}) },
+  bank: { type: Object, default: () => ({}) },
 });
 
 // Refs
@@ -103,22 +103,21 @@ const removeBankAccount = (bankaccountId) => {
 };
 
 const deleteBankAccount = () => {
-  axios
-    .delete(route("bankaccounts.delete", deleteid.value)) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("bankaccounts.index",props.bank.id));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar a sucursal", error);
-    });
+  router.delete(route("bankaccounts.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
+      console.error("Error al eliminar la cuenta bancaria", error);
+    },
+  });
 };
 
 watch(
   search,
 
   async (newQuery) => {
-    const url = route("bankaccounts.index",props.bank.id);
+    const url = route("bankaccounts.index", props.bank.id);
     loading.value = true;
     console.log("si entra");
 
@@ -139,7 +138,7 @@ watch(
 
 // Función para manejar el cambio de página
 const handlePageChange = async (page) => {
-  const url = route("bankaccounts.index",props.bank.id); // Ruta hacia el backend
+  const url = route("bankaccounts.index", props.bank.id); // Ruta hacia el backend
   loading.value = true;
 
   try {
@@ -164,7 +163,7 @@ const toggleState = (bankaccountId, currentState) => {
     })
     .then(() => {
       // On success, reload the page or update the local data
-      router.visit(route("bankaccounts.index",props.bank.id));
+      router.visit(route("bankaccounts.index", props.bank.id));
     })
     .catch((error) => {
       console.error("Error al cambiar el estado del cuenta bancaria", error);
@@ -220,15 +219,15 @@ const toggleState = (bankaccountId, currentState) => {
             <td>{{ bankaccount.account_type }}</td>
             <td>{{ bankaccount.current_balance }}</td>
 
-            <td >
-                <button
-                  :class="bankaccount.state ? 'bg-success' : 'bg-danger'"
-                  @click="toggleState(bankaccount.id, bankaccount.state)"
-                  class="rounded px-2 py-1 text-white"
-                >
-                  {{ bankaccount.state ? "Activo" : "Inactivo" }}
-                </button>
-              </td>
+            <td>
+              <button
+                :class="bankaccount.state ? 'bg-success' : 'bg-danger'"
+                @click="toggleState(bankaccount.id, bankaccount.state)"
+                class="rounded px-2 py-1 text-white"
+              >
+                {{ bankaccount.state ? "Activo" : "Inactivo" }}
+              </button>
+            </td>
 
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">

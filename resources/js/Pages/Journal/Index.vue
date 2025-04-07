@@ -33,14 +33,14 @@ const removeJournals = (journalId) => {
 };
 
 const deletejournarls = () => {
-  axios
-    .delete(route("journal.delete", deleteId.value))
-    .then(() => {
-      router.visit(route("journal.index")); // Redirige a la ruta deseada
-    })
-    .catch((error) => {
+  router.delete(route("journal.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
       console.error("Error al eliminar el asiento contable", error);
-    });
+    },
+  });
 };
 
 watch(

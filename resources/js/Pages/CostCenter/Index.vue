@@ -16,7 +16,7 @@ import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 // Props
 const props = defineProps({
   costCenters: { type: Object, default: () => ({ data: [] }) }, // Default empty array to avoid undefined errors
-  filters:  { type: Object, default: () => ({ data: [] }) }, 
+  filters: { type: Object, default: () => ({ data: [] }) },
 });
 
 // Refs
@@ -102,15 +102,14 @@ const removeCostCenter = (costCenterId) => {
 };
 
 const deletecostcenter = () => {
-  axios
-    .delete(route("costCenter.delete", deleteid.value)) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("costcenter.index"));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar el centro de costos", error);
-    });
+  router.delete(route("costCenter.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
+      console.error("Error al eliminar el centro de costo", error);
+    },
+  });
 };
 
 const loading = ref(false);
@@ -218,7 +217,7 @@ const toggleState = (costcenterId, currentState) => {
               <td>{{ i + 1 }}</td>
               <td>{{ costCenter.code }}</td>
               <td>{{ costCenter.name }}</td>
-              <td >
+              <td>
                 <button
                   :class="costCenter.state ? 'bg-success' : 'bg-danger'"
                   @click="toggleState(costCenter.id, costCenter.state)"

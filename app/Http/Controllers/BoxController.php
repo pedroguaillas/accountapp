@@ -76,12 +76,10 @@ class BoxController extends Controller
 
     public function destroy(Box $box)
     {
-        $box->delete(); // Esto usará SoftDeletes
+        $box = Box::findOrFail($box->id);
+        $box->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Caja eliminado correctamente.',
-        ]);
+        return redirect()->route('boxes.index');
     }
 
     public function open(Request $request, Box $box)

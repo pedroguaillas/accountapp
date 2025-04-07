@@ -111,7 +111,7 @@ Route::middleware([
         Route::post('stores', [BranchController::class, 'store'])->name('branch.store');
         Route::put('stores/{branch}', [BranchController::class, 'update'])->name('branch.update');
         Route::delete('stores/{branch}', [BranchController::class, 'destroy'])->name('branch.delete');
-        Route::put('stores/{id}/state', [BranchController::class, 'updateState'])->name('branch.updateState');
+        // Route::put('stores/{id}/state', [BranchController::class, 'updateState'])->name('branch.updateState');
 
         // Contabilidad
         Route::get('plan-de-cuentas', [AccountController::class, 'index'])->name('accounts');

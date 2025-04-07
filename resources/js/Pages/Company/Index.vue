@@ -102,14 +102,14 @@ const removeCompany = (companyId) => {
 };
 
 const deletecompany = () => {
-  axios
-    .delete(route("company.delete", deleteid.value))
-    .then(() => {
-      router.visit(route("rucs.index")); // Redirige a la ruta deseada
-    })
-    .catch((error) => {
+  router.delete(route("company.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
       console.error("Error al eliminar la compania", error);
-    });
+    },
+  });
 };
 
 watch(

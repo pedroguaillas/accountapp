@@ -35,14 +35,14 @@ const removeIntangibleAsset = (intangibleId) => {
 };
 
 const deleteintangible = () => {
-  axios
-    .delete(route("intangibleassets.delete", deleteid.value))
-    .then(() => {
-      router.visit(route("intangibleassets.index")); // Redirige a la ruta deseada
-    })
-    .catch((error) => {
+  router.delete(route("intangibleassets.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
       console.error("Error al eliminar el activo intangible", error);
-    });
+    },
+  });
 };
 
 watch(

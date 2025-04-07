@@ -205,10 +205,6 @@ class FixedAssetController extends Controller
     public function destroy(FixedAsset $fixedAsset)
     {
         $fixedAsset->delete(); // Esto usará SoftDeletes
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Activo fijo eliminado correctamente.',
-        ]);
+        return redirect()->route('fixedassets.index');
     }
 }

@@ -55,12 +55,10 @@ class BankController extends Controller
 
     public function destroy(Bank $bank)
     {
-        $bank->delete(); // Esto usará SoftDeletes
+        $bank = Bank::findOrFail($bank->id);
+        $bank->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Banco eliminado correctamente.',
-        ]);
+        return redirect()->route('banks.index');
     }
 
     public function updateState($id)

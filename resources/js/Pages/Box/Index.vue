@@ -3,7 +3,7 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import OpenModal from "./OpenModal.vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, router } from "@inertiajs/vue3";
 import Table from "@/Components/Table.vue";
 import axios from "axios";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
@@ -113,14 +113,14 @@ const toggleDeleteBox = () => {
 };
 
 const deletebox = () => {
-  axios
-    .delete(route("boxes.delete", deleteid.value))
-    .then(() => {
-      router.visit(route("boxes.index"));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar la caja", error);
-    });
+  router.delete(route("boxes.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
+      console.error("Error al eliminar la sucursal", error);
+    },
+  });
 };
 
 watch(
@@ -351,9 +351,10 @@ const closeboxfinally = () => {
       </p>
     </template>
     <template #footer>
-   
       <SecondaryButton @click="closeModal = false">Cancelar</SecondaryButton>
-      <PrimaryButton @click="closeboxfinally" :disabled="openForm.processing">Cerrar Caja</PrimaryButton>
+      <PrimaryButton @click="closeboxfinally" :disabled="openForm.processing"
+        >Cerrar Caja</PrimaryButton
+      >
     </template>
   </ConfirmationModal>
 </template>

@@ -68,12 +68,10 @@ class BankAccountController extends Controller
 
     public function destroy(BankAccount $bankaccount)
     {
-        $bankaccount->delete(); // Esto usará SoftDeletes
+        $bankaccount = BankAccount::findOrFail($bankaccount->id);
+        $bankaccount->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Cuenta eliminada correctamente.',
-        ]);
+        return redirect()->route('bankaccounts.index');
     }
 
     public function updateState($id)

@@ -108,16 +108,27 @@ const removeBranch = (branchId) => {
   deleteid.value = branchId;
 };
 
-const deletebranch = () => {
-  axios
-    .delete(route("branch.delete", deleteid.value)) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("branch.index"));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar a sucursal", error);
-    });
+// const deletebranch = () => {
+//   axios
+//     .delete(route("branch.delete", deleteid.value)) // Eliminar centro de costos
+//     .then(() => {
+//       // Después de eliminar el centro de costos, redirigir a la ruta deseada
+//       router.visit(route("branch.index"));
+//     })
+//     .catch((error) => {
+//       console.error("Error al eliminar a sucursal", error);
+//     });
+// };
+
+const deleteBranch = () => {
+  router.delete(route('branch.delete', deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
+      console.error('Error al eliminar la sucursal', error);
+    },
+  });
 };
 
 watch(
@@ -279,7 +290,7 @@ const toggleState = (branchId, currentState) => {
       <SecondaryButton @click="modal1 = !modal1" class="mr-2"
         >Cancelar</SecondaryButton
       >
-      <PrimaryButton type="button" @click="deletebranch">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deleteBranch">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

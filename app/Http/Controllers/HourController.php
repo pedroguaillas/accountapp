@@ -75,9 +75,6 @@ class HourController extends Controller
     {
         $hour->delete(); // Esto usará SoftDeletes
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Adelanto eliminado correctamente.',
-        ]);
+        return redirect()->route('hours.index');
     }
 }

@@ -81,15 +81,14 @@ const removeEmployee = (employeeId) => {
 };
 
 const deleteEmployee = () => {
-  axios
-    .delete(route("employee.delete", deleteid.value)) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("employee.index"));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar al empleado", error);
-    });
+  router.delete(route("employee.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
+      console.error("Error al eliminar el empleado", error);
+    },
+  });
 };
 
 watch(
@@ -171,7 +170,7 @@ const toggleState = (employeeId, currentState) => {
         <Link
           :href="route('employee.create')"
           class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-          >
+        >
           +
         </Link>
       </div>
@@ -185,7 +184,7 @@ const toggleState = (employeeId, currentState) => {
             <th class="text-left">CARGO</th>
             <th>DIAS</th>
             <th class="text-right pr-4">SALARIO</th>
-            <th >ESTADO</th>
+            <th>ESTADO</th>
             <th class="w-1"></th>
           </tr>
         </thead>
@@ -202,25 +201,25 @@ const toggleState = (employeeId, currentState) => {
             <td>{{ employee.days }}</td>
             <td class="text-right pr-4">{{ employee.salary.toFixed(2) }}</td>
 
-            <td >
-                <button
-                  :class="employee.state ? 'bg-success' : 'bg-danger'"
-                  @click="toggleState(employee.id, employee.state)"
-                  class="rounded px-2 py-1 text-white"
-                >
-                  {{ employee.state ? "Activo" : "Inactivo" }}
-                </button>
-              </td>
+            <td>
+              <button
+                :class="employee.state ? 'bg-success' : 'bg-danger'"
+                @click="toggleState(employee.id, employee.state)"
+                class="rounded px-2 py-1 text-white"
+              >
+                {{ employee.state ? "Activo" : "Inactivo" }}
+              </button>
+            </td>
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button
-                   class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                  class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
                   @click="removeEmployee(employee.id)"
                 >
                   <TrashIcon class="size-6 text-white" />
                 </button>
                 <Link
-                   class="rounded px-2 pt-2 bg-primary hover:bg-primaryhover text-white"
+                  class="rounded px-2 pt-2 bg-primary hover:bg-primaryhover text-white"
                   :href="route('employee.edit', employee.id)"
                 >
                   <PencilIcon class="size-4 text-white" />

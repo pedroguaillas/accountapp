@@ -100,14 +100,14 @@ const removeHour = (hourId) => {
 };
 
 const deletehour = () => {
-  axios
-    .delete(route("hours.delete", deleteid.value))
-    .then(() => {
-      router.visit(route("hours.index")); // Redirige a la ruta deseada
-    })
-    .catch((error) => {
-      console.error("Error al eliminar la hora", error);
-    });
+  router.delete(route("hours.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
+      console.error("Error al eliminar las horas", error);
+    },
+  });
 };
 
 watch(
@@ -123,7 +123,7 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } 
+    }
   },
   { immediate: false }
 );
@@ -140,7 +140,7 @@ const handlePageChange = async (page) => {
     );
   } catch (error) {
     console.error("Error al paginar:", error);
-  } 
+  }
 };
 </script>
 

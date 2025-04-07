@@ -11,7 +11,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { TrashIcon, PencilIcon,ListBulletIcon } from "@heroicons/vue/24/solid";
+import { TrashIcon, PencilIcon, ListBulletIcon } from "@heroicons/vue/24/solid";
 
 // Props
 const props = defineProps({
@@ -32,12 +32,11 @@ const toggle1 = () => {
 
 // Inicializador de objetos
 const initialPerson = {
-  identification:"",
+  identification: "",
   name: "",
   email: "",
-  phone:"",
-  address:"",
-
+  phone: "",
+  address: "",
 };
 
 // Reactives
@@ -104,15 +103,14 @@ const removePerson = (personId) => {
 };
 
 const deletePerson = () => {
-  axios
-    .delete(route("people.delete", deleteid.value)) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("people.index"));
-    })
-    .catch((error) => {
+  router.delete(route("people.delete", deleteid.value), {
+    onSuccess: () => {
+      toggle1();
+    },
+    onError: (error) => {
       console.error("Error al eliminar la persona", error);
-    });
+    },
+  });
 };
 
 watch(
@@ -200,7 +198,7 @@ const handlePageChange = async (page) => {
             <td>{{ i + 1 }}</td>
             <td class="text-left p-2">{{ person.identification }}</td>
             <td class="text-left">{{ person.name }}</td>
-            <td class="text-left">{{ person.address}}</td>
+            <td class="text-left">{{ person.address }}</td>
 
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
