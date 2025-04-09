@@ -15,3 +15,14 @@ export type PageProps<
     };
     ziggy: Config & { location: string };
 };
+
+//import general (request)
+export * from './general-request';
+
+//barril de los tipos de datos del modelo
+export * from './advance';
+export * from './bank';
+export * from './bank-account';
+export * from './box';
+export * from './cash';
+export * from './employee';

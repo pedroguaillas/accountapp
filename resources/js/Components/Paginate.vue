@@ -3,13 +3,12 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/24/outline";
 import { router } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
-import {  BankPaginate } from "@/types/bank";
-import { PropType } from "vue";
+import { GeneralRequest } from "@/types/general-request";
 
 // Props
-const props = defineProps({
-  page: { type: Object as PropType<BankPaginate>, default: () => ({}) },
-});
+const props = defineProps<{
+  page: GeneralRequest<any>
+}>();
 
 // States
 const currentGroup = ref(0); // Tracks the current group of pages

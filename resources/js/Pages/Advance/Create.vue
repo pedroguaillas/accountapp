@@ -1,22 +1,18 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { reactive, computed, ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchEmployee from "./SearchEmployee.vue";
-import { useForm, router, usePage } from "@inertiajs/vue3";
-import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
-import { TrashIcon } from "@heroicons/vue/24/outline";
+import { useForm, usePage } from "@inertiajs/vue3";
+import { InputError, InputLabel, DynamicSelect, TextInput } from "@/Components";
+import { BankAccount, Cash, Employee, Errors } from "@/types";
 
-// Props
-const props = defineProps({
-  bankAccounts: { type: Array, default: () => [] },
-  employees: { type: Array, default: () => [] },
-  cash: { type: Array, default: () => [] },
-  optimum: { type: Boolean, default: () => false },
-});
+const props = defineProps<{
+  bankAccounts: BankAccount[]; // Paginación de los bancos
+  employees: Employee[];
+  cash: Cash[];
+  optimum: Boolean;
+}>();
 
 const page = usePage();
 const errors = computed(() => page.props.errors);
@@ -54,11 +50,11 @@ const advance = useForm({
   employee_id,
   date,
 });
-const errorForm = reactive({});
+const errorForm: Record<string, string> = {};
 
 const save = () => {
   advance.post(route("advances.store"), {
-    onError: (errors) => {
+    onError: (errors: Errors) => {
       if (errors.redirect) {
         redirect.value = errors.redirect;
       }
@@ -69,12 +65,7 @@ const save = () => {
   });
 };
 
-// Método para recibir el centro de costo seleccionado desde SearchCostCenter
-const handleBankAccountSelect = (bankaccount) => {
-  transaction.bank_account_id = bankaccount.id; // Asignar el centro de costo al objeto journal
-};
-
-const handleEmployeeSelect = (employee) => {
+const handleEmployeeSelect = (employee:Employee) => {
   advance.employee_id = employee.id; // Asignar el centro de costo al objeto journal
 };
 
@@ -83,7 +74,8 @@ const TypeOptions = ref();
 watch(
   () => advance.amount, // Observa cambios en el monto
   (newAmount) => {
-    if (newAmount >= 500) {
+    const numericAmount = parseFloat(newAmount); // Convertir a número
+    if (numericAmount >= 500) {
       TypeOptions.value = [{ value: "banco", label: "Bancos" }];
     } else {
       TypeOptions.value = [
@@ -95,17 +87,17 @@ watch(
 );
 
 const paymentMethodOptionsBank = props.bankAccounts.map((bankAccount) => ({
-  value: bankAccount.id,
+  value: bankAccount.id !== undefined ? bankAccount.id : 0,
   label: `${bankAccount.name} ${bankAccount.account_number}`,
 }));
 
 const paymentMethodOptionsBox = props.cash.map((box) => ({
-  value: box.id,
+  value: box.id !== undefined ? box.id : 0,
   label: box.name,
 }));
 
 const employeeOptions = props.employees.map((person) => ({
-  value: person.id,
+  value: person.id !== undefined ? person.id : 0,
   label: person.name,
 }));
 </script>
@@ -115,18 +107,12 @@ const employeeOptions = props.employees.map((person) => ({
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Modal de error -->
-      <div
-        v-if="showErrorModal"
-        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-      >
+      <div v-if="showErrorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
         <div class="bg-white p-6 rounded shadow-lg w-96">
           <h2 class="text-lg font-bold text-red-600">Error</h2>
           <p class="mt-2 text-gray-700">{{ errors.error }}</p>
           <div class="mt-4 text-right">
-            <button
-              @click="closeErrorModal"
-              class="px-4 py-2 bg-red-500 text-white rounded"
-            >
+            <button @click="closeErrorModal" class="px-4 py-2 bg-red-500 text-white rounded">
               Aceptar
             </button>
           </div>
@@ -145,25 +131,14 @@ const employeeOptions = props.employees.map((person) => ({
           <!-- Fecha -->
           <div class="w-full">
             <InputLabel for="date" value="Fecha" />
-            <TextInput
-              v-model="advance.date"
-              type="date"
-              class="mt-1 w-full"
-              :max="date"
-            />
+            <TextInput v-model="advance.date" type="date" class="mt-1 w-full" :max="date" />
             <InputError :message="errorForm.date" class="mt-2" />
           </div>
 
           <!-- Campo de Monto -->
           <div class="w-full mt-4 sm:mt-0">
             <InputLabel for="amount" value="Monto" />
-            <TextInput
-              v-model="advance.amount"
-              type="number"
-              class="mt-1 w-full"
-              min="0"
-              step="0.01"
-            />
+            <TextInput v-model="advance.amount" type="number" class="mt-1 w-full" min="0" step="0.01" />
             <InputError :message="errorForm.amount" class="mt-2" />
           </div>
         </div>
@@ -172,27 +147,17 @@ const employeeOptions = props.employees.map((person) => ({
         <div class="sm:flex gap-4 mt-4">
           <div class="w-full">
             <InputLabel for="type" value="Tipo de pago" />
-            <DynamicSelect
-              v-model="advance.payment_type"
-              :options="TypeOptions"
-              placeholder="Seleccione un tipo"
-              class="mt-1 w-full"
-            />
+            <DynamicSelect v-model="advance.payment_type" :options="TypeOptions" placeholder="Seleccione un tipo"
+              class="mt-1 w-full" />
           </div>
 
           <!-- Cuenta de bancos-->
           <div class="w-full mt-4 sm:mt-0 ">
             <InputLabel for="payment_method_id" value="Formas de pago" />
-            <DynamicSelect
-              class="mt-1 w-full"
-              v-model="advance.payment_method_id"
-              :options="
-                advance.payment_type === 'banco'
-                  ? paymentMethodOptionsBank
-                  : paymentMethodOptionsBox
-              "
-              autofocus
-            />
+            <DynamicSelect class="mt-1 w-full" v-model="advance.payment_method_id" :options="advance.payment_type === 'banco'
+              ? paymentMethodOptionsBank
+              : paymentMethodOptionsBox
+              " autofocus />
             <InputError :message="errorForm.payment_method_id" class="mt-2" />
           </div>
         </div>
@@ -200,50 +165,30 @@ const employeeOptions = props.employees.map((person) => ({
         <!--fila 3-->
         <div class="sm:flex gap-4 mt-4">
           <!-- beneficiario-->
-          <div class="w-full sm:w-[50%] " :class="advance.payment_type !== 'banco'?'sm:pr-2':''">
+          <div class="w-full sm:w-[50%] " :class="advance.payment_type !== 'banco' ? 'sm:pr-2' : ''">
             <InputLabel for="employee_id" value="Empleado" />
-            <DynamicSelect
-              v-if="props.optimum"
-              class="mt-1 w-full"
-              v-model="advance.employee_id"
-              :options="employeeOptions"
-              autofocus
-            />
+            <DynamicSelect v-if="props.optimum" class="mt-1 w-full" v-model="advance.employee_id"
+              :options="employeeOptions" autofocus />
             <SearchEmployee v-else @selectEmployees="handleEmployeeSelect" />
             <InputError :message="errorForm.employee_id" class="mt-2" />
           </div>
 
-           <div v-show="advance.payment_type === 'banco'" class="w-full  sm:w-[50%] mt-4 sm:mt-0">
+          <div v-show="advance.payment_type === 'banco'" class="w-full  sm:w-[50%] mt-4 sm:mt-0">
             <InputLabel for="receipt_number" value="Numero de comprobante" />
-            <TextInput
-              v-model="advance.receipt_number"
-              type="text"
-              class="mt-1 w-full"
-              minlength="3"
-              maxlength="300"
-            />
+            <TextInput v-model="advance.receipt_number" type="text" class="mt-1 w-full" minlength="3" maxlength="300" />
             <InputError :message="errorForm.receipt_number" class="mt-2" />
           </div>
         </div>
 
         <div class="w-full mt-4 sm:mt-0">
           <InputLabel for="detail" value="Detalle" />
-          <TextInput
-            v-model="advance.detail"
-            type="text"
-            class="mt-1 w-full"
-            minlength="3"
-            maxlength="300"
-          />
+          <TextInput v-model="advance.detail" type="text" class="mt-1 w-full" minlength="3" maxlength="300" />
           <InputError :message="errorForm.detail" class="mt-2" />
         </div>
 
         <div class="mt-4 text-right">
-          <button
-            @click="save"
-            :disabled="advance.processing"
-            class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded"
-          >
+          <button @click="save" :disabled="advance.processing"
+            class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
             Guardar
           </button>
         </div>

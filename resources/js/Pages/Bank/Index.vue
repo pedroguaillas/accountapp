@@ -12,12 +12,11 @@ import TextInput from "@/Components/TextInput.vue";
 import Paginate from "@/Components/Paginate.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon, ListBulletIcon } from "@heroicons/vue/24/solid";
-import { ResponseBankProps,BankPaginate, Filters, Bank, Errors } from "@/types/bank";
-import { PropType } from "vue";
+import { Bank, Errors, Filters, GeneralRequest } from "@/types";
 
 // Props
 const props = defineProps<{
-  banks: BankPaginate; // Paginación de los bancos
+  banks: GeneralRequest<Bank>; // Paginación de los bancos
   filters: Filters; // Filtros aplicados
 }>();
 
@@ -79,9 +78,9 @@ const save = () => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
       if (error.response?.data?.errors) {
         // Iterar sobre los errores recibidos del servidor
-        // Object.entries(error.response.data.errors).forEach(([key, value]) => {
-        //   errorForm[key] = value[0]; // Mostrar el primer error asociado a cada campo
-        // });
+        Object.entries(error.response.data.errors).forEach(([key, value]) => {
+          errorForm[key] = (value as string[])[0]; // Mostrar el primer error
+        });
       } else {
         console.error("Error desconocido:", error);
         alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");

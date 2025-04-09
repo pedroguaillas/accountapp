@@ -1,16 +1,21 @@
-<script setup>
+<script setup lang="ts">
 
 // Imports
-import { onMounted, ref } from "vue";
+import { PropType, ref, onMounted } from "vue";
+
+interface Option {
+  value: string | number;
+  label: string;
+}
 
 // Definir las propiedades del componente
-defineProps({
+const props = defineProps({
   modelValue: {
-    type: String,
+    type: [String, Number] as PropType<string | number>,
     default: "", // Valor por defecto para modelValue
   },
   options: {
-    type: Array,
+    type: Array as PropType<Option[]>,
     required: true, // Asegura que siempre se pase un array
   },
   seleccione: {
@@ -27,7 +32,7 @@ defineProps({
 defineEmits(["update:modelValue"]);
 
 // Referencia al elemento <select>
-const select = ref(null);
+const select = ref<HTMLSelectElement | null>(null);
 
 // Manejar el foco en el componente si tiene el atributo "autofocus"
 onMounted(() => {
@@ -38,19 +43,23 @@ onMounted(() => {
 
 // Exponer la función `focus` para que pueda ser llamada desde el padre
 defineExpose({
-  focus: () => select.value.focus(),
+  focus: () => select.value && select.value.focus(),
 });
 </script>
 
 <template>
   <select ref="select"
     class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-    :value="modelValue" :required="required" @change="$emit('update:modelValue', $event.target.value)">
+    :value="modelValue" :required="required" @change="(event) => {
+      if (event.target) {
+        $emit('update:modelValue', (event.target as HTMLSelectElement).value);
+      }
+    }">
     <!-- Opción predeterminada -->
     <option v-if="seleccione" value="">Seleccione</option>
 
     <!-- Generar opciones dinámicas -->
-    <option v-for="option in options" :key="option.value" :value="option.value">
+    <option v-for="option in props.options" :key="option.value" :value="option.value">
       {{ option.label }}
     </option>
   </select>
