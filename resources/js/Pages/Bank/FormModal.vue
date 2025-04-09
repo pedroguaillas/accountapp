@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import DialogModal from "@/Components/DialogModal.vue";
 import InputError from "@/Components/InputError.vue";
@@ -8,12 +8,14 @@ import DynamicSelect from "@/Components/DynamicSelect.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
-import { ref } from "vue";
+import { Bank,Errors } from "@/types/bank";
+import { PropType } from "vue";
+
 
 // Props
 defineProps({
-  bank: { type: Object, default: () => ({}) },
-  error: { type: Object, default: () => ({}) },
+  bank: { type: Object as PropType<Bank>, default: () => ({}) },
+  error: { type: Object as PropType<Errors>, default: () => ({}) },
   show: { type: Boolean, default: false },
 });
 

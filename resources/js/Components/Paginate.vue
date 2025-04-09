@@ -1,12 +1,14 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/24/outline";
 import { router } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
+import {  BankPaginate } from "@/types/bank";
+import { PropType } from "vue";
 
 // Props
 const props = defineProps({
-  page: { type: Object, default: () => ({}) },
+  page: { type: Object as PropType<BankPaginate>, default: () => ({}) },
 });
 
 // States
@@ -25,7 +27,7 @@ function prevPage() {
   }
 }
 
-function interPage(url) {
+function interPage(url:string) {
   if (url) {
     router.get(url, {}, { preserveState: true });
   }
@@ -84,7 +86,7 @@ function prevGroup() {
       <li v-for="(link, i) in visibleLinks" :key="`pagination-${i}`">
         <button
           :disabled="!link.url || link.active"
-          @click="interPage(link.url)"
+          @click="()=>link.url && interPage(link.url)"
           :class="[
             'flex items-center justify-center px-3 h-8 text-sm leading-tight border',
             link.active ? 'bg-blue-50 text-blue-600' : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700',

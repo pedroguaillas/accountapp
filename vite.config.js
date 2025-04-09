@@ -20,7 +20,8 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': '/resources/js', // por ejemplo
+           // '@': '/resources/js', // por ejemplo
+           '@': path.resolve(__dirname, 'resources/js'),
         },
     },
 });
