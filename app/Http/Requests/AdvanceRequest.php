@@ -31,11 +31,9 @@ class AdvanceRequest extends FormRequest
         return [
             'employee_id' => 'required|exists:employees,id',
             'date' => "required|date|before_or_equal:$date",
-            'amount' => [
-                'required',
-                'numeric',
-                'min:0.01',
-            ],
+            'amount' => 'required|numeric|min:0.01',
+            'payment_type' => "required",
+            'payment_method_id' => "required",
         ];
     }
 
@@ -53,20 +51,20 @@ class AdvanceRequest extends FormRequest
             }
         });
 
-        $validator->after(function ($validator) {
-            if ($this->payment_type === 'caja') {
-                $cash = CashSession::where('id', $this->payment_method_id)->first();
-                if ($this->amount > $cash->balance) {
-                    $validator->errors()->add('amount', "El monto no puede ser mayor al saldo de caja: $cash->balance");
+        $validator->after(
+            function ($validator) {
+                if ($this->payment_type === 'caja') {
+                    $cash = CashSession::where('id', $this->payment_method_id)->first();
+                    if ($this->amount > $cash->balance) {
+                        $validator->errors()->add('amount', "El monto no puede ser mayor al saldo de caja: $cash->balance");
+                    }
+                } else if ($this->payment_type === 'banco') {
+                    $bank = BankAccount::where('id', $this->payment_method_id)->first();
+                    if ($this->amount > $bank->current_balance) {
+                        $validator->errors()->add('amount', "El monto no puede ser mayor al saldo de banco: $bank->current_balance");
+                    }
                 }
-            }else
-            {
-                $bank = BankAccount::where('id', $this->payment_method_id)->first();
-                if ($this->amount > $bank->current_balance) {
-                    $validator->errors()->add('amount', "El monto no puede ser mayor al saldo de banco: $bank->current_balance");
-                }  
             }
-
-        });
+        );
     }
 }

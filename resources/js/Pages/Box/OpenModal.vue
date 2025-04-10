@@ -1,13 +1,7 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { TextInput, SecondaryButton, PrimaryButton, InputLabel, InputError, DialogModal } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
-import { ref } from "vue";
 
 // Props
 defineProps({

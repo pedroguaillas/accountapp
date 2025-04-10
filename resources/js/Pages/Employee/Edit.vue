@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { reactive } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
@@ -8,13 +8,14 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 
+
 // Props
-const props = defineProps({
-  employee: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  employee: GeneralRequest<Employee>; // Paginación de los bancos
+}>();
 
 // Reactives
-const employee = useForm({ ...props.employee });
+const employee = useForm<Employee>({ ...props.employee });
 const errorForm = reactive({});
 
 // Método de guardar con mensajes

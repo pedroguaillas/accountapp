@@ -4,12 +4,7 @@ import { ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { router, Link } from "@inertiajs/vue3";
 import axios from "axios";
-import Table from "@/Components/Table.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { ConfirmationModal, TextInput, SecondaryButton, PrimaryButton, Table, Paginate } from "@/Components";
 import { TrashIcon } from "@heroicons/vue/24/solid";
 import { Advance, Filters, GeneralRequest } from "@/types";
 

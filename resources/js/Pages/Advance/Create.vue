@@ -5,7 +5,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchEmployee from "./SearchEmployee.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import { InputError, InputLabel, DynamicSelect, TextInput } from "@/Components";
-import { BankAccount, Cash, Employee, Errors } from "@/types";
+import { Advance, BankAccount, Cash, Employee, Errors } from "@/types";
 
 const props = defineProps<{
   bankAccounts: BankAccount[]; // Paginación de los bancos
@@ -33,14 +33,18 @@ const closeErrorModal = () => {
 const date = new Date().toISOString().split("T")[0];
 
 // Inicializador de objetos
-const initialAdvance = {
+const initialAdvance:Advance = {
+  id: undefined,
+  company_id:0,
   detail: "",
   amount: "",
   employee_id: 0,
   payment_type: "",
   payment_method_id: 0, //identificador de caja o banco
-  date: "",
+  movement_type_id: 0,
+  date,
   receipt_number: "",
+  processing: false,
 };
 
 const employee_id = props.employees.length === 1 ? props.employees[0].id : 0;
@@ -74,8 +78,9 @@ const TypeOptions = ref();
 watch(
   () => advance.amount, // Observa cambios en el monto
   (newAmount) => {
-    const numericAmount = parseFloat(newAmount); // Convertir a número
-    if (numericAmount >= 500) {
+    const newAmountAux = String(newAmount);
+    const newAmountRequired =parseFloat(newAmountAux);
+    if (newAmountRequired>= 500) {
       TypeOptions.value = [{ value: "banco", label: "Bancos" }];
     } else {
       TypeOptions.value = [
@@ -149,6 +154,7 @@ const employeeOptions = props.employees.map((person) => ({
             <InputLabel for="type" value="Tipo de pago" />
             <DynamicSelect v-model="advance.payment_type" :options="TypeOptions" placeholder="Seleccione un tipo"
               class="mt-1 w-full" />
+            <InputError :message="errorForm.payment_type" class="mt-2" />
           </div>
 
           <!-- Cuenta de bancos-->

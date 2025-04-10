@@ -26,3 +26,4 @@ export * from './bank-account';
 export * from './box';
 export * from './cash';
 export * from './employee';
+export * from './person';

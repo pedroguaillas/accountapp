@@ -4,15 +4,10 @@ import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import { router, useForm, Link } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
 import axios from "axios";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon, ListBulletIcon } from "@heroicons/vue/24/solid";
 import { Bank, Errors, Filters, GeneralRequest } from "@/types";
+import { TextInput, SecondaryButton, PrimaryButton, ConfirmationModal, Paginate, Table } from "@/Components";
 
 // Props
 const props = defineProps<{

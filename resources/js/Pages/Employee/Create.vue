@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { reactive, computed } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
@@ -17,9 +17,9 @@ const initialEmployee = {
   name: "",
   sector_code: "",
   position: "",
-  days: "",
-  salary: "",
-  porcent_aportation: "",
+  days: 0,
+  salary: 0,
+  porcent_aportation: 0,
   is_a_parnert: false,
   is_a_qualified_craftsman: false,
   affiliated_with_spouse: false,
@@ -32,7 +32,7 @@ const initialEmployee = {
 
 // Reactives
 const employee = useForm({ ...initialEmployee });
-const errorForm = reactive({});
+const errorForm: Record<string, string> = {};
 
 const resetErrorForm = () => {
   Object.assign(errorForm, { ...initialEmployee, date_start: "" });
@@ -48,11 +48,6 @@ const save = () => {
         errorForm[key] = errors[key];
       });
     },
-    // onSuccess: () => {
-    //   // Reiniciar el formulario tras éxito
-    //   employee.reset();
-    //   resetErrorForm();
-    // },
   });
 };
 </script>

@@ -108,18 +108,6 @@ const removeBranch = (branchId) => {
   deleteid.value = branchId;
 };
 
-// const deletebranch = () => {
-//   axios
-//     .delete(route("branch.delete", deleteid.value)) // Eliminar centro de costos
-//     .then(() => {
-//       // Después de eliminar el centro de costos, redirigir a la ruta deseada
-//       router.visit(route("branch.index"));
-//     })
-//     .catch((error) => {
-//       console.error("Error al eliminar a sucursal", error);
-//     });
-// };
-
 const deleteBranch = () => {
   router.delete(route('branch.delete', deleteid.value), {
     onSuccess: () => {
