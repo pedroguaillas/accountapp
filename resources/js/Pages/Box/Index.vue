@@ -11,7 +11,6 @@ import { Box, Cash, Employee, Errors, Filters, GeneralRequest } from "@/types";
 import { TextInput, SecondaryButton, PrimaryButton, ConfirmationModal, Paginate, Table } from "@/Components";
 
 // Props
-
 const props = defineProps<{
   boxes: GeneralRequest<Box>; // Paginación de los bancos
   filters: Filters; // Filtros aplicados

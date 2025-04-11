@@ -1,39 +1,34 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import FormModal from "./FormModal.vue";
 import { router, useForm, Link } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
 import axios from "axios";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { ConfirmationModal, TextInput, SecondaryButton, PrimaryButton, Table, Paginate } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { Employee, Filters, GeneralRequest } from "@/types";
 
 // Props
-const props = defineProps({
-  employees: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  employees: GeneralRequest<Employee>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+}>();
+
 
 // Refs
-const modal = ref(false);
-const modal1 = ref(false);
-const deleteid = ref(0);
+const modalDelete = ref(false);
+const deleteId = ref<Number>(0);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 
-const toggle1 = () => {
-  modal1.value = !modal1.value;
+const toggleDelete = () => {
+  modalDelete.value = !modalDelete.value;
 };
 
 const date = new Date().toISOString().split("T")[0];
 
 // Inicializador de objetos
 const initialEmployee = {
+  id: undefined,
   cuit: "",
   name: "",
   sector_code: "",
@@ -47,43 +42,15 @@ const initialEmployee = {
   date_start: date,
 };
 
-// Reactives
-const employee = useForm({ ...initialEmployee });
-const errorForm = reactive({});
-
-const newEmployee = () => {
-  if (employee.id !== undefined) {
-    delete employee.id;
-  }
-  Object.assign(employee, initialEmployee);
-  Object.assign(errorForm, { ...initialEmployee, date_start: "" });
-  toggle();
-};
-
-const resetErrorForm = () => {
-  Object.assign(errorForm, initialEmployee);
-};
-
-const toggle = () => {
-  modal.value = !modal.value;
-};
-
-const edit = (employeeEdit) => {
-  resetErrorForm();
-  Object.assign(employee, { ...initialEmployee, ...employeeEdit });
-  Object.assign(errorForm, { ...initialEmployee, date_start: "" });
-  toggle();
-};
-
-const removeEmployee = (employeeId) => {
-  toggle1();
-  deleteid.value = employeeId;
+const removeEmployee = (employeeId: Number) => {
+  toggleDelete();
+  deleteId.value = employeeId;
 };
 
 const deleteEmployee = () => {
-  router.delete(route("employee.delete", deleteid.value), {
+  router.delete(route("employee.delete", deleteId.value), {
     onSuccess: () => {
-      toggle1();
+      toggleDelete();
     },
     onError: (error) => {
       console.error("Error al eliminar el empleado", error);
@@ -96,8 +63,6 @@ watch(
 
   async (newQuery) => {
     const url = route("employee.index");
-    loading.value = true;
-    console.log("si entra");
 
     try {
       await router.get(
@@ -107,32 +72,13 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
-    }
+    } 
   },
   { immediate: false }
 );
 
 // Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("employee.index"); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const toggleState = (employeeId, currentState) => {
+const toggleState = (employeeId: Number, currentState: boolean) => {
   const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
 
   axios
@@ -160,18 +106,11 @@ const toggleState = (employeeId, currentState) => {
           Empleados
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
-        <Link
-          :href="route('employee.create')"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
-          +
+        <Link :href="route('employee.create')"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
+        +
         </Link>
       </div>
 
@@ -189,11 +128,7 @@ const toggleState = (employeeId, currentState) => {
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(employee, i) in props.employees.data"
-            :key="employee.id"
-            class="border-t [&>td]:py-2"
-          >
+          <tr v-for="(employee, i) in props.employees.data" :key="employee.id" class="border-t [&>td]:py-2">
             <td>{{ i + 1 }}</td>
             <td>{{ employee.cuit }}</td>
             <td class="text-left">{{ employee.name }}</td>
@@ -202,27 +137,21 @@ const toggleState = (employeeId, currentState) => {
             <td class="text-right pr-4">{{ employee.salary.toFixed(2) }}</td>
 
             <td>
-              <button
-                :class="employee.state ? 'bg-success' : 'bg-danger'"
-                @click="toggleState(employee.id, employee.state)"
-                class="rounded px-2 py-1 text-white"
-              >
+              <button :class="employee.state ? 'bg-success' : 'bg-danger'"
+                @click="() => employee.id && toggleState(employee.id, employee.state)"
+                class="rounded px-2 py-1 text-white">
                 {{ employee.state ? "Activo" : "Inactivo" }}
               </button>
             </td>
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
-                <button
-                  class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="removeEmployee(employee.id)"
-                >
+                <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                  @click="() => employee.id && removeEmployee(employee.id)">
                   <TrashIcon class="size-6 text-white" />
                 </button>
-                <Link
-                  class="rounded px-2 pt-2 bg-primary hover:bg-primaryhover text-white"
-                  :href="route('employee.edit', employee.id)"
-                >
-                  <PencilIcon class="size-4 text-white" />
+                <Link class="rounded px-2 pt-2 bg-primary hover:bg-primaryhover text-white"
+                  :href="route('employee.edit', employee.id)">
+                <PencilIcon class="size-4 text-white" />
                 </Link>
               </div>
             </td>
@@ -230,28 +159,16 @@ const toggleState = (employeeId, currentState) => {
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.employees" @page-change="handlePageChange" />
+    <Paginate :page="props.employees" />
   </AdminLayout>
 
-  <FormModal
-    :show="modal"
-    :employee="employee"
-    :error="errorForm"
-    @close="toggle"
-    @save="save"
-  />
-
-  <ConfirmationModal :show="modal1">
+  <ConfirmationModal :show="modalDelete">
     <template #title> ELIMINAR EMPLEADOS </template>
     <template #content> Esta seguro de eliminar el empleado? </template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
+      <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2">Cancelar</SecondaryButton>
 
-      <PrimaryButton type="button" @click="deleteEmployee"
-        >Aceptar</PrimaryButton
-      >
+      <PrimaryButton type="button" @click="deleteEmployee">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

@@ -1,48 +1,51 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
 import axios from "axios";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { ConfirmationModal, TextInput, SecondaryButton, PrimaryButton, Table, Paginate } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { Branch, Errors, Filters, GeneralRequest } from "@/types";
 
 // Props
-const props = defineProps({
-  branches: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  branches: GeneralRequest<Branch>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+}>();
 
 // Refs
 const modal = ref(false);
-const modal1 = ref(false);
-const deleteid = ref(0);
+const modalDelete = ref(false);
+const deleteId = ref<Number>(0);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 
-const toggle1 = () => {
-  modal1.value = !modal1.value;
+const toggleDelete = () => {
+  modalDelete.value = !modalDelete.value;
 };
 
 // Inicializador de objetos
 const initialBranch = {
-  number: "",
+  id: undefined,
+  company_id: 0,
+  number: 0,
   name: "",
   city: "",
+  phone: "",
   address: "",
+  logo_path: "",
   is_matriz: false,
-  enviroment_type: "",
+  enviroment_type: 0,
+  email: "",
+  pass_email: "",
+  state: false,
+  processing: false,
 };
 
 // Reactives
-const branch = useForm({ ...initialBranch });
-const errorForm = reactive({ ...initialBranch });
+const branch = useForm<Branch>({ ...initialBranch });
+const errorForm = reactive<Errors>({});
 
 const newBranch = () => {
   if (branch.id !== undefined) {
@@ -80,12 +83,12 @@ const save = () => {
       resetErrorForm(); // Limpiar errores del formulario
       router.reload({ only: ["stores"] }); // Recargar datos
     },
-    onError: (error) => {
+    onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
       if (error.response?.data?.errors) {
         // Iterar sobre los errores recibidos del servidor
         Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          errorForm[key] = value[0]; // Mostrar el primer error asociado a cada campo
+          errorForm[key] = (value as string[])[0];// Mostrar el primer error asociado a cada campo
         });
       } else {
         console.error("Error desconocido:", error);
@@ -95,7 +98,7 @@ const save = () => {
   });
 };
 
-const update = (branchEdit) => {
+const update = (branchEdit: Branch) => {
   resetErrorForm();
   Object.keys(branchEdit).forEach((key) => {
     branch[key] = branchEdit[key];
@@ -103,15 +106,15 @@ const update = (branchEdit) => {
   toggle();
 };
 
-const removeBranch = (branchId) => {
-  toggle1();
-  deleteid.value = branchId;
+const removeBranch = (branchId: Number) => {
+  toggleDelete();
+  deleteId.value = branchId;
 };
 
 const deleteBranch = () => {
-  router.delete(route('branch.delete', deleteid.value), {
+  router.delete(route('branch.delete', deleteId.value), {
     onSuccess: () => {
-      toggle1();
+      toggleDelete();
     },
     onError: (error) => {
       console.error('Error al eliminar la sucursal', error);
@@ -124,9 +127,6 @@ watch(
 
   async (newQuery) => {
     const url = route("branch.index");
-    loading.value = true;
-    console.log("si entra");
-
     try {
       await router.get(
         url,
@@ -135,32 +135,13 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
-    }
+    } 
   },
   { immediate: false }
 );
 
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("branch.index"); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const toggleState = (branchId, currentState) => {
+// Función para el estado
+const toggleState = (branchId: Number, currentState: Boolean) => {
   const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
 
   axios
@@ -187,17 +168,10 @@ const toggleState = (branchId, currentState) => {
           Sucursales / establecimientos
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
-        <button
-          @click="newBranch"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
+        <button @click="newBranch"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -217,11 +191,7 @@ const toggleState = (branchId, currentState) => {
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(branch, i) in props.branches.data"
-            :key="branch.id"
-            class="border-t [&>td]:py-2"
-          >
+          <tr v-for="(branch, i) in props.branches.data" :key="branch.id" class="border-t [&>td]:py-2">
             <td>{{ i + 1 }}</td>
             <td>{{ branch.number }}</td>
             <td>{{ branch.name }}</td>
@@ -231,27 +201,19 @@ const toggleState = (branchId, currentState) => {
             <td>
               {{ branch.enviroment_type === 1 ? "Prueba" : "Producción" }}
             </td>
-            <td >
-              <button
-                :class="branch.state ? 'bg-success' : 'bg-danger'"
-                @click="toggleState(branch.id, branch.state)"
-                class="rounded px-2 py-1 text-white"
-              >
+            <td>
+              <button :class="branch.state ? 'bg-success' : 'bg-danger'"
+                @click="() => branch.id && toggleState(branch.id, branch.state)" class="rounded px-2 py-1 text-white">
                 {{ branch.state ? "Activo" : "Inactivo" }}
               </button>
             </td>
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
-                <button
-                  class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="removeBranch(branch.id)"
-                >
+                <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                  @click="() => branch.id && removeBranch(branch.id)">
                   <TrashIcon class="size-6 text-white" />
                 </button>
-                <button
-                  class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                  @click="update(branch)"
-                >
+                <button class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white" @click="update(branch)">
                   <PencilIcon class="size-4 text-white" />
                 </button>
               </div>
@@ -260,24 +222,16 @@ const toggleState = (branchId, currentState) => {
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.branches" @page-change="handlePageChange" />
+    <Paginate :page="props.branches" />
   </AdminLayout>
 
-  <FormModal
-    :show="modal"
-    :branch="branch"
-    :error="errorForm"
-    @close="toggle"
-    @save="save"
-  />
+  <FormModal :show="modal" :branch="branch" :error="errorForm" @close="toggle" @save="save" />
 
-  <ConfirmationModal :show="modal1">
+  <ConfirmationModal :show="modalDelete">
     <template #title> ELIMINAR ESTABLECIMIENTOS </template>
     <template #content> Esta seguro de eliminar el establecimiento? </template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
+      <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2">Cancelar</SecondaryButton>
       <PrimaryButton type="button" @click="deleteBranch">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>

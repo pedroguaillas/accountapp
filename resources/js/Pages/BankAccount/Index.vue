@@ -1,53 +1,50 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import { ref, reactive, watch, computed } from "vue";
+import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
 import axios from "axios";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { TextInput, SecondaryButton, PrimaryButton, ConfirmationModal, Paginate, Table } from "@/Components";
+import { Bank, BankAccount, Errors, Filters, GeneralRequest } from "@/types";
 
 // Props
-const props = defineProps({
-  bankaccounts: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-  bank: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  bankAccounts: GeneralRequest<BankAccount>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+  bank: Bank;
+}>();
 
 // Refs
 const modal = ref(false);
-const modal1 = ref(false);
-const deleteid = ref(0);
+const modalDelete = ref(false);
+const deleteId = ref<Number>(0);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 
-const toggle1 = () => {
-  modal1.value = !modal1.value;
+const toggleDelete = () => {
+  modalDelete.value = !modalDelete.value;
 };
 
 // Inicializador de objetos
 const initialBankAccount = {
+  id: undefined,
   account_number: "",
-  account_type: 0,
+  account_type: "",
   bank_id: props.bank.id,
   current_balance: 0,
+  state: false,
 };
 
 // Reactives
-const bankaccount = useForm({ ...initialBankAccount });
-const errorForm = reactive({ ...initialBankAccount });
+const bankAccount = useForm<BankAccount>({ ...initialBankAccount });
+const errorForm = reactive<Errors>({});
 
 const newBankAccount = () => {
-  if (bankaccount.id !== undefined) {
-    delete bankaccount.id;
+  if (bankAccount.id !== undefined) {
+    delete bankAccount.id;
   }
-  Object.assign(bankaccount, initialBankAccount);
+  Object.assign(bankAccount, initialBankAccount);
   toggle();
 };
 
@@ -60,26 +57,26 @@ const toggle = () => {
 };
 
 const save = () => {
-  const isUpdate = Boolean(bankaccount.id);
+  const isUpdate = Boolean(bankAccount.id);
   const routeMethod = isUpdate ? "put" : "post";
   const routeName = isUpdate
-    ? route("bankaccounts.update", { id: bankaccount.id }) // Ruta para actualización
+    ? route("bankaccounts.update", { id: bankAccount.id }) // Ruta para actualización
     : route("bankaccounts.store"); // Ruta para creación
 
-  console.log(bankaccount.data);
+  console.log(bankAccount.data);
   // Preparar la solicitud
-  bankaccount[routeMethod](routeName, {
+  bankAccount[routeMethod](routeName, {
     onSuccess: () => {
       toggle(); // Cerrar modal o reiniciar estados
       resetErrorForm(); // Limpiar errores del formulario
       router.reload({ only: ["bankaccounts"] }); // Recargar datos
     },
-    onError: (error) => {
+    onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
       if (error.response?.data?.errors) {
         // Iterar sobre los errores recibidos del servidor
         Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          errorForm[key] = value[0]; // Mostrar el primer error asociado a cada campo
+          errorForm[key] = (value as string[])[0]; // Mostrar el primer error asociado a cada campo
         });
       } else {
         console.error("Error desconocido:", error);
@@ -89,23 +86,23 @@ const save = () => {
   });
 };
 
-const update = (bankaccountEdit) => {
+const update = (bankAccountEdit: BankAccount) => {
   resetErrorForm();
-  Object.keys(bankaccountEdit).forEach((key) => {
-    bankaccount[key] = bankaccountEdit[key];
+  Object.keys(bankAccountEdit).forEach((key) => {
+    bankAccount[key] = bankAccountEdit[key];
   });
   toggle();
 };
 
-const removeBankAccount = (bankaccountId) => {
-  toggle1();
-  deleteid.value = bankaccountId;
+const removeBankAccount = (bankAccountId: Number) => {
+  toggleDelete();
+  deleteId.value = bankAccountId;
 };
 
 const deleteBankAccount = () => {
-  router.delete(route("bankaccounts.delete", deleteid.value), {
+  router.delete(route("bankaccounts.delete", deleteId.value), {
     onSuccess: () => {
-      toggle1();
+      toggleDelete();
     },
     onError: (error) => {
       console.error("Error al eliminar la cuenta bancaria", error);
@@ -115,50 +112,26 @@ const deleteBankAccount = () => {
 
 watch(
   search,
-
   async (newQuery) => {
     const url = route("bankaccounts.index", props.bank.id);
-    loading.value = true;
-    console.log("si entra");
-
     try {
       await router.get(
         url,
-        { search: newQuery, page: props.bankaccounts.current_page }, // Mantener la página actual
+        { search: newQuery, page: props.bankAccounts.current_page }, // Mantener la página actual
         { preserveState: true }
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
-    }
+    } 
   },
   { immediate: false }
 );
 
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("bankaccounts.index", props.bank.id); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const toggleState = (bankaccountId, currentState) => {
+const toggleState = (bankAccountId: Number, currentState: Boolean) => {
   const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
 
   axios
-    .put(route("bankaccounts.updateState", { id: bankaccountId }), {
+    .put(route("bankaccounts.updateState", { id: bankAccountId }), {
       state: newState,
     })
     .then(() => {
@@ -182,17 +155,10 @@ const toggleState = (bankaccountId, currentState) => {
           Cuentas Bancarias {{ props.bank.name }}
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
-        <button
-          @click="newBankAccount"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
+        <button @click="newBankAccount"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -209,38 +175,28 @@ const toggleState = (bankaccountId, currentState) => {
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(bankaccount, i) in props.bankaccounts.data"
-            :key="bankaccount.id"
-            class="border-t [&>td]:py-2"
-          >
+          <tr v-for="(bankAccount, i) in props.bankAccounts.data" :key="bankAccount.id" class="border-t [&>td]:py-2">
             <td>{{ i + 1 }}</td>
-            <td>{{ bankaccount.account_number }}</td>
-            <td>{{ bankaccount.account_type }}</td>
-            <td>{{ bankaccount.current_balance }}</td>
+            <td>{{ bankAccount.account_number }}</td>
+            <td>{{ bankAccount.account_type }}</td>
+            <td>{{ bankAccount.current_balance }}</td>
 
             <td>
-              <button
-                :class="bankaccount.state ? 'bg-success' : 'bg-danger'"
-                @click="toggleState(bankaccount.id, bankaccount.state)"
-                class="rounded px-2 py-1 text-white"
-              >
-                {{ bankaccount.state ? "Activo" : "Inactivo" }}
+              <button :class="bankAccount.state ? 'bg-success' : 'bg-danger'"
+                @click="() => bankAccount.id && toggleState(bankAccount.id, bankAccount.state)"
+                class="rounded px-2 py-1 text-white">
+                {{ bankAccount.state ? "Activo" : "Inactivo" }}
               </button>
             </td>
 
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
-                <button
-                  class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="removeBankAccount(bankaccount.id)"
-                >
+                <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                  @click="()=> bankAccount.id && removeBankAccount(bankAccount.id)">
                   <TrashIcon class="size-6 text-white" />
                 </button>
-                <button
-                  class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                  @click="update(bankaccount)"
-                >
+                <button class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
+                  @click="update(bankAccount)">
                   <PencilIcon class="size-4 text-white" />
                 </button>
               </div>
@@ -249,27 +205,17 @@ const toggleState = (bankaccountId, currentState) => {
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.bankaccounts" @page-change="handlePageChange" />
+    <Paginate :page="props.bankAccounts" />
   </AdminLayout>
 
-  <FormModal
-    :show="modal"
-    :bankaccount="bankaccount"
-    :error="errorForm"
-    @close="toggle"
-    @save="save"
-  />
+  <FormModal :show="modal" :bankAccount="bankAccount" :error="errorForm" @close="toggle" @save="save" />
 
-  <ConfirmationModal :show="modal1">
+  <ConfirmationModal :show="modalDelete">
     <template #title> ELIMINAR CUENTAS BANCARIAS </template>
     <template #content> Esta seguro de eliminar la cuenta bancaria? </template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="deleteBankAccount"
-        >Aceptar</PrimaryButton
-      >
+      <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="deleteBankAccount">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

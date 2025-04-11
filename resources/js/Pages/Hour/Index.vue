@@ -1,43 +1,37 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import ModalHour from "./ModalHour.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import axios from "axios";
-import Table from "@/Components/Table.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { ConfirmationModal, TextInput, SecondaryButton, PrimaryButton, Table, Paginate } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
-
+import { Employee, Errors, Filters, GeneralRequest, Hour } from "@/types";
 //Props
-const props = defineProps({
-  hours: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-  employees: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  hours: GeneralRequest<Hour>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+  employees: Employee[];
+}>();
 
 // Refs
 const modal = ref(false);
 const search = ref(props.filters.search); // Término de búsqueda
-const modal1 = ref(false);
-
+const modalDelete = ref(false);
 const date = new Date().toISOString().split("T")[0];
 //El inicializador de objetos
 const initialHour = {
+  id: undefined,
   detail: "",
   amount: "",
-  employee_id: "",
+  employee_id: 0,
   type: "",
 };
 
 // Reactives
-const hour = useForm({ ...initialHour, date });
-const errorForm = reactive({});
-const deleteid = ref(0);
+const hour = useForm<Hour>({ ...initialHour, date });
+const errorForm = reactive<Errors>({});
+const deleteid = ref<Number>(0);
 
 const newHour = () => {
   // Reinicio el formularios con valores vacios
@@ -59,8 +53,8 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const toggle1 = () => {
-  modal1.value = !modal1.value;
+const toggleDelete = () => {
+  modalDelete.value = !modalDelete.value;
 };
 
 const save = () => {
@@ -77,7 +71,7 @@ const save = () => {
       toggle(); // Cerrar modal o reiniciar estados
       router.reload({ only: ["horas"] }); // Recargar datos
     },
-    onError: (error) => {
+    onError: (error: Errors) => {
       // Iterar sobre los errores recibidos del servidor
       Object.entries(error).forEach(([key, value]) => {
         errorForm[key] = value; // Mostrar el primer error asociado a cada campo
@@ -86,7 +80,7 @@ const save = () => {
   });
 };
 
-const update = (hourEdit) => {
+const update = (hourEdit: Hour) => {
   resetErrorForm();
   Object.keys(hourEdit).forEach((key) => {
     hour[key] = hourEdit[key];
@@ -94,15 +88,15 @@ const update = (hourEdit) => {
   toggle();
 };
 
-const removeHour = (hourId) => {
-  toggle1();
+const removeHour = (hourId: Number) => {
+  toggleDelete();
   deleteid.value = hourId;
 };
 
-const deletehour = () => {
+const deleteHour = () => {
   router.delete(route("hours.delete", deleteid.value), {
     onSuccess: () => {
-      toggle1();
+      toggleDelete();
     },
     onError: (error) => {
       console.error("Error al eliminar las horas", error);
@@ -114,7 +108,6 @@ watch(
   search,
   async (newQuery) => {
     const url = route("hours.index");
-    console.log("si entra");
     try {
       await router.get(
         url,
@@ -127,21 +120,6 @@ watch(
   },
   { immediate: false }
 );
-
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("hours.index"); // Ruta hacia el backend
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  }
-};
 </script>
 
 <template>
@@ -154,20 +132,11 @@ const handlePageChange = async (page) => {
           Horas Extra/Normales
         </h2>
         <div class="w-full flex justify-end">
-          <TextInput
-            v-model="search"
-            type="text"
-            class="mt-1 block w-[50%] mr-2 h-8"
-            minlength="3"
-            maxlength="300"
-            required
-            placeholder="Buscar..."
-          />
+          <TextInput v-model="search" type="text" class="mt-1 block w-[50%] mr-2 h-8" minlength="3" maxlength="300"
+            required placeholder="Buscar..." />
         </div>
-        <button
-          @click="newHour"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
+        <button @click="newHour"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -186,11 +155,7 @@ const handlePageChange = async (page) => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(hour, i) in props.hours.data"
-              :key="hour.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(hour, i) in props.hours.data" :key="hour.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td>{{ hour.cuit }}</td>
               <td class="text-left">{{ hour.name }}</td>
@@ -198,16 +163,11 @@ const handlePageChange = async (page) => {
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                    @click="removeHour(hour.id)"
-                  >
+                  <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                    @click="() => hour.id && removeHour(hour.id)">
                     <TrashIcon class="size-6 text-white" />
                   </button>
-                  <button
-                    class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                    @click="update(hour)"
-                  >
+                  <button class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white" @click="update(hour)">
                     <PencilIcon class="size-4 text-white" />
                   </button>
                 </div>
@@ -217,27 +177,18 @@ const handlePageChange = async (page) => {
         </Table>
       </div>
     </div>
-    <Paginate :page="props.hours" @page-change="handlePageChange" />
+    <Paginate :page="props.hours" />
   </AdminLayout>
 
-  <ModalHour
-    :show="modal"
-    :hour="hour"
-    :error="errorForm"
-    :employees="props.employees"
-    :date="date"
-    @close="toggle"
-    @save="save"
-  />
+  <ModalHour :show="modal" :hour="hour" :error="errorForm" :employees="props.employees" :date="date" @close="toggle"
+    @save="save" />
 
-  <ConfirmationModal :show="modal1">
+  <ConfirmationModal :show="modalDelete">
     <template #title> ELIMINAR HORAS EXTRAS</template>
     <template #content> Esta seguro de eliminar la hora extra? </template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="deletehour">Aceptar</PrimaryButton>
+      <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="deleteHour">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

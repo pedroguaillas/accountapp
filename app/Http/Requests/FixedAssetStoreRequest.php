@@ -29,7 +29,7 @@ class FixedAssetStoreRequest extends FormRequest
             'vaucher' => 'nullable|string|max:17',
             'date_acquisition' => 'required|date',
             'detail' => 'nullable|string|max:300',
-            'code' => 'required|string|max:20',
+           'code' => 'required|string|max:20|unique:fixed_assets,code',
             'address' => 'required|string|min:3|max:255',
             'period' => 'nullable|integer|min:0',
             'value' => 'required|numeric|min:0',

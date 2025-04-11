@@ -15,7 +15,7 @@ class BankAccountController extends Controller
         $company = Company::first();
         $search = $request->input('search', '');
         // Construimos la consulta base
-        $bankaccounts = BankAccount::query()
+        $bankAccounts = BankAccount::query()
             ->select('id', 'account_number', 'account_type', 'current_balance', 'state')
             ->where('data_additional->company_id', $company->id)
             ->where('bank_id', $bank->id)
@@ -29,7 +29,7 @@ class BankAccountController extends Controller
             'filters' => [
                 'search' => $search, // Retornar el filtro de código
             ],
-            'bankaccounts' => $bankaccounts,
+            'bankAccounts' => $bankAccounts,
             'bank' => $bank,
         ]);
     }

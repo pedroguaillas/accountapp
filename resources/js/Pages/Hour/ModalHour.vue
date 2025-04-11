@@ -1,22 +1,17 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { TextInput, SecondaryButton, PrimaryButton, DynamicSelect, InputLabel, InputError, DialogModal } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
+import { Employee, Errors, Hour } from "@/types";
 
 // Props
-const props = defineProps({
-  hour: { type: Object, default: () => ({}) },
-  error: { type: Object, default: () => ({}) },
-  show: { type: Boolean, default: false },
-  employees: { type: Array, default: () => [] },
-  date: { type: String, default: "" },
-});
+const props = defineProps<{
+  hour: Hour;
+  error: Errors;
+  show: boolean;
+  employees: Employee[];
+  date:string;
+}>();
 
 const { focusNextField } = useFocusNextField();
 
@@ -25,7 +20,7 @@ defineEmits(["close", "save"]);
 
 // Opciones de empleados y tipo de activo
 const employeesOptions = props.employees.map((employee) => ({
-  value: employee.id,
+  value: employee.id !== undefined ? employee.id : 0,
   label: employee.name,
 }));
 
@@ -33,14 +28,7 @@ const typeOptions = [
   { value: "extra", label: "EXTRA" },
   { value: "normal", label: "NORMAL" },
 ];
-
-// Establecer la fecha actual si no está definida en advance.date
-if (!props.hour.date) {
-  const currentDate = new Date().toISOString().split("T")[0]; // Obtener la fecha actual en formato YYYY-MM-DD
-  props.hour.date = currentDate;
-}
 </script>
-
 
 <template>
   <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">

@@ -14,7 +14,7 @@ export interface Employee {
     xiii?: boolean;
     xiv?: boolean;
     reserve_funds?: boolean;
-    date_start: Date;
+    date_start: string;
     email?: string;
     processing?: boolean;
     [key: string]: any;

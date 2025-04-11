@@ -1,20 +1,15 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { TextInput, SecondaryButton, PrimaryButton, DynamicSelect, InputLabel, InputError, DialogModal } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
+import { BankAccount, Errors } from "@/types";
 
 // Props
-defineProps({
-  bankaccount: { type: Object, default: () => ({}) },
-  error: { type: Object, default: () => ({}) },
-  show: { type: Boolean, default: false },
-});
+defineProps<{
+  bankAccount: BankAccount;
+  error: Errors;
+  show: boolean;
+}>();
 
 // Composable para cambiar de campo al presionar "Enter"
 const { focusNextField } = useFocusNextField();
@@ -25,7 +20,6 @@ const accountTypeOptions = [
   { value: "corriente", label: "Corriente" },
 ];
 
-
 // Emits
 defineEmits(["close", "save"]);
 </script>
@@ -33,7 +27,7 @@ defineEmits(["close", "save"]);
 <template>
   <DialogModal :show="show" maxWidth="lg" @close="$emit('close')">
     <template #title>
-      {{ bankaccount.id === undefined ? "Añadir" : "Editar" }} cuenta bancaria
+      {{ bankAccount.id === undefined ? "Añadir" : "Editar" }} cuenta bancaria
     </template>
 
     <template #content>
@@ -49,7 +43,7 @@ defineEmits(["close", "save"]);
               value="Número de cuenta bancaria"
             />
             <TextInput
-              v-model="bankaccount.account_number"
+              v-model="bankAccount.account_number"
               type="text"
               class="mt-1 block w-full"
               id="account_number"
@@ -61,7 +55,7 @@ defineEmits(["close", "save"]);
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="account_type" value="Tipo de Cuenta" />
             <DynamicSelect
-              v-model="bankaccount.account_type"
+              v-model="bankAccount.account_type"
               :options="accountTypeOptions"
               class="mt-1 block w-full"
               id="account_type"
@@ -72,7 +66,7 @@ defineEmits(["close", "save"]);
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="current_balance" value="Saldo" />
             <TextInput
-              v-model="bankaccount.current_balance"
+              v-model="bankAccount.current_balance"
               type="number"
               min="0"
               class="mt-1 block w-full"
@@ -90,7 +84,7 @@ defineEmits(["close", "save"]);
       >
       <PrimaryButton
         @click="$emit('save')"
-         :disabled="bankaccount.processing"
+         :disabled="bankAccount.processing"
         class="px-6 py-2 ml-2 bg-blue-600 dark:bg-blue-600 text-blue-100 dark:text-blue-200 rounded"
       >
         Guardar

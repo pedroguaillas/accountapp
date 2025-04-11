@@ -1,45 +1,35 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
-import Table from "@/Components/Table.vue";
-import axios from "axios";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import {
-  TrashIcon,
-  PencilIcon,
-  ArrowTrendingDownIcon,
-} from "@heroicons/vue/24/solid";
+import { ConfirmationModal, TextInput, SecondaryButton, PrimaryButton, Table, Paginate } from "@/Components";
+import { TrashIcon, PencilIcon, ArrowTrendingDownIcon, } from "@heroicons/vue/24/solid";
+import { Filters, FixedAsset, GeneralRequest } from "@/types";
 
 // Props
-const props = defineProps({
-  fixedAssetss: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  fixedAssetss: GeneralRequest<FixedAsset>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+}>();
 
 const modal = ref(false);
-const deleteid = ref(0);
+const deleteId = ref<Number>(0);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 
 const toggle = () => {
   modal.value = !modal.value;
 };
 
-const removeFixedAsset = (fixedAssetId) => {
+const removeFixedAsset = (fixedAssetId: Number) => {
   toggle();
-  deleteid.value = fixedAssetId;
+  deleteId.value = fixedAssetId;
 };
 
-const deletefixed = () => {
-  router.delete(route("fixedassets.delete", deleteid.value), {
+const deleteFixed = () => {
+  router.delete(route("fixedassets.delete", deleteId.value), {
     onSuccess: () => {
-      toggle1();
+      toggle();
     },
     onError: (error) => {
       console.error("Error al eliminar el activo fijo", error);
@@ -47,17 +37,11 @@ const deletefixed = () => {
   });
 };
 
-const reloadPage = async (url) => {
-  await router.get(url, { search }, { preserveState: true });
-};
-
 watch(
   search,
 
   async (newQuery) => {
     const url = route("fixedassets.index");
-    loading.value = true;
-
     try {
       await router.get(
         url,
@@ -66,30 +50,10 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
     }
   },
   { immediate: false }
 );
-
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("fixedassets.index"); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
@@ -101,19 +65,12 @@ const handlePageChange = async (page) => {
           Activos fijos
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
 
-        <Link
-          :href="route('fixedassets.create')"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
-          +
+        <Link :href="route('fixedassets.create')"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
+        +
         </Link>
       </div>
 
@@ -131,11 +88,7 @@ const handlePageChange = async (page) => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(fixe, i) in props.fixedAssetss.data"
-              :key="fixe.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(fixe, i) in props.fixedAssetss.data" :key="fixe.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td>{{ fixe.code }}</td>
               <td>
@@ -148,23 +101,17 @@ const handlePageChange = async (page) => {
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                    @click="removeFixedAsset(fixe.id)"
-                  >
+                  <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                    @click="() => fixe.id && removeFixedAsset(fixe.id)">
                     <TrashIcon class="size-6 text-white" />
                   </button>
-                  <Link
-                    class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                    :href="route('fixedassets.edit', fixe.id)"
-                  >
-                    <PencilIcon class="size-4 text-white" />
+                  <Link class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
+                    :href="route('fixedassets.edit', fixe.id)">
+                  <PencilIcon class="size-4 text-white" />
                   </Link>
-                  <Link
-                    class="rounded px-2 pt-1 pb-0 bg-blue-800 text-white"
-                    :href="route('depreciations.index', fixe.id)"
-                  >
-                    <ArrowTrendingDownIcon class="size-4 text-white" />
+                  <Link class="rounded px-2 pt-1 pb-0 bg-blue-800 text-white"
+                    :href="route('depreciations.index', fixe.id)">
+                  <ArrowTrendingDownIcon class="size-4 text-white" />
                   </Link>
                 </div>
               </td>
@@ -173,16 +120,14 @@ const handlePageChange = async (page) => {
         </Table>
       </div>
     </div>
-    <Paginate :page="props.fixedAssetss" @page-change="handlePageChange" />
+    <Paginate :page="props.fixedAssetss" />
   </AdminLayout>
   <ConfirmationModal :show="modal">
     <template #title> ELIMINAR ACTIVOS FIJOS </template>
     <template #content> Esta seguro de eliminar el activo fijo? </template>
     <template #footer>
-      <SecondaryButton @click="modal = !modal" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="deletefixed">Aceptar</PrimaryButton>
+      <SecondaryButton @click="modal = !modal" class="mr-2">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="deleteFixed">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

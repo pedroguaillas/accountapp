@@ -1,44 +1,49 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import ModalCompany from "./ModalCompany.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import axios from "axios";
-import Table from "@/Components/Table.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { ConfirmationModal, TextInput, SecondaryButton, PrimaryButton, Table, Paginate } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { Company, ContributorType, EconomiActivity, Errors, Filters, GeneralRequest } from "@/types";
 
 //Props
-const props = defineProps({
-  companies: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-  economyActivities: { type: Array, default: () => [] },
-  contributorTypes: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  companies: GeneralRequest<Company>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+  economyActivities: EconomiActivity[];
+  contributorTypes: ContributorType[];
+}>();
 
 // Refs
 const modal = ref(false);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
-const modal1 = ref(false);
+const modalDelete = ref(false);
 
 //El inicializador de objetos
 const initialCompany = {
+  id: undefined,
   ruc: "",
   company: "",
   economic_activity_id: "",
   contributor_type_id: "",
+  restart_activities: "",
+  special: "",
+  accounting: false,
+  retention_agent: 0,
+  declaration_type: "",
+  certificate_path: "",
+  certificate_pass: "",
+  sign_valid_from: "",
+  sign_valid_to: "",
+  date: "",
 };
 
 // Reactives
-const company = useForm({ ...initialCompany });
-const errorForm = reactive({});
-const deleteid = ref(0);
+const company = useForm<Company>({ ...initialCompany });
+const errorForm: Record<string, string> = {};
+const deleteId = ref<Number>(0);
 
 const newCompany = () => {
   // Reinicio el formularios con valores vacios
@@ -58,8 +63,8 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const toggle1 = () => {
-  modal1.value = !modal1.value;
+const toggleDelete = () => {
+  modalDelete.value = !modalDelete.value;
 };
 
 const save = () => {
@@ -77,7 +82,7 @@ const save = () => {
       resetErrorForm(); // Limpiar errores del formulario
       router.reload({ only: ["rucs"] }); // Recargar datos
     },
-    onError: (error) => {
+    onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
 
       // Iterar sobre los errores recibidos del servidor
@@ -88,7 +93,7 @@ const save = () => {
   });
 };
 
-const update = (companyEdit) => {
+const update = (companyEdit: Company) => {
   resetErrorForm();
   Object.keys(companyEdit).forEach((key) => {
     company[key] = companyEdit[key];
@@ -96,15 +101,15 @@ const update = (companyEdit) => {
   toggle();
 };
 
-const removeCompany = (companyId) => {
-  toggle1();
-  deleteid.value = companyId;
+const removeCompany = (companyId: Number) => {
+  toggleDelete();
+  deleteId.value = companyId;
 };
 
 const deletecompany = () => {
-  router.delete(route("company.delete", deleteid.value), {
+  router.delete(route("company.delete", deleteId.value), {
     onSuccess: () => {
-      toggle1();
+      toggleDelete();
     },
     onError: (error) => {
       console.error("Error al eliminar la compania", error);
@@ -114,11 +119,8 @@ const deletecompany = () => {
 
 watch(
   search,
-
   async (newQuery) => {
     const url = route("rucs.index");
-    loading.value = true;
-    console.log("si entra");
 
     try {
       await router.get(
@@ -128,30 +130,11 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
     }
   },
   { immediate: false }
 );
 
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("rucs.index"); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
@@ -164,20 +147,11 @@ const handlePageChange = async (page) => {
           Negocios / RUCs
         </h2>
         <div class="w-full flex justify-end">
-          <TextInput
-            v-model="search"
-            type="text"
-            class="mt-1 block w-[50%] mr-2 h-8"
-            minlength="3"
-            maxlength="300"
-            required
-            placeholder="Buscar..."
-          />
+          <TextInput v-model="search" type="text" class="mt-1 block w-[50%] mr-2 h-8" minlength="3" maxlength="300"
+            required placeholder="Buscar..." />
         </div>
-        <button
-          @click="newCompany"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
+        <button @click="newCompany"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -190,32 +164,24 @@ const handlePageChange = async (page) => {
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
               <th>RUC</th>
-              <th>RAZON SOCIAL</th>
+              <th class="text-left">RAZON SOCIAL</th>
               <th class="w-1"></th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(company, i) in props.companies.data"
-              :key="company.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(company, i) in props.companies.data" :key="company.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td>{{ company.ruc }}</td>
-              <td>{{ company.company }}</td>
+              <td class="text-left">{{ company.company }}</td>
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                    @click="removeCompany(company.id)"
-                  >
+                  <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                    @click="() => company.id && removeCompany(company.id)">
                     <TrashIcon class="size-6 text-white" />
                   </button>
-                  <button
-                    class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                    @click="update(company)"
-                  >
+                  <button class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
+                    @click="update(company)">
                     <PencilIcon class="size-4 text-white" />
                   </button>
                 </div>
@@ -225,29 +191,18 @@ const handlePageChange = async (page) => {
         </Table>
       </div>
     </div>
-    <Paginate :page="props.companies" @page-change="handlePageChange" />
+    <Paginate :page="props.companies" />
   </AdminLayout>
 
-  <ModalCompany
-    :show="modal"
-    :company="company"
-    :error="errorForm"
-    :economyActivities="economyActivities"
-    :contributorTypes="contributorTypes"
-    @close="toggle"
-    @save="save"
-  />
+  <ModalCompany :show="modal" :company="company" :error="errorForm" :economyActivities="economyActivities"
+    :contributorTypes="contributorTypes" @close="toggle" @save="save" />
 
-  <ConfirmationModal :show="modal1">
+  <ConfirmationModal :show="modalDelete">
     <template #title> ELIMINAR LAS COMPANIAS</template>
     <template #content> Esta seguro de eliminar la compania? </template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="deletecompany"
-        >Aceptar</PrimaryButton
-      >
+      <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="deletecompany">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>
