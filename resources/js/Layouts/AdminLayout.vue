@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import Header from "./admin/Header.vue";
 import Sidebar from "./admin/Sidebar.vue";
@@ -11,12 +11,11 @@ onMounted(() => {
 });
 
 // Props
-defineProps({
-  title: String,
-});
-
+defineProps<{
+  title: string;
+}>()
 // Refs
-const divRef = ref(null);
+const divRef = ref<HTMLDivElement | null>(null);
 const menu = ref(false);
 
 const toggle = () => {
@@ -24,14 +23,16 @@ const toggle = () => {
 };
 
 watch(divRef, () => {
+  if (!divRef.value) return;
   if (divRef.value.getBoundingClientRect().width > 640) {
     toggle();
   }
-  // divRef si altura del main mas altura del Header > h-screen ? h-full : h-screen
 });
+
 </script>
 
 <template>
+
   <Head :title="title" />
   <div ref="divRef" class="w-screen h-screen flex">
     <!-- Sidebar -->

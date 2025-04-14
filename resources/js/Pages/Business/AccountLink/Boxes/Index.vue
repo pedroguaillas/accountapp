@@ -1,24 +1,22 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import Table from "@/Components/Table.vue";
 import AccountLinkLayout from "@/Layouts/AccountLinkLayout.vue";
 import ModalSelectAccount from "../ModalSelectAccount.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { Link, router,usePage } from "@inertiajs/vue3";
-import { ref, computed} from "vue";
+import { router, usePage } from "@inertiajs/vue3";
+import { ref, computed } from "vue";
 import axios from "axios";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/outline";
+import { ConfirmationModal, SecondaryButton, PrimaryButton, Table } from "@/Components";
+import { Account, Box, MovementType } from "@/types";
 
 // Props
-const props = defineProps({
-  accounts: { type: Array, default: () => [] },
-  boxes: { type: Array, default: () => [] },
-  ingres: { type: Array, default: () => [] },
-  egres: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  ingres: MovementType[];
+  egres: MovementType[];
+  accounts: Account[];
+  boxes: Box[];
+}>();
 
 // Refs
 const modal = ref(true);
@@ -37,7 +35,7 @@ const toggle1 = () => {
   modaldelete.value = !modaldelete.value;
 };
 
-const editBoxAccount = (boxIdEdit, boxNameEdit, boxTableEdit) => {
+const editBoxAccount = (boxIdEdit: number, boxNameEdit: string, boxTableEdit: string) => {
   // Actualizar los valores según el tipo de cuenta
   boxId.value = boxIdEdit;
   boxName.value = boxNameEdit;
@@ -47,8 +45,7 @@ const editBoxAccount = (boxIdEdit, boxNameEdit, boxTableEdit) => {
   toggle();
 };
 
-const selectAccount = (accountId) => {
-  console.log(boxName.value);
+const selectAccount = (accountId: number) => {
   router.put(
     route("settingaccount.box.update", boxId.value),
     { name: boxName.value, account_id: accountId, table: boxtable.value },
@@ -57,7 +54,7 @@ const selectAccount = (accountId) => {
   toggle();
 };
 
-const removeVinculation = (boxIdD, boxNameD, boxtableD) => {
+const removeVinculation = (boxIdD: number, boxNameD: string, boxtableD: string) => {
   boxId.value = boxIdD;
   boxName.value = boxNameD;
   boxtable.value = boxtableD;
@@ -65,19 +62,12 @@ const removeVinculation = (boxIdD, boxNameD, boxtableD) => {
 };
 
 const handleInputChange = () => {
-  axios
-    .put(
-      route("settingaccount.box.update", boxId.value),
-      { name: boxName.value, account_id: null, table: boxtable.value },
-      { preserveState: true }
-    ) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("setting.account.box.index"));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar la vinculacion", error);
-    });
+  router.put(
+    route("settingaccount.box.update", boxId.value),
+    { name: boxName.value, account_id: null, table: boxtable.value },
+    { preserveState: true }
+  );
+
 };
 </script>
 
@@ -103,22 +93,14 @@ const handleInputChange = () => {
           </td>
           <td>
             <div class="flex h-8">
-              <input
-                type="text"
-                :value="box.ap_info ?? ''"
-                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
-                disabled
-              />
-              <button
-                class="px-1 py-1 border border-red-400"
-                @click="removeVinculation(box.id, 'account_id', 'Box')"
-              >
+              <input type="text" :value="box.ap_info ?? ''"
+                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" disabled />
+              <button class="px-1 py-1 border border-red-400"
+                @click="() => box.id && removeVinculation(box.id, 'account_id', 'Box')">
                 <TrashIcon class="size-6 text-red-400" />
               </button>
-              <button
-                @click="editBoxAccount(box.id, 'account_id', 'Box')"
-                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
-              >
+              <button @click="() => box.id && editBoxAccount(box.id, 'account_id', 'Box')"
+                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
               </button>
             </div>
@@ -142,26 +124,16 @@ const handleInputChange = () => {
           <td class="text-left">{{ ingress.name }}</td>
           <td>
             <div class="flex h-8">
-              <input
-                type="text"
-                :value="ingress.ap_info ?? ''"
-                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
-                disabled
-              />
-              <button
-                class="px-1 py-1 border border-red-400"
-                @click="
-                  removeVinculation(ingress.id, 'account_id', 'MovementType')
-                "
-              >
+              <input type="text" :value="ingress.ap_info ?? ''"
+                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" disabled />
+              <button class="px-1 py-1 border border-red-400" @click="() => ingress.id &&
+                removeVinculation(ingress.id, 'account_id', 'MovementType')
+              ">
                 <TrashIcon class="size-6 text-red-400" />
               </button>
-              <button
-                @click="
-                  editBoxAccount(ingress.id, 'account_id', 'MovementType')
-                "
-                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
-              >
+              <button @click="() => ingress.id &&
+                editBoxAccount(ingress.id, 'account_id', 'MovementType')
+              " class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
               </button>
             </div>
@@ -186,24 +158,15 @@ const handleInputChange = () => {
           <td class="text-left">{{ egress.name }}</td>
           <td>
             <div class="flex h-8">
-              <input
-                type="text"
-                :value="egress.ap_info ?? ''"
-                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
-                disabled
-              />
-              <button
-                class="px-1 py-1 border border-red-400"
-                @click="
-                  removeVinculation(egress.id, 'account_id', 'MovementType')
-                "
-              >
+              <input type="text" :value="egress.ap_info ?? ''"
+                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" disabled />
+              <button class="px-1 py-1 border border-red-400" @click="()=>egress.id &&
+                removeVinculation(egress.id, 'account_id', 'MovementType')
+                ">
                 <TrashIcon class="size-6 text-red-400" />
               </button>
-              <button
-                @click="editBoxAccount(egress.id, 'account_id', 'MovementType')"
-                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
-              >
+              <button @click="()=> egress.id && editBoxAccount(egress.id, 'account_id', 'MovementType')"
+                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
               </button>
             </div>
@@ -213,12 +176,8 @@ const handleInputChange = () => {
     </Table>
   </AccountLinkLayout>
 
-  <ModalSelectAccount
-    :show="modal"
-    :filteredAccountsFromMain="props.accounts"
-    @close="toggle"
-    @selectAccount="selectAccount"
-  />
+  <ModalSelectAccount :show="modal" :filteredAccountsFromMain="props.accounts" @close="toggle"
+    @selectAccount="selectAccount" />
 
   <ConfirmationModal :show="modaldelete">
     <template #title> ELIMINAR VINCULACION </template>
@@ -226,12 +185,8 @@ const handleInputChange = () => {
       Esta seguro de eliminar la vinculación de la cuenta?
     </template>
     <template #footer>
-      <SecondaryButton class="mr-2" type="button" @click="toggle1()"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="handleInputChange()"
-        >Aceptar</PrimaryButton
-      >
+      <SecondaryButton class="mr-2" type="button" @click="toggle1()">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="handleInputChange()">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

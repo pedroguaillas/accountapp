@@ -1,20 +1,21 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
-import Table from "@/Components/Table.vue";
 import IceSearch from "./IceSearch.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { Table } from "@/Components";
+import { Ice } from "@/types";
 
-const props = defineProps({
-  globalIces: { type: Array, default: () => [] },
-  ices: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  globalIces: Ice[];
+  ices: Ice[];
+}>();
 
 // Variables para el formulario
 const code = ref("");
 const name = ref("");
-const percentage = ref("");
+const percentage = ref(0);
 
 const showForm = ref(false); // Inicialmente oculto
 
@@ -25,7 +26,7 @@ const toggleForm = () => {
 // Método para guardar el ICE
 // Método para guardar el ICE
 const saveSelect = () => {
-  const ice= {
+  const ice = {
     code: code.value,
     name: name.value,
     percentage: percentage.value,
@@ -40,9 +41,7 @@ const saveSelect = () => {
 };
 
 // Método para recibir los datos seleccionados desde SearchWithholding.vue
-const handleAddIces = (ice) => {
-  console.log("Retención agregada desde modal:", ice);
-
+const handleAddIces = (ice : Ice) => {
   code.value = ice.code;
   name.value = ice.name;
   percentage.value = ice.percentage;
@@ -55,10 +54,8 @@ const handleAddIces = (ice) => {
   <GeneralSetting title="Ices">
     <div class="p-4 bg-white rounded drop-shadow-md">
       <div class="w-full flex sm:justify-end">
-        <button
-          @click="toggleForm"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
+        <button @click="toggleForm"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -66,11 +63,8 @@ const handleAddIces = (ice) => {
       <!-- Formulario solo visible si modal es true -->
       <div v-if="showForm" id="nuevo" class="mt-4">
         <div v-if="showForm" id="nuevo" class="mt-4">
-        <IceSearch
-          :globalIces="props.globalIces"
-          @addIces="handleAddIces"
-        />
-      </div>
+          <IceSearch :globalIces="props.globalIces" @addIces="handleAddIces" />
+        </div>
       </div>
 
       <div class="w-full overflow-x-auto">
@@ -87,11 +81,7 @@ const handleAddIces = (ice) => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(ice, i) in props.ices"
-              :key="ice.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(ice, i) in props.ices" :key="ice.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td>{{ ice.code }}</td>
               <td class="text-left">{{ ice.name }}</td>
@@ -104,9 +94,7 @@ const handleAddIces = (ice) => {
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  >
+                  <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white">
                     <TrashIcon class="size-6 text-white" />
                   </button>
                 </div>
@@ -118,4 +106,3 @@ const handleAddIces = (ice) => {
     </div>
   </GeneralSetting>
 </template>
-

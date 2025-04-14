@@ -17,13 +17,13 @@ const props = defineProps<{
 
 // Refs
 const modal = ref(false);
-const modal1 = ref(false);
+const modalDelete = ref(false);
 const deleteid = ref<Number>(0);
 const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
 
 const toggle1 = () => {
-  modal1.value = !modal1.value;
+  modalDelete.value = !modalDelete.value;
 };
 
 // Inicializador de objetos
@@ -211,11 +211,11 @@ const toggleState = (bankId: Number, currentState: String) => {
 
   <FormModal :show="modal" :bank="bank" :error="errorForm" @close="toggle" @save="save" />
 
-  <ConfirmationModal :show="modal1">
+  <ConfirmationModal :show="modalDelete">
     <template #title> ELIMINAR BANCOS</template>
     <template #content> Esta seguro de eliminar el banco? </template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2">Cancelar</SecondaryButton>
+      <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2">Cancelar</SecondaryButton>
       <PrimaryButton type="button" @click="deletebank">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>

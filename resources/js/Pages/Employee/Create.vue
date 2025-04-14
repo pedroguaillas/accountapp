@@ -3,7 +3,7 @@
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { useForm } from "@inertiajs/vue3";
 import { TextInput, Checkbox, InputLabel, InputError } from "@/Components";
-import { Employee } from "@/types";
+import { Employee, Errors } from "@/types";
 
 const date = new Date().toISOString().split("T")[0];
 
@@ -35,7 +35,7 @@ const errorForm: Record<string, string> = {};
 const save = () => {
   // Enviar datos al backend
   employee.post(route("employee.store"), {
-    onError: (errors) => {
+    onError: (errors:Errors) => {
       // Mostrar errores de validación desde el backend
       Object.keys(errors).forEach((key) => {
         errorForm[key] = errors[key];

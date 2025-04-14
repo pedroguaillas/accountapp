@@ -1,12 +1,12 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import AdminLayout from "./AdminLayout.vue";
 import { Link } from "@inertiajs/vue3";
 
 // Props
-defineProps({
-  title: String,
-});
+defineProps<{
+  title: string;
+}>()
 </script>
 
 <template>

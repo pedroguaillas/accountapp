@@ -1,20 +1,16 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { InputLabel,PrimaryButton,SecondaryButton,TextInput,InputError,DialogModal    } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
+import { Errors, Expense } from "@/types";
+
 
 // Props
-const props = defineProps({
-  expense: { type: Object, default: () => ({}) },
-  error: { type: Object, default: () => ({}) },
-  show: { type: Boolean, default: false },
-});
+const props = defineProps<{
+  expense: Expense;
+  error: Errors;
+  show: boolean;
+}>();
 
 const { focusNextField } = useFocusNextField();
 

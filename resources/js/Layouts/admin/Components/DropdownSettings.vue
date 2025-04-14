@@ -13,22 +13,20 @@ import DropdownLink from "@/Components/DropdownLink.vue";
   <Dropdown width="60">
     <template #trigger>
       <button type="button">
-        <WrenchIcon
-          class="size-6 text-white transition-transform duration-300"
-        />
+        <WrenchIcon class="size-6 text-white transition-transform duration-300" />
       </button>
     </template>
 
     <template #content>
       <div class="w-60">
         <!-- Team Settings -->
-        <DropdownLink :href="route('busssines.setting.iess.index')"> General </DropdownLink>
+        <DropdownLink as="a" :href="route('busssines.setting.iess.index')"> General </DropdownLink>
 
-        <DropdownLink :href="route('business.setting.accountlinks')">
+        <DropdownLink as="a" :href="route('business.setting.accountlinks')">
           Vinculación de cuentas
         </DropdownLink>
 
-        <DropdownLink :href="route('business.setting.roles')">
+        <DropdownLink as="a" :href="route('business.setting.roles')">
           Roles
         </DropdownLink>
       </div>

@@ -1,17 +1,16 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import Table from "@/Components/Table.vue";
+import { DialogModal, Table, SecondaryButton } from "@/Components";
+import {  PayRegim } from "@/types";
 
 // Props
-defineProps({
-  globalPaymentRegims: { type: Array, default: () => [] },
-  show: { type: Boolean, default: false },
-});
+defineProps<{
+  globalPaymentRegims: PayRegim[];
+  show: boolean;
+}>();
 
 // Emits
-defineEmits(["close", "save"]);
+defineEmits(["close", "selectedPaymentRegim"]);
 </script>
 
 <template>
@@ -33,12 +32,8 @@ defineEmits(["close", "save"]);
             </tr>
           </thead>
           <tbody>
-            <tr
-              @click="$emit('selectedPaymentRegim', paymentRegim)"
-              v-for="(paymentRegim, i) in globalPaymentRegims"
-              :key="`paymentRegim-${i}`"
-              class="h-8 cursor-pointer hover:bg-gray-200"
-            >
+            <tr @click="$emit('selectedPaymentRegim', paymentRegim)" v-for="(paymentRegim, i) in globalPaymentRegims"
+              :key="`paymentRegim-${i}`" class="h-8 cursor-pointer hover:bg-gray-200">
               <td class="text-left">{{ paymentRegim.region }}</td>
               <td class="text-left">{{ paymentRegim.months_xiii }}</td>
               <td class="text-left">{{ paymentRegim.months_xiv }}</td>
@@ -49,9 +44,7 @@ defineEmits(["close", "save"]);
       </div>
     </template>
     <template #footer>
-      <SecondaryButton @click="$emit('close')" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
+      <SecondaryButton @click="$emit('close')" class="mr-2">Cancelar</SecondaryButton>
     </template>
   </DialogModal>
 </template>

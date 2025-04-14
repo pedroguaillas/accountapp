@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import {
   ArrowRightOnRectangleIcon,
@@ -7,23 +7,18 @@ import {
 import { WrenchIcon } from "@heroicons/vue/24/solid";
 import { router, usePage, Link } from "@inertiajs/vue3";
 import { computed } from "vue";
-import DropdownSettings from "./Components/DropdownSettings.vue";
 
 // Emits
 defineEmits(["toggle"]);
 
 // Props
-defineProps({
-  menu: Boolean,
-});
-
 const logout = () => {
   router.post(route("logout"));
 };
 
 const page = usePage();
 
-const user = computed(() => page.props.auth.user);
+const user = computed<AuthUser>(() => page.props.auth.user as AuthUser);
 </script>
 
 <template>

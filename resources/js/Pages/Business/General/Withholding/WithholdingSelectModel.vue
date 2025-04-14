@@ -1,15 +1,14 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ref, computed } from "vue";
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import Table from "@/Components/Table.vue";
+import { DialogModal, Table, SecondaryButton } from "@/Components";
+import { Withholding } from "@/types";
 
 // Props
-const props = defineProps({
-  show: { type: Boolean, default: false },
-  withholdings: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  withholdings: Withholding[];
+  show: boolean;
+}>();
 
 // Emits
 defineEmits(["close", "selectWithholding"]);

@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { PropType, ref, onMounted } from "vue";
 
-defineProps({
-    modelValue: {
-        type: [String, Number] as PropType<string | number>,
-        default: "", // Valor por defecto para modelValue
-    },
+// defineProps({
+//     modelValue: {
+//         type: [String, Number] as PropType<string | number>,
+//         default: "", // Valor por defecto para modelValue
+//     },
+// });
+withDefaults(defineProps<{
+    modelValue: string | number |undefined;
+}>(), {
+    modelValue: "",
 });
 
 defineEmits(['update:modelValue']);

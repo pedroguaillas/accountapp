@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 import ModalIva from "./ModalIva.vue";
 import { router } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { Table } from "@/Components";
+import { Iva } from "@/types";
 
 // Recibes 'paymethods' desde Inertia
-const props = defineProps({
-  globalIvas: { type: Array, default: () => [] },
-  ivas: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  globalIvas: Iva[];
+  ivas: Iva[];
+}>();
 
 const modal = ref(false);
 
@@ -18,7 +19,7 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const selectedIva = (iva) => {
+const selectedIva = (iva:Iva) => {
   router.post(route("busssines.setting.ivas.store"), iva, {
     preserveState: true,
   });
@@ -87,7 +88,6 @@ const selectedIva = (iva) => {
     :show="modal"
     :ivas="props.globalIvas"
     @close="toggle"
-    @save="save"
     @selectedIva="selectedIva"
   />
 </template>

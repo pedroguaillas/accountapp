@@ -15,6 +15,7 @@ const props = defineProps<{
   costCenters: GeneralRequest<CostCenter>; // Paginación de los bancos
   filters: Filters; // Filtros aplicados
 }>();
+
 // Refs
 const modal = ref(false);
 const search = ref(props.filters.search);

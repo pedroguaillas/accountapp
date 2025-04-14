@@ -1,19 +1,19 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import IceSelectModel from "./IceSelectModel.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
+import { InputLabel  } from "@/Components";
+import { Ice } from "@/types";
 
 // Props
-defineProps({
-  globalIces: { type: Array, default: () => [] },
-});
-
+defineProps<{
+  globalIces: Ice[];
+}>();
 // Refs
-const iceId = ref(0);
+const iceId = ref<number>(0);
 const code = ref("");
 const search = ref("");
-const percentage = ref("");
+const percentage = ref<number>(0);
 const modal = ref(false);
 
 // Método para alternar la visibilidad de la modal
@@ -22,16 +22,14 @@ const toggleModal = () => {
 };
 
 // Método para recibir la retención seleccionada
-const selectedIce= ref(null); // Nuevo ref para almacenar la selección temporalmente
+const selectedIce = ref<Ice | null>(null); // Nuevo ref para almacenar la selección temporalmente
 
-const handleIceSelect = (ice) => {
-  console.log("Retención seleccionada:", ice);
-
+const handleIceSelect = (ice: Ice) => {
   // Guarda la retención seleccionada sin enviarla al componente principal
   selectedIce.value = ice;
 
   // Asigna los valores a los campos del formulario
-  iceId.value = ice.id;
+  iceId.value = ice.id ?? 0;
   search.value = ice.name;
   code.value = ice.code;
   percentage.value = ice.percentage;

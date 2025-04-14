@@ -1,17 +1,16 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import Table from "@/Components/Table.vue";
+import { DialogModal, Table, SecondaryButton } from "@/Components";
+import { PayMethod } from "@/types";
 
 // Props
-defineProps({
-  payMethods: { type: Array, default: () => [] },
-  show: { type: Boolean, default: false },
-});
+defineProps<{
+  payMethods: PayMethod[];
+  show: boolean;
+}>();
 
 // Emits
-defineEmits(["close", "save"]);
+defineEmits(["close", "selectedPayMethod"]);
 </script>
 
 <template>

@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 import ModalIess from "./ModalIess.vue";
 import { router } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { Table } from "@/Components";
+import { Iess } from "@/types";
 
 // Recibes 'paymethods' desde Inertia
-const props = defineProps({
-  globalIess: { type: Array, default: () => [] },
-  iesses: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  globalIess: Iess[];
+  iesses: Iess[];
+}>();
 
 const modal = ref(false);
 
@@ -18,7 +19,7 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const selectedIess = (iess) => {
+const selectedIess = (iess: Iess) => {
   router.post(route("busssines.setting.iess.store"), iess, {
     preserveState: true,
   });
@@ -89,7 +90,6 @@ const selectedIess = (iess) => {
     :show="modal"
     :iesses="props.globalIess"
     @close="toggle"
-    @save="save"
     @selectedIess="selectedIess"
   />
 </template>

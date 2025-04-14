@@ -1,17 +1,14 @@
-<script setup>
+<script setup lang="ts"> 
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { InputLabel,TextInput, SecondaryButton, InputError, DialogModal } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
+import { Errors, RoleEgress } from "@/types";
 // Props
-defineProps({
-  egress: { type: Object, default: () => ({}) },
-  error: { type: Object, default: () => ({}) },
-  show: { type: Boolean, default: false },
-});
+const props = defineProps<{
+  egress: RoleEgress;
+  error: Errors;
+  show:boolean;
+}>();
 
 const { focusNextField } = useFocusNextField();
 

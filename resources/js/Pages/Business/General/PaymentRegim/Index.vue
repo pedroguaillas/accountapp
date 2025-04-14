@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 import ModalPaymentRegim from "./ModalPaymentRegim.vue";
 import { router } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
+import { Table } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { PayRegim } from "@/types";
 
 // Recibes 'paymethods' desde Inertia
-const props = defineProps({
-  globalPaymentRegims: { type: Array, default: () => [] },
-  paymentRegims: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  globalPaymentRegims: PayRegim[];
+  paymentRegims: PayRegim[];
+}>();
 
 const modal = ref(false);
 
@@ -18,7 +19,7 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const selectedPaymentRegim = (paymentRegim) => {
+const selectedPaymentRegim = (paymentRegim:PayRegim) => {
   router.post(route("busssines.setting.paymentregims.store"), paymentRegim, {
     preserveState: true,
   });

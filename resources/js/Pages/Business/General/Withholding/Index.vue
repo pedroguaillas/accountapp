@@ -1,15 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
-import Table from "@/Components/Table.vue";
+import { Table } from "@/Components";
 import SearchWithholding from "./SearchWithholding.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { Withholding } from "@/types";
 
-const props = defineProps({
-  globalWithholdings: { type: Array, default: () => [] },
-  withholdings: { type: Array, default: () => [] },
-});
+const props = defineProps < {
+  globalWithholdings: Withholding[];
+  withholdings: Withholding[];
+} > ();
 
 // Variables para el formulario
 const code = ref("");
@@ -41,12 +42,12 @@ const saveSelect = () => {
 };
 
 // Método para recibir los datos seleccionados desde SearchWithholding.vue
-const handleAddWithholdings = (withholding) => {
+const handleAddWithholdings = (withholding: Withholding) => {
   console.log("Retención agregada desde modal:", withholding);
 
   code.value = withholding.code;
   name.value = withholding.name;
-  percentage.value = withholding.percentage;
+  percentage.value = String(withholding.percentage);
   type.value = withholding.type;
 
   saveSelect(); // Guarda automáticamente después de seleccionar
@@ -57,20 +58,15 @@ const handleAddWithholdings = (withholding) => {
   <GeneralSetting title="Retenciones">
     <div class="p-4 bg-white rounded drop-shadow-md">
       <div class="w-full flex sm:justify-end">
-        <button
-          @click="toggleForm"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
+        <button @click="toggleForm"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
 
       <!-- Formulario solo visible si modal es true -->
       <div v-if="showForm" id="nuevo" class="mt-4">
-        <SearchWithholding
-          :globalWithholdings="props.globalWithholdings"
-          @addWithholdings="handleAddWithholdings"
-        />
+        <SearchWithholding :globalWithholdings="props.globalWithholdings" @addWithholdings="handleAddWithholdings" />
       </div>
 
       <div class="w-full overflow-x-auto">
@@ -88,11 +84,7 @@ const handleAddWithholdings = (withholding) => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(withholding, i) in props.withholdings"
-              :key="withholding.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(withholding, i) in props.withholdings" :key="withholding.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td>{{ withholding.code }}</td>
               <td class="text-left">{{ withholding.name }}</td>
@@ -105,9 +97,7 @@ const handleAddWithholdings = (withholding) => {
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  >
+                  <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white">
                     <TrashIcon class="size-6 text-white" />
                   </button>
                 </div>
@@ -119,4 +109,3 @@ const handleAddWithholdings = (withholding) => {
     </div>
   </GeneralSetting>
 </template>
-

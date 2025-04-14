@@ -1,27 +1,20 @@
-<script setup>
+<script setup lang="ts">
 // Importaciones
 import { Link, router } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
-import axios from "axios";
 import { ref, watch } from "vue";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { SecondaryButton, TextInput, Paginate, PrimaryButton, ConfirmationModal, Table } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { IntangibleAsset } from "@/types/intangible-asset";
+import { Filters, GeneralRequest } from "@/types";
 
 // Props
-
-// Props
-const props = defineProps({
-  intangibleAssetss: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  intangibleAssetss: GeneralRequest<IntangibleAsset>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+}>();
 
 const modal = ref(false);
-const deleteid = ref(0);
+const deleteID = ref<Number>(0);
 const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
 
@@ -29,19 +22,13 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const removeIntangibleAsset = (intangibleId) => {
+const removeIntangibleAsset = (intangibleId: number) => {
   toggle();
-  deleteid.value = intangibleId;
+  deleteID.value = intangibleId;
 };
 
 const deleteintangible = () => {
-  router.delete(route("intangibleassets.delete", deleteid.value), {
-    onSuccess: () => {
-      toggle1();
-    },
-    onError: (error) => {
-      console.error("Error al eliminar el activo intangible", error);
-    },
+  router.delete(route("intangibleassets.delete", deleteID.value), {
   });
 };
 
@@ -66,24 +53,6 @@ watch(
   },
   { immediate: false }
 );
-
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("intangibleassets.index"); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
@@ -96,19 +65,12 @@ const handlePageChange = async (page) => {
           Activos Intangibles
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
 
-        <Link
-          :href="route('intangibleassets.create')"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
-          +
+        <Link :href="route('intangibleassets.create')"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
+        +
         </Link>
       </div>
 
@@ -126,11 +88,7 @@ const handlePageChange = async (page) => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(inta, i) in props.intangibleAssetss.data"
-              :key="inta.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(inta, i) in props.intangibleAssetss.data" :key="inta.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td>{{ inta.code ?? "" }}</td>
               <td>
@@ -143,17 +101,13 @@ const handlePageChange = async (page) => {
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                    @click="removeIntangibleAsset(inta.id)"
-                  >
+                  <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                    @click="() => inta.id && removeIntangibleAsset(inta.id)">
                     <TrashIcon class="size-6 text-white" />
                   </button>
-                  <Link
-                    class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                    :href="route('intangibleassets.edit', inta.id)"
-                  >
-                    <PencilIcon class="size-4 text-white" />
+                  <Link class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
+                    :href="route('intangibleassets.edit', inta.id)">
+                  <PencilIcon class="size-4 text-white" />
                   </Link>
                 </div>
               </td>
@@ -162,18 +116,14 @@ const handlePageChange = async (page) => {
         </Table>
       </div>
     </div>
-    <Paginate :page="props.intangibleAssetss" @page-change="handlePageChange" />
+    <Paginate :page="props.intangibleAssetss" />
   </AdminLayout>
   <ConfirmationModal :show="modal">
     <template #title> ELIMINAR ACTIVOS FIJOS </template>
     <template #content> Esta seguro de eliminar el activo fijo? </template>
     <template #footer>
-      <SecondaryButton @click="modal = !modal" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="deleteintangible"
-        >Aceptar</PrimaryButton
-      >
+      <SecondaryButton @click="modal = !modal" class="mr-2">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="deleteintangible">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import {
   BookOpenIcon,
@@ -10,21 +10,22 @@ import { Link, usePage } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 
 // Props
-defineProps({
-  menu: Boolean,
-});
+defineProps<{
+  menu: boolean;
+}>()
 
 // Estados de los menúa desplegables
 const isDropdownOpenAccount = ref(false);
 const isDropdownOpenPersonal = ref(false);
 const isDropdownOpenBank = ref(false);
+const current_tenant_id =ref(null);// para identificar cuando un usuario tiene muchos rucs
 
 // Emits
 defineEmits(["toggle"]);
 
 const page = usePage();
 
-const user = computed(() => page.props.auth.user);
+const user = computed<AuthUser>(() => page.props.auth.user as AuthUser);
 </script>
 
 <template>

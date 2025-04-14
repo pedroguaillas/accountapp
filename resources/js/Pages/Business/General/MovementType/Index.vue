@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 import ModalMovementType from "./ModalMovementType.vue";
 import { router } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
+import { Table } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { MovementType } from "@/types";
 
 // Recibes 'paymethods' desde Inertia
-const props = defineProps({
-  globalMovementTypes: { type: Array, default: () => [] },
-  movementTypes: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  globalMovementTypes: MovementType[];
+  movementTypes: MovementType[];
+}>();
 
 const modal = ref(false);
 
@@ -18,8 +19,8 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const selectedMovementType = (iva) => {
-  router.post(route("busssines.setting.movementtypes.store"), iva, {
+const selectedMovementType = (movementType:MovementType) => {
+  router.post(route("busssines.setting.movementtypes.store"), movementType, {
     preserveState: true,
   });
   toggle();
@@ -89,7 +90,6 @@ const selectedMovementType = (iva) => {
     :show="modal"
     :movementTypes="props.globalMovementTypes"
     @close="toggle"
-    @save="save"
     @selectedMovementType="selectedMovementType"
   />
 </template>

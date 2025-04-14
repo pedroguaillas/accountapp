@@ -1,14 +1,15 @@
-<script setup>
+<script setup lang="ts">
 
 // Imports
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import Table from "@/Components/Table.vue";
+import { Table } from "@/Components";
+import { Depresation, Filters, FixedAsset, GeneralRequest } from "@/types";
 
 // Props
-defineProps({
-    fixedAsset: { type: Object, default: () => ({}) },
-    depreciations: { type: Array, default: () => ([]) },
-});
+const props = defineProps < {
+    fixedAsset: FixedAsset; // Paginación de los bancos
+    depreciations: Depresation[]; // Filtros aplicados
+} > ();
 
 </script>
 

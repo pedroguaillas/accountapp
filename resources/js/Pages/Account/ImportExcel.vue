@@ -1,22 +1,27 @@
-<script setup>
+<script setup lang="ts">
 
 // Imports
 import { ArrowUpTrayIcon } from '@heroicons/vue/24/outline'; // Icono Upload
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const fileInput = ref(null); // Referencia al input de archivo
+const fileInput = ref<HTMLInputElement | null>(null); // Referencia al input de archivo
 
 const handleClick = () => {
-    fileInput.value.click(); // Programáticamente hace clic en el input de archivo
+    if (fileInput.value) {
+        fileInput.value.click(); // Programáticamente hace clic en el input de archivo
+    } // Programáticamente hace clic en el input de archivo
 }
 
-const handleFileChange = (event) => {
-    const files = event.target.files;
-    if (files.length > 0) submit(files[0])
+const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
+    if (files && files.length > 0) {
+        submit(files[0]);
+    }
 }
 
-const submit = (file) => {
+const submit = (file: File) => {
     router.post(`accounts/import`, { file }, {
         onError: (err) => {
             alert(err)

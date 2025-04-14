@@ -1,17 +1,17 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import Table from "@/Components/Table.vue";
+import { DialogModal, Table, SecondaryButton } from "@/Components";
+import { MovementType } from "@/types";
 
 // Props
-defineProps({
-  movementTypes: { type: Array, default: () => [] },
-  show: { type: Boolean, default: false },
-});
+defineProps<{
+  movementTypes: MovementType[];
+  show: boolean;
+}>();
+
 
 // Emits
-defineEmits(["close", "save"]);
+defineEmits(["close", "selectedMovementType"]);
 </script>
 
 <template>

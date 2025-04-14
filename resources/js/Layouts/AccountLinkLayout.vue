@@ -1,12 +1,14 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import AdminLayout from "./AdminLayout.vue";
 import { Link } from "@inertiajs/vue3";
 
 // Props
-defineProps({
-  title: String,
-});
+defineProps<{
+  title: string;
+}>()
+
+
 </script>
 
 <template>
@@ -30,83 +32,63 @@ defineProps({
               </button>
             </li>
             <li class="me-2">
-              <Link
-                class="pointer inline-block p-4 border-b-2 rounded-t-lg"
-                :href="route('setting.account.index')"
+              <Link class="pointer inline-block p-4 border-b-2 rounded-t-lg" :href="route('setting.account.index')"
                 :class="{
                   ' border-gray-300 dark:text-gray-300 text-xl pt-2':
                     route().current('setting.account.index'),
                   ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
                     !route().current('setting.account.index'),
-                }"
-                type="button"
-              >
-                Activos fijos
+                }" type="button">
+              Activos fijos
               </Link>
             </li>
 
             <li>
-              <Link
-                class="pointer inline-block p-4 border-b-2 rounded-t-lg"
-                :href="route('setting.account.rol.index')"
+              <Link class="pointer inline-block p-4 border-b-2 rounded-t-lg" :href="route('setting.account.rol.index')"
                 :class="{
                   ' border-gray-300 dark:text-gray-300 text-xl pt-2':
                     route().current('setting.account.rol.index'),
                   ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
                     !route().current('setting.account.rol.index'),
-                }"
-                type="button"
-              >
-                Roles
+                }" type="button">
+              Roles
               </Link>
             </li>
 
 
             <li>
-              <Link
-                class="pointer inline-block p-4 border-b-2 rounded-t-lg"
-                :href="route('setting.account.bank.index')"
+              <Link class="pointer inline-block p-4 border-b-2 rounded-t-lg" :href="route('setting.account.bank.index')"
                 :class="{
                   ' border-gray-300 dark:text-gray-300 text-xl pt-2':
                     route().current('setting.account.bank.index'),
                   ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
                     !route().current('setting.account.bank.index'),
-                }"
-                type="button"
-              >
-                Bancos
+                }" type="button">
+              Bancos
               </Link>
             </li>
 
             <li>
-              <Link
-                class="pointer inline-block p-4 border-b-2 rounded-t-lg"
-                :href="route('setting.account.box.index')"
+              <Link class="pointer inline-block p-4 border-b-2 rounded-t-lg" :href="route('setting.account.box.index')"
                 :class="{
                   ' border-gray-300 dark:text-gray-300 text-xl pt-2':
                     route().current('setting.account.box.index'),
                   ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
                     !route().current('setting.account.box.index'),
-                }"
-                type="button"
-              >
-                Cajas
+                }" type="button">
+              Cajas
               </Link>
             </li>
 
-             <li>
-              <Link
-                class="pointer inline-block p-4 border-b-2 rounded-t-lg"
-                :href="route('setting.account.expenses.index')"
-                :class="{
+            <li>
+              <Link class="pointer inline-block p-4 border-b-2 rounded-t-lg"
+                :href="route('setting.account.expenses.index')" :class="{
                   ' border-gray-300 dark:text-gray-300 text-xl pt-2':
                     route().current('setting.account.expenses.index'),
                   ' hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300':
                     !route().current('setting.account.expenses.index'),
-                }"
-                type="button"
-              >
-                Gastos
+                }" type="button">
+              Gastos
               </Link>
             </li>
           </ul>

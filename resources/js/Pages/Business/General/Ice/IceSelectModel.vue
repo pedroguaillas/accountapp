@@ -1,14 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
-import DialogModal from "@/Components/DialogModal.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import Table from "@/Components/Table.vue";
+import { DialogModal, Table, SecondaryButton } from "@/Components";
+import { Ice } from "@/types";
 
 // Props
-const props = defineProps({
-  show: { type: Boolean, default: false },
-  ices: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  ices: Ice[];
+  show: boolean;
+}>();
 
 // Emits
 defineEmits(["close", "selectIce"]);
@@ -24,8 +23,8 @@ const filteredIces = computed(() => {
 
   const query = searchQuery.value.toLowerCase();
 
-  return props.ices.filter((ice) =>
-    String(ice.code).toLowerCase().includes(query) || 
+  return props.ices.filter((ice: Ice) =>
+    String(ice.code).toLowerCase().includes(query) ||
     String(ice.name).toLowerCase().includes(query)
   );
 });
@@ -44,16 +43,10 @@ const filteredIces = computed(() => {
       <!-- Campo de búsqueda -->
       <div class="mb-3">
         <label for="search" class="sr-only">Buscar ICE</label>
-        <input
-          id="search"
-          v-model="searchQuery"
-          type="text"
-          placeholder="Buscar por código o nombre"
-          class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
-          @keyup.enter="
+        <input id="search" v-model="searchQuery" type="text" placeholder="Buscar por código o nombre"
+          class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300" @keyup.enter="
             filteredIces.length > 0 && $emit('selectIce', filteredIces[0])
-          "
-        />
+            " />
       </div>
 
       <!-- Tabla con scroll en dispositivos pequeños -->
@@ -67,12 +60,8 @@ const filteredIces = computed(() => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="ice in filteredIces"
-              :key="ice.id"
-              class="h-8 cursor-pointer hover:bg-gray-200 transition-colors"
-              @click="$emit('selectIce', ice)"
-            >
+            <tr v-for="ice in filteredIces" :key="ice.id" class="h-8 cursor-pointer hover:bg-gray-200 transition-colors"
+              @click="$emit('selectIce', ice)">
               <td class="px-4 py-2">{{ ice.code }}</td>
               <td class="px-4 py-2">{{ ice.name }}</td>
               <td class="px-4 py-2 text-right">{{ ice.percentage }}%</td>

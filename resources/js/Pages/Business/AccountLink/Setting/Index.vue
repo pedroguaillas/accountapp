@@ -1,21 +1,19 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import Table from "@/Components/Table.vue";
 import AccountLinkLayout from "@/Layouts/AccountLinkLayout.vue";
 import ModalSelectAccount from "../ModalSelectAccount.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
-import { Link, router } from "@inertiajs/vue3";
+import { router } from "@inertiajs/vue3";
 import { ref } from "vue";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/outline";
+import { ConfirmationModal, SecondaryButton, PrimaryButton, Table } from "@/Components";
+import { Account, ActiveType } from "@/types";
 
 // Props
-const props = defineProps({
-  activeTypes: { type: Array, default: () => [] },
-  accounts: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  accounts: Account[];
+  activeTypes: ActiveType[];
+}>();
 
 // Refs
 const modal = ref(true);
@@ -32,20 +30,20 @@ const toggle1 = () => {
   modaldelete.value = !modaldelete.value;
 };
 
-const editActiveType = (activeTypeIdEdit, activeTypeNameEdit) => {
+const editActiveType = (activeTypeIdEdit: number, activeTypeNameEdit: string) => {
   accounts.value = Array.isArray(props.accounts)
     ? props.accounts.filter((acc) => {
-        const prefix =
-          activeTypeNameEdit === "account_dep_spent_id" ? "5" : "1";
-        return acc.code.startsWith(prefix);
-      })
+      const prefix =
+        activeTypeNameEdit === "account_dep_spent_id" ? "5" : "1";
+      return acc.code.startsWith(prefix);
+    })
     : [];
   activeTypeId.value = activeTypeIdEdit;
   activeTypeName.value = activeTypeNameEdit;
   toggle();
 };
 
-const selectAccount = (accountId) => {
+const selectAccount = (accountId: number) => {
   router.put(
     route("settingaccount.update", activeTypeId.value),
     { name: activeTypeName.value, account_id: accountId },
@@ -54,26 +52,18 @@ const selectAccount = (accountId) => {
   toggle();
 };
 
-const removeVinculation = (activeTypeIdD, activeTypeNameD) => {
+const removeVinculation = (activeTypeIdD: number, activeTypeNameD: string) => {
   activeTypeId.value = activeTypeIdD;
   activeTypeName.value = activeTypeNameD;
   toggle1();
 };
 
 const handleInputChange = () => {
-  axios
-    .put(
-      route("settingaccount.update", activeTypeId.value),
-      { name: activeTypeName.value, account_id: null },
-      { preserveState: true }
-    ) // Eliminar centro de costos
-    .then(() => {
-      // Después de eliminar el centro de costos, redirigir a la ruta deseada
-      router.visit(route("setting.account.index"));
-    })
-    .catch((error) => {
-      console.error("Error al eliminar la vinculacion", error);
-    });
+  router.put(
+    route("settingaccount.update", activeTypeId.value),
+    { name: activeTypeName.value, account_id: null },
+    { preserveState: true }
+  );
 };
 </script>
 
@@ -90,79 +80,51 @@ const handleInputChange = () => {
         </tr>
       </thead>
       <tbody class="h-6">
-        <tr
-          v-for="(activeType, i) in props.activeTypes"
-          :key="`activeType-${i}`"
-        >
+        <tr v-for="(activeType, i) in props.activeTypes" :key="`activeType-${i}`">
           <td>{{ i + 1 }}</td>
           <td class="text-left">{{ activeType.name }}</td>
           <td>
             <div class="flex h-8">
-              <input
-                type="text"
-                :value="activeType.a_info ?? ''"
-                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
-                disabled
-              />
+              <input type="text" :value="activeType.a_info ?? ''"
+                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" disabled />
 
-              <button
-                class=" px-1 py-1 border border-red-400"
-                @click="removeVinculation(activeType.id, 'account_id')"
-              >
+              <button class=" px-1 py-1 border border-red-400"
+                @click="() => activeType.id && removeVinculation(activeType.id, 'account_id')">
                 <TrashIcon class="size-6 text-red-400" />
               </button>
-              <button
-                @click="editActiveType(activeType.id, 'account_id')"
-                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
-              >
+              <button @click="() => activeType.id && editActiveType(activeType.id, 'account_id')"
+                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
               </button>
             </div>
           </td>
           <td>
             <div class="flex h-8">
-              <input
-                type="text"
-                :value="activeType.ad_info ?? ''"
-                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
-                disabled
-              />
+              <input type="text" :value="activeType.ad_info ?? ''"
+                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" disabled />
 
-              <button
-                class=" px-1 py-1 border border-red-400"
-                @click="removeVinculation(activeType.id, 'account_dep_id')"
-              >
+              <button class=" px-1 py-1 border border-red-400"
+                @click="() => activeType.id && removeVinculation(activeType.id, 'account_dep_id')">
                 <TrashIcon class="size-6 text-red-400" />
               </button>
-              <button
-                @click="editActiveType(activeType.id, 'account_dep_id')"
-                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
-              >
+              <button @click="() => activeType.id && editActiveType(activeType.id, 'account_dep_id')"
+                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
               </button>
             </div>
           </td>
           <td>
             <div class="flex h-8">
-              <input
-                type="text"
-                :value="activeType.ads_info ?? ''"
-                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none"
-                disabled
-              />
-              <button
-                class=" px-1 py-1 border border-red-400"
-                @click="
-                  removeVinculation(activeType.id, 'account_dep_spent_id')
-                "
-              >
+              <input type="text" :value="activeType.ads_info ?? ''"
+                class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" disabled />
+              <button class=" px-1 py-1 border border-red-400" @click="()=>activeType.id &&
+                removeVinculation(activeType.id, 'account_dep_spent_id')
+                ">
                 <TrashIcon class="size-6 text-red-400" />
               </button>
 
-              <button
-                @click="editActiveType(activeType.id, 'account_dep_spent_id')"
-                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none"
-              >
+              <button @click="()=> activeType.id && editActiveType(activeType.id, 'account_dep_spent_id')"
+                class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
               </button>
             </div>
@@ -172,12 +134,8 @@ const handleInputChange = () => {
     </Table>
   </AccountLinkLayout>
 
-  <ModalSelectAccount
-    :show="modal"
-    :filteredAccountsFromMain="accounts"
-    @close="toggle"
-    @selectAccount="selectAccount"
-  />
+  <ModalSelectAccount :show="modal" :filteredAccountsFromMain="accounts" @close="toggle"
+    @selectAccount="selectAccount" />
 
   <ConfirmationModal :show="modaldelete">
     <template #title> ELIMINAR VINCULACION </template>
@@ -185,12 +143,8 @@ const handleInputChange = () => {
       Esta seguro de eliminar la vinculación de la cuenta?
     </template>
     <template #footer>
-      <SecondaryButton class="mr-2" type="button" @click="toggle1()"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="handleInputChange()"
-        >Aceptar</PrimaryButton
-      >
+      <SecondaryButton class="mr-2" type="button" @click="toggle1()">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="handleInputChange()">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

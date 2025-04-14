@@ -1,17 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import axios from "axios";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 import ModalPayMethod from "./ModalPayMethod.vue";
 import { router } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
+import { Table } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { PayMethod } from "@/types";
 
 // Recibes 'paymethods' desde Inertia
-const props = defineProps({
-  globalPayMethods: { type: Array, default: () => [] },
-  payMethods: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  globalPayMethods: PayMethod[];
+  payMethods: PayMethod[];
+}>();
 
 const modal = ref(false);
 
@@ -19,7 +20,7 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const selectedPayMethod = (payMethod) => {
+const selectedPayMethod = (payMethod: PayMethod) => {
   router.post(route("busssines.setting.paymethods.store"), payMethod, {
     preserveState: true,
   });
@@ -88,7 +89,6 @@ const selectedPayMethod = (payMethod) => {
     :show="modal"
     :payMethods="props.globalPayMethods"
     @close="toggle"
-    @save="save"
     @selectedPayMethod="selectedPayMethod"
   />
 </template>

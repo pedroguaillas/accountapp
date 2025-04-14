@@ -1,16 +1,14 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import Table from "@/Components/Table.vue";
 import { ref, computed, watch } from "vue";
-import TextInput from "@/Components/TextInput.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import {TextInput, SecondaryButton, Table,DialogModal } from "@/Components";
+import { Account } from "@/types";
 
 // Props
-const props = defineProps({
-  filteredAccountsFromMain: { type: Array, default: () => [] },
-  show: { type: Boolean, default: () => true },
-});
+const props = defineProps<{
+  filteredAccountsFromMain: Account[];
+  show: boolean;
+}>();
 
 // Variables reactivas
 const search = ref("");

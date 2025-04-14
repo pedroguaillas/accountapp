@@ -18,8 +18,10 @@ export type PageProps<
 
 //import general (request)
 export * from './general-request';
+export * from './user';
 
 //barril de los tipos de datos del modelo
+export * from './account';
 export * from './active-type';
 export * from './advance';
 export * from './bank';
@@ -29,9 +31,19 @@ export * from './branch';
 export * from './cash';
 export * from './company';
 export * from './contributor-type';
+export * from './depresation';
 export * from './economic-activity';
 export * from './employee';
+export * from './expense';
 export * from './fixed-asset';
+export * from './ice';
+export * from './iess';
+export * from './iva';
 export * from './hour';
+export * from './movement-type';
 export * from './pay-method';
+export * from './pay-regim';
 export * from './person';
+export * from './role-egress';
+export * from './role-ingress';
+export * from './withholding';
