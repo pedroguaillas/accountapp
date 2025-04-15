@@ -1,16 +1,17 @@
-<script setup>
+<script setup lang="ts">
 
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
+import { DialogModal } from "@/Components";
+import { CostCenter } from "@/types";
 
 // Props
-defineProps({
-  costCenters: { type: Array, default: () => [] },
-  show: { type: Boolean, default: false },
-});
+const props = defineProps<{
+  costCenters: CostCenter[]; // Paginación de los bancos
+  show: boolean;
+}>()
 
 // Método para seleccionar centro de costo
-const handleSelectCostCenter = (costCenter) => {
+const handleSelectCostCenter = (costCenter: CostCenter) => {
   emit("selectCostCenter", costCenter); // Emitir el centro de costo seleccionado
   emit("close"); // Cerrar el modal
 };

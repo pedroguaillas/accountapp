@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 // Imports
+import { BankAccount } from "@/types";
 import BankAccountSelectModal from "./BankAccountSelectModal.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import { ref, computed } from "vue";
 
 // Props
-const props = defineProps({
-  bankaccounts: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  bankaccounts: BankAccount[];
+}>();
 
 // Refs
 const modal = ref(false); // Estado del modal
@@ -28,7 +29,7 @@ const toggleModal = () => {
 };
 
 // Método para recibir la cuenta bancaria seleccionada y actualizar los campos
-const handleBankAccountSelect = (bankaccount) => {
+const handleBankAccountSelect = (bankaccount: BankAccount) => {
   name.value = bankaccount.name;
   cuent.value = bankaccount.account_number; // Se actualiza el número de cuenta correctamente
 

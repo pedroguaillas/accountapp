@@ -1,21 +1,15 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import InputError from "@/Components/InputError.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { useFocusNextField } from "@/composables/useFocusNextField";
-import { ref } from "vue";
+import { PrimaryButton, DialogModal,SecondaryButton,InputError,TextInput,InputLabel } from "@/Components";
+import { Errors, Person } from "@/types";
 
 // Props
-defineProps({
-  person: { type: Object, default: () => ({}) },
-  error: { type: Object, default: () => ({}) },
-  show: { type: Boolean, default: false },
-});
+defineProps<{
+  person: Person; // Paginación de los bancos
+  error: Errors;
+  show: boolean;
+}>();
 
 const { focusNextField } = useFocusNextField();
 

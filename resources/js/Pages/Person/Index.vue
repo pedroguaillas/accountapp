@@ -1,33 +1,27 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ref, reactive, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
-import axios from "axios";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { TrashIcon, PencilIcon, ListBulletIcon } from "@heroicons/vue/24/solid";
+import { TextInput, Paginate, Table, SecondaryButton, PrimaryButton, ConfirmationModal } from "@/Components";
+import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { Errors, Filters, GeneralRequest, Person } from "@/types";
 
 // Props
-const props = defineProps({
-  people: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  people: GeneralRequest<Person>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+}>();
 
 // Refs
 const modal = ref(false);
-const modal1 = ref(false);
-const deleteid = ref(0);
+const modalDelete = ref(false);
+const deleteId = ref(0);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 
-const toggle1 = () => {
-  modal1.value = !modal1.value;
+const toggleDelete = () => {
+  modalDelete.value = !modalDelete.value;
 };
 
 // Inicializador de objetos
@@ -40,8 +34,8 @@ const initialPerson = {
 };
 
 // Reactives
-const person = useForm({ ...initialPerson });
-const errorForm = reactive({ ...initialPerson });
+const person = useForm<Person>({ ...initialPerson });
+const errorForm: Record<string, string> = {};
 
 const newPerson = () => {
   if (person.id !== undefined) {
@@ -74,12 +68,12 @@ const save = () => {
       resetErrorForm(); // Limpiar errores del formulario
       router.reload({ only: ["people"] }); // Recargar datos
     },
-    onError: (error) => {
+    onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
       if (error.response?.data?.errors) {
         // Iterar sobre los errores recibidos del servidor
         Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          errorForm[key] = value[0]; // Mostrar el primer error asociado a cada campo
+          errorForm[key] = (error[key] as string[])[0];// Mostrar el primer error asociado a cada campo
         });
       } else {
         console.error("Error desconocido:", error);
@@ -89,7 +83,7 @@ const save = () => {
   });
 };
 
-const update = (personEdit) => {
+const update = (personEdit:Person) => {
   resetErrorForm();
   Object.keys(personEdit).forEach((key) => {
     person[key] = personEdit[key];
@@ -97,15 +91,15 @@ const update = (personEdit) => {
   toggle();
 };
 
-const removePerson = (personId) => {
-  toggle1();
-  deleteid.value = personId;
+const removePerson = (personId:number) => {
+  toggleDelete();
+  deleteId.value = personId;
 };
 
 const deletePerson = () => {
-  router.delete(route("people.delete", deleteid.value), {
+  router.delete(route("people.delete", deleteId.value), {
     onSuccess: () => {
-      toggle1();
+      toggleDelete();
     },
     onError: (error) => {
       console.error("Error al eliminar la persona", error);
@@ -118,7 +112,6 @@ watch(
 
   async (newQuery) => {
     const url = route("people.index");
-    loading.value = true;
     try {
       await router.get(
         url,
@@ -127,30 +120,10 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
-    }
+    } 
   },
   { immediate: false }
 );
-
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("people.index"); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
@@ -163,17 +136,10 @@ const handlePageChange = async (page) => {
           personas
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
-        <button
-          @click="newPerson"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
+        <button @click="newPerson"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -190,11 +156,7 @@ const handlePageChange = async (page) => {
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(person, i) in props.people.data"
-            :key="person.id"
-            class="border-t [&>td]:py-2"
-          >
+          <tr v-for="(person, i) in props.people.data" :key="person.id" class="border-t [&>td]:py-2">
             <td>{{ i + 1 }}</td>
             <td class="text-left p-2">{{ person.identification }}</td>
             <td class="text-left">{{ person.name }}</td>
@@ -202,16 +164,11 @@ const handlePageChange = async (page) => {
 
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
-                <button
-                  class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="removePerson(person.id)"
-                >
+                <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+                  @click="()=>person.id && removePerson(person.id)">
                   <TrashIcon class="size-6 text-white" />
                 </button>
-                <button
-                  class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-                  @click="update(person)"
-                >
+                <button class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white" @click="update(person)">
                   <PencilIcon class="size-4 text-white" />
                 </button>
               </div>
@@ -220,24 +177,16 @@ const handlePageChange = async (page) => {
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.people" @page-change="handlePageChange" />
+    <Paginate :page="props.people" />
   </AdminLayout>
 
-  <FormModal
-    :show="modal"
-    :person="person"
-    :error="errorForm"
-    @close="toggle"
-    @save="save"
-  />
+  <FormModal :show="modal" :person="person" :error="errorForm" @close="toggle" @save="save" />
 
-  <ConfirmationModal :show="modal1">
+  <ConfirmationModal :show="modalDelete">
     <template #title> ELIMINAR PERSONAS</template>
     <template #content> Esta seguro de eliminar la persona? </template>
     <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
+      <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2">Cancelar</SecondaryButton>
       <PrimaryButton type="button" @click="deletePerson">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>

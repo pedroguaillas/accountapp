@@ -1,18 +1,19 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
+import { DialogModal } from "@/Components";
+import { BankAccount } from "@/types";
 
 // Props
-defineProps({
-  bankaccounts: { type: Array, default: () => [] },
-  show: { type: Boolean, default: false },
-});
+defineProps<{
+  bankaccounts: BankAccount[]; // Paginación de los bancos
+  show: boolean;
+}>();
 
 // Emits
 const emit = defineEmits(["close", "selectBankAccount"]);
 
 // Método para seleccionar centro de costo
-const handleSelectBankAccount = (bankaccount) => {
+const handleSelectBankAccount = (bankaccount: BankAccount) => {
   emit("selectBankAccount", bankaccount); // Emitir la cuenta seleccionada
   emit("close"); // Cerrar el modal
 };
@@ -32,8 +33,8 @@ const handleSelectBankAccount = (bankaccount) => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(bankaccount, i) in bankaccounts" :key="bankaccount.id" class="border-t [&>td]:py-2 cursor-pointer"
-              @click="handleSelectBankAccount(bankaccount)">
+            <tr v-for="(bankaccount, i) in bankaccounts" :key="bankaccount.id"
+              class="border-t [&>td]:py-2 cursor-pointer" @click="handleSelectBankAccount(bankaccount)">
               <td>{{ bankaccount.id }}</td>
               <td>{{ bankaccount.name }}</td>
               <td class="text-left">{{ bankaccount.account_number }}</td>

@@ -1,10 +1,10 @@
 export interface Cash {
     id?: number;
-    box_id: number;
-    close_employee_id:number;
-    initial_value: number;
-    ingress:number;
-    egress:number;
+    box_id?: number;
+    close_employee_id?:number|string;
+    initial_value?: number|string;
+    ingress?:number|string;
+    egress?:number|string;
     balance: number;
     state_box: string;
     real_balance: number;

@@ -1,23 +1,20 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { reactive, computed, ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchBankAccount from "./SearchBankAccount.vue";
 import SearchPerson from "./SearchPerson.vue";
 import { useForm, router, usePage } from "@inertiajs/vue3";
-import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
-import { TrashIcon } from "@heroicons/vue/24/outline";
+import { TextInput, InputError, InputLabel, DynamicSelect } from "@/Components";
+import { BankAccount, Errors, MovementType, Person, TransactionBank } from "@/types";
 
 // Props
-const props = defineProps({
-  bankaccounts: { type: Array, default: () => [] },
-  movementtypes: { type: Array, default: () => [] },
-  people: { type: Array, default: () => [] },
-  countperson: { type: Number, default: () => 0 },
-});
+const props = defineProps<{
+  bankaccounts: BankAccount[],
+  movementtypes: MovementType[],
+  people:Person[],
+  countperson: number;
+}>();
 
 const page = usePage();
 const errors = computed(() => page.props.errors);
@@ -47,7 +44,7 @@ const initialTransaction = {
   description: "",
   payment_method: "",
   beneficiary_id: "",
-  cheque_date: null,
+  cheque_date: "",
   transfer_account: "",
   voucher_number: "",
   state_transaction: "pendiente",
@@ -63,14 +60,14 @@ const transaction = useForm({
   bank_account_id,
   beneficiary_id,
 });
-const errorForm = reactive({});
+const errorForm = reactive<Record<string, string>>({});
 
 const save = () => {
   transaction.post(route("transactions.store"), {
     // onSuccess: () => {
     //  // router.visit(route("transactions.index"));
     // },
-    onError: (errors) => {
+    onError: (errors: Errors) => {
       if (errors.redirect) {
         redirect.value = errors.redirect;
       }
@@ -82,11 +79,11 @@ const save = () => {
 };
 
 // Método para recibir el centro de costo seleccionado desde SearchCostCenter
-const handleBankAccountSelect = (bankaccount) => {
+const handleBankAccountSelect = (bankaccount: BankAccount) => {
   transaction.bank_account_id = bankaccount.id; // Asignar el centro de costo al objeto journal
 };
 
-const handlePersonSelect = (person) => {
+const handlePersonSelect = (person: Person) => {
   transaction.beneficiary_id = person.id; // Asignar el centro de costo al objeto journal
 };
 
@@ -102,13 +99,13 @@ const paymentMethodOptions = [
 ];
 
 const movementTypeOptions = props.movementtypes.map((type) => ({
-  value: type.id,
+  value: type.id ?? 0,
   label: type.name,
   type: type.type,
 }));
 
 const peopleOptions = props.people.map((person) => ({
-  value: person.id,
+  value: person.id ?? 0,
   label: person.name,
 }));
 
@@ -119,7 +116,7 @@ const filteredMovementTypes = computed(() => {
 });
 
 const bankacountOptions = props.bankaccounts.map((bankacount) => ({
-  value: bankacount.id,
+  value: bankacount.id ?? 0,
   label: `${bankacount.name} - ${bankacount.account_number}`,
 }));
 </script>

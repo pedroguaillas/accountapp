@@ -1,13 +1,12 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-
+import { PrimaryButton, DialogModal } from "@/Components";
+import { PaymentRol } from "@/types";
 // Props
-const props = defineProps({
-  paymentRol: { type: Object, default: () => ({}) },
-  show: { type: Boolean, default: false },
-});
+const props = defineProps<{
+  paymentRol: PaymentRol; // Paginación de los bancos
+  show: boolean; // Filtros aplicados
+}>();
 
 // Emits
 defineEmits(["close", "save"]);

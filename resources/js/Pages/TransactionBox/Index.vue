@@ -1,61 +1,24 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { router, Link } from "@inertiajs/vue3";
-import Table from "@/Components/Table.vue";
-import axios from "axios";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { TextInput, Table, Paginate } from "@/Components";
+import { Filters, GeneralRequest, TransactionBox } from "@/types";
 
 // Props
-const props = defineProps({
-  transactionboxes: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  transactionboxes: GeneralRequest<TransactionBox>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+}>();
 
 // Refs
-const modal1 = ref(false);
-const deleteid = ref(0);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
-
-const toggle1 = () => {
-  modal1.value = !modal1.value;
-};
-
-const removeTransactionBox = (transactionId) => {
-  toggle1();
-  deleteid.value = transactionId;
-};
-
-const deleteTransaction = () => {
-  console.log(deleteid.value);
-  axios
-    .delete(route("transaction.boxes.delete", deleteid.value))
-    .then(() => {
-      router.visit(route("transaction.boxes.index"));
-    })
-    .catch((error) => {
-      if (error.response) {
-        console.error("Error del backend:", error.response.data);
-        alert(
-          error.response.data.error ||
-            "Ocurrió un error al eliminar la transacción."
-        );
-      }
-    });
-};
 
 watch(
   search,
   async (newQuery) => {
     const url = route("transaction.boxes.index");
-    loading.value = true;
     try {
       await router.get(
         url,
@@ -64,29 +27,11 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
-    }
+    } 
   },
   { immediate: false }
 );
 
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("transaction.boxes.index");
-  loading.value = true;
-  try {
-    await router.get(
-      url,
-      { page, search: search.value },
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
@@ -99,18 +44,11 @@ const handlePageChange = async (page) => {
           Movimientos de cajas
         </h2>
         <div class="w-full flex sm:justify-end">
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block sm:mr-2 h-8 w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
-        <Link
-          :href="route('transaction.boxes.create')"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
-          +
+        <Link :href="route('transaction.boxes.create')"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
+        +
         </Link>
       </div>
 
@@ -126,11 +64,8 @@ const handlePageChange = async (page) => {
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(transaction, i) in props.transactionboxes.data"
-            :key="transaction.id"
-            class="border-t [&>td]:py-2"
-          >
+          <tr v-for="(transaction, i) in props.transactionboxes.data" :key="transaction.id"
+            class="border-t [&>td]:py-2">
             <td>{{ i + 1 }}</td>
             <td class="text-left p-1">
               {{ transaction.name }}
@@ -138,26 +73,11 @@ const handlePageChange = async (page) => {
             <td class="text-left p-1">{{ transaction.description }}</td>
             <td class="text-left p-1">{{ transaction.type }}</td>
             <td class="text-right p-1">{{ transaction.amount }}</td>
-            
+
           </tr>
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.transactionboxes" @page-change="handlePageChange" />
+    <Paginate :page="props.transactionboxes" />
   </AdminLayout>
-
-  <ConfirmationModal :show="modal1">
-    <template #title> ELIMINAR MOVIMIENTO DE CAJA</template>
-    <template #content>
-      ¿Está seguro de eliminar este movimiento de caja?
-    </template>
-    <template #footer>
-      <SecondaryButton @click="modal1 = !modal1" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="deleteTransaction"
-        >Aceptar</PrimaryButton
-      >
-    </template>
-  </ConfirmationModal>
 </template>

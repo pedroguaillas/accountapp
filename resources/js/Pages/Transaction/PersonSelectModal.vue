@@ -1,15 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import DialogModal from "@/Components/DialogModal.vue";
 import { ref, watch, computed } from "vue";
 import Table from "@/Components/Table.vue";
 import TextInput from "@/Components/TextInput.vue";
+import { PeopleResponse } from "@/types";
 
-const props = defineProps({
-  show: { type: Boolean, default: false },
-  people: { type: Object, default: () => ({}) },
-  search: { type: String, default: "" },
-  page: { type: Number, default: 1 }, // ✅ Agregar esto
-});
+const props = defineProps<{
+  people: PeopleResponse; // Paginación de los bancos
+  show: boolean;
+  search: string;
+  page: number;
+}>();
+
 
 const totalPages = computed(() => props.people?.last_page ?? 1);
 const searchLocal = ref(props.search);

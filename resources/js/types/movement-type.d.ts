@@ -4,7 +4,7 @@ export interface MovementType {
     account_id?: number;
     name: string;
     code: string;
-    type: boolean;
+    type: string;
     venue: string;
     processing?: boolean;
     [key: string]: any;

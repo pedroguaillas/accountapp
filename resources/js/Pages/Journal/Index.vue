@@ -1,24 +1,20 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import Table from "@/Components/Table.vue";
 import { ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Link, router } from "@inertiajs/vue3";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import Paginate from "@/Components/Paginate.vue";
-import TextInput from "@/Components/TextInput.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { SecondaryButton, TextInput, Paginate, PrimaryButton, ConfirmationModal, Table } from "@/Components";
+import { Filters, GeneralRequest, Journal } from "@/types";
 
 // Props
-const props = defineProps({
-  journals: { type: Object, default: () => ({ data: [] }) },
-  validateFixedAsset: { type: Boolean, default: () => false },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  journals: GeneralRequest<Journal>; // Paginación de los bancos
+  validateFixedAsset: boolean;
+  filters: Filters; // Filtros aplicados
+}>();
 
 // Refs
-const deleteId = ref(0);
+const deleteId = ref<Number>(0);
 const modal = ref(false);
 const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
@@ -27,15 +23,14 @@ const toggle = () => {
   modal.value = !modal.value;
 };
 
-const removeJournals = (journalId) => {
+const removeJournals = (journalId: number) => {
   toggle();
   deleteId.value = journalId;
 };
 
 const deletejournarls = () => {
-  router.delete(route("journal.delete", deleteid.value), {
+  router.delete(route("journal.delete", deleteId.value), {
     onSuccess: () => {
-      toggle1();
     },
     onError: (error) => {
       console.error("Error al eliminar el asiento contable", error);
@@ -63,25 +58,6 @@ watch(
   },
   { immediate: false }
 );
-
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  if (loading.value) return;
-  loading.value = true;
-  const url = route("journal.index"); // Ruta hacia el backend
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
@@ -114,7 +90,7 @@ const handlePageChange = async (page) => {
 
     <!-- Card -->
     <div
-      v-for="journal in props.journals.data"
+      v-for="(journal,i) in props.journals.data"
       :key="journal.id"
       class="p-4 bg-white rounded drop-shadow-md mb-3"
     >
@@ -169,13 +145,13 @@ const handlePageChange = async (page) => {
         </Link>
         <button
           class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-          @click="removeJournals(journal.id)"
+          @click="()=>journal.id && removeJournals(journal.id)"
         >
           <i class="fa fa-trash"></i> Eliminar
         </button>
       </div>
     </div>
-    <Paginate :page="props.journals" @page-change="handlePageChange" />
+    <Paginate :page="props.journals" />
   </AdminLayout>
 
   <ConfirmationModal :show="modal" maxWidth="lg">

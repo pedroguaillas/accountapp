@@ -1,39 +1,31 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import { ref, reactive, computed, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import FormModal from "./FormModal.vue";
 import { router, useForm } from "@inertiajs/vue3";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
-import Table from "@/Components/Table.vue";
 import axios from "axios";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-
-import {
-  PencilIcon,
-  PrinterIcon,
-  EnvelopeIcon,
-  DocumentArrowDownIcon,
-} from "@heroicons/vue/24/solid";
+import { DynamicSelect, TextInput, Paginate, Table } from "@/Components";
+import { PencilIcon, PrinterIcon, EnvelopeIcon, DocumentArrowDownIcon, } from "@heroicons/vue/24/solid";
+import { Errors, Filters, GeneralRequest, PaymentRol, RoleEgress, RoleIngress } from "@/types";
 
 // Props
-const props = defineProps({
-  paymentroles: { type: Object, default: () => ({ data: [] }) },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  paymentroles: GeneralRequest<PaymentRol>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+}>();
 
 // Inicializador de objetos
 const initialPaymentRol = {};
 
 // Reactives
-const paymentrol = reactive({ ...initialPaymentRol });
+const paymentrol = reactive<PaymentRol>({ ...initialPaymentRol });
 
 const toggle = () => {
   modal.value = !modal.value;
 };
 
-const edit = (paymentrolEdit) => {
+const edit = (paymentrolEdit: PaymentRol) => {
   Object.assign(paymentrol, { ...initialPaymentRol, ...paymentrolEdit });
   toggle();
 };
@@ -49,11 +41,11 @@ const save = () => {
   }
 
   const updatedData = {
-    ingresses: paymentrol.ingresses.map((ingress) => ({
+    ingresses: paymentrol.ingresses.map((ingress: RoleIngress) => ({
       id: ingress.id,
       value: ingress.value,
     })),
-    egresses: paymentrol.egresses.map((egress) => ({
+    egresses: paymentrol.egresses.map((egress: RoleEgress) => ({
       id: egress.id,
       value: egress.value,
     })),
@@ -64,7 +56,7 @@ const save = () => {
     .then((response) => {
       if (response.data.success) {
         toggle(); // Cerrar la modal después de guardar
-        router.reload(["paymentroles"]);
+        router.visit(route("paymentrol.index"));
       }
     })
     .catch((error) => {
@@ -75,7 +67,7 @@ const save = () => {
 const modal = ref(false);
 const search = ref(props.filters.search); // Término de búsqueda
 const loading = ref(false); // Estado de carga
-const hoveredRow = ref(null);
+const hoveredRow = ref<number | null>(null);
 
 // Filtros de Año y Mes
 const selectedYear = ref(props.filters.year); // Año por defecto
@@ -105,30 +97,6 @@ const months = computed(() => {
     { value: "12", label: "Diciembre" },
   ];
 });
-
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  if (loading.value) return;
-  const url = route("paymentrol.index"); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      {
-        page,
-        search: search.value,
-        year: selectedYear.value,
-        month: selectedMonth.value,
-      }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
 
 watch(
   [search, selectedYear, selectedMonth], // Las dependencias observadas
@@ -168,7 +136,7 @@ const exportToExcel = () => {
 };
 
 const selectAll = ref(false); // Estado del checkbox principal
-const selectedIds = ref([]); // IDs seleccionados
+const selectedIds = ref<(number | undefined)[]>([]);
 
 // Función para seleccionar/deseleccionar todos
 const toggleSelectAll = () => {
@@ -194,7 +162,7 @@ const generateJournals = () => {
     route("paymentrol.journal.generate"),
     { selectedIds: selectedIds.value },
     {
-      onError: (errors) => {
+      onError: (errors: Errors) => {
         if (errors.response && errors.response.status === 412) {
           // Capturar el mensaje de error enviado desde el backend
           console.log(errors.response.data.error); // "Debe generar el ASIENTO DE SITUACION INICIAL"
@@ -206,6 +174,15 @@ const generateJournals = () => {
     }
   );
 };
+
+const printAction = () => {
+  console.log('Acción de impresión');
+  // Aquí puedes agregar la lógica para la acción de impresión, por ejemplo, hacer una solicitud para generar un documento o abrir un cuadro de diálogo de impresión.
+};
+const envelopeAction = () => {
+  console.log('Acción de impresión');
+}
+
 </script>
 
 
@@ -220,43 +197,20 @@ const generateJournals = () => {
         </h2>
         <div class="w-full flex sm:justify-end gap-2">
           <!-- Filtro Año -->
-          <DynamicSelect
-            class="block w-full"
-            v-model="selectedYear"
-            :options="years"
-            :seleccione="false"
-            autofocus
-          />
+          <DynamicSelect class="block w-full" v-model="selectedYear" :options="years" :seleccione="false" autofocus />
 
           <!-- Filtro Mes -->
 
-          <DynamicSelect
-            class="block w-full"
-            v-model="selectedMonth"
-            :options="months"
-            :seleccione="false"
-            autofocus
-          />
+          <DynamicSelect class="block w-full" v-model="selectedMonth" :options="months" :seleccione="false" autofocus />
 
-          <TextInput
-            v-model="search"
-            type="search"
-            class="block w-full"
-            placeholder="Buscar ..."
-          />
+          <TextInput v-model="search" type="search" class="block w-full" placeholder="Buscar ..." />
 
-          <button
-            v-if="props.paymentroles.data.length > 0"
-            @click="exportToExcel"
-            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
-          >
+          <button v-if="props.paymentroles.data.length > 0" @click="exportToExcel"
+            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">
             <DocumentArrowDownIcon class="size-6 text-red" />
           </button>
 
-          <button
-            class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
-            @click="generateJournals"
-          >
+          <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700" @click="generateJournals">
             GENERAR
           </button>
         </div>
@@ -266,11 +220,7 @@ const generateJournals = () => {
         <thead>
           <tr class="[&>th]:py-2">
             <th>
-              <input
-                type="checkbox"
-                v-model="selectAll"
-                @change="toggleSelectAll"
-              />
+              <input type="checkbox" v-model="selectAll" @change="toggleSelectAll" />
             </th>
             <th class="w-1">N°</th>
             <th>CEDULA</th>
@@ -286,19 +236,11 @@ const generateJournals = () => {
           </tr>
         </thead>
         <tbody class="min-w-full table-auto">
-          <tr
-            v-for="(paymentrol, i) in props.paymentroles.data"
-            :key="paymentrol.id"
+          <tr v-for="(paymentrol, i) in props.paymentroles.data" :key="paymentrol.id"
             class="border-t relative [&>td]:py-4 group hover:bg-slate-200"
-            @mouseenter="hoveredRow = paymentrol.id"
-            @mouseleave="hoveredRow = null"
-          >
+            @mouseenter="() => paymentrol.id && (hoveredRow = paymentrol.id)" @mouseleave="hoveredRow = null">
             <td>
-              <input
-                type="checkbox"
-                v-model="selectedIds"
-                :value="paymentrol.id"
-              />
+              <input type="checkbox" v-model="selectedIds" :value="paymentrol.id" />
             </td>
             <td>{{ i + 1 }}</td>
             <td>{{ paymentrol.cuit }}</td>
@@ -318,49 +260,38 @@ const generateJournals = () => {
               {{ paymentrol.total_egress_o.toFixed(2) }}
             </td>
             <td class="text-right pr-4">
-              {{ paymentrol.salary_receive.toFixed(2) }}
+              {{ paymentrol.salary_receive !== undefined ? paymentrol.salary_receive.toFixed(2) : 'N/A' }}
             </td>
             <td class="text-right pr-4">
               {{ paymentrol.state }}
             </td>
 
             <!-- Superposición de opciones -->
-            <td
-              v-if="hoveredRow === paymentrol.id"
-              class="flex justify-center absolute h-12 top-0 right-1/2 bg-white items-center shadow-md border rounded z-10 group-hover:block"
-            >
+            <td v-if="hoveredRow === paymentrol.id"
+              class="flex justify-center absolute h-12 top-0 right-1/2 bg-white items-center shadow-md border rounded z-10 group-hover:block">
               <ul class="px-4 flex gap-4 rounded items-center justify-center">
-                <li
-                  @click="paymentrol.state !== 'GENERADO' && edit(paymentrol)"
-                  :class="{
-                    'cursor-not-allowed text-gray-400':
-                      paymentrol.state === 'GENERADO',
-                    'hover:text-yellow-500 cursor-pointer':
-                      paymentrol.state !== 'GENERADO',
-                  }"
-                >
+                <li @click=" paymentrol.state !== 'GENERADO' && edit(paymentrol)" :class="{
+                  'cursor-not-allowed text-gray-400':
+                    paymentrol.state === 'GENERADO',
+                  'hover:text-yellow-500 cursor-pointer':
+                    paymentrol.state !== 'GENERADO',
+                }">
                   <PencilIcon class="size-5 text-red" />
                 </li>
-                <li
-                  :class="{
-                    'cursor-not-allowed text-gray-400':
-                      paymentrol.state === 'CREADO',
-                    'hover:text-yellow-500 cursor-pointer':
-                      paymentrol.state !== 'CREADO',
-                  }"
-                  @click="paymentrol.state !== 'CREADO' && printAction()"
-                >
+                <li :class="{
+                  'cursor-not-allowed text-gray-400':
+                    paymentrol.state === 'CREADO',
+                  'hover:text-yellow-500 cursor-pointer':
+                    paymentrol.state !== 'CREADO',
+                }" @click="paymentrol.state !== 'CREADO' && printAction()">
                   <PrinterIcon class="size-5 text-red" />
                 </li>
-                <li
-                  :class="{
-                    'cursor-not-allowed text-gray-400':
-                      paymentrol.state === 'CREADO',
-                    'hover:text-purple-500 cursor-pointer':
-                      paymentrol.state !== 'CREADO',
-                  }"
-                  @click="paymentrol.state !== 'CREADO' && envelopeAction()"
-                >
+                <li :class="{
+                  'cursor-not-allowed text-gray-400':
+                    paymentrol.state === 'CREADO',
+                  'hover:text-purple-500 cursor-pointer':
+                    paymentrol.state !== 'CREADO',
+                }" @click="paymentrol.state !== 'CREADO' && envelopeAction()">
                   <EnvelopeIcon class="size-5 text-red" />
                 </li>
               </ul>
@@ -369,13 +300,8 @@ const generateJournals = () => {
         </tbody>
       </Table>
     </div>
-    <Paginate :page="props.paymentroles" @page-change="handlePageChange" />
+    <Paginate :page="props.paymentroles" />
   </AdminLayout>
 
-  <FormModal
-    :show="modal"
-    :paymentRol="paymentrol"
-    @close="toggle"
-    @save="save"
-  />
+  <FormModal :show="modal" :paymentRol="paymentrol" @close="toggle" @save="save" />
 </template>

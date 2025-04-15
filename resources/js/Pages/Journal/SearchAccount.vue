@@ -1,21 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import AccountSelectModal from "./AccountSelectModal.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
+import { InputLabel } from "@/Components";
+import { Account, Journal } from "@/types";
 
 // Props
-defineProps({
-  accounts: { type: Array, default: () => [] },
-  journal: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  journal: Journal; // Paginación de los bancos
+  accounts: Account [];
+}>();
 
 // Refs
-const accountId = ref(0);
+const accountId = ref<Number>(0);
 const code = ref("");
 const search = ref("");
-const debit = ref("");
-const have = ref("");
+const debit = ref<Number>(0);
+const have = ref<Number>(0);
 const modal = ref(false);
 
 // Método para alternar la visibilidad de la modal
@@ -24,8 +25,8 @@ const toggleModal = () => {
 };
 
 // Método para recibir la cuenta seleccionada
-const handleAccountSelect = (account) => {
-  accountId.value = account.id;
+const handleAccountSelect = (account: Account) => {
+  accountId.value = account.id ?? 0;
   search.value = account.name;
   code.value = account.code;
 };
@@ -49,8 +50,8 @@ const agregarCuenta = () => {
       account_id: accountId.value,
       code: code.value,
       name: search.value,
-      debit: parseFloat(debit.value),
-      have: parseFloat(have.value),
+      debit: parseFloat(String(debit.value)),
+      have: parseFloat(String(have.value)),
     };
 
     // Emitimos el objeto journalEntry al componente principal
@@ -59,8 +60,8 @@ const agregarCuenta = () => {
     // Limpiar los campos después de agregar
     code.value = "";
     search.value = "";
-    debit.value = "";
-    have.value = "";
+    debit.value = 0;
+    have.value = 0;
   } else {
     alert("Ingresar almenos un valor para el DEBE o el HABER");
   }
@@ -84,7 +85,8 @@ const emit = defineEmits(["selectAccount", "addJournalEntry"]);
     <div class="col-span-3">
       <InputLabel for="search" value="Buscar" />
       <div class="flex">
-        <input v-model="search" type="search" placeholder="Buscar ..." class="block w-full border border-gray-300 px-4 py-1 focus:outline-none" />
+        <input v-model="search" type="search" placeholder="Buscar ..."
+          class="block w-full border border-gray-300 px-4 py-1 focus:outline-none" />
         <button @click="toggleModal" class="bg-slate-500 text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
           <MagnifyingGlassIcon class="size-6 text-white stroke-[3px]" />
         </button>

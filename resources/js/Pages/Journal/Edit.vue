@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 // Imports
 import { reactive, computed } from "vue";
@@ -6,26 +6,22 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchAccount from "./SearchAccount.vue";
 import SearchCostCenter from "./SearchCostCenter.vue";
 import { useForm } from "@inertiajs/vue3";
-import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import Table from "@/Components/Table.vue";
-import DynamicSelect from "@/Components/DynamicSelect.vue";
-import Checkbox from "@/Components/Checkbox.vue";
+import { Checkbox, DynamicSelect, InputError, InputLabel,TextInput, Table } from "@/Components";
+import { Account, CostCenter, Errors, Journal, JournalEntry } from "@/types";
 
 // Props
-const props = defineProps({
-  accounts: { type: Array, default: () => [] },
-  costCenters: { type: Array, default: () => [] },
-  journal: { type: Object, required: true }, // Datos del asiento contable a editar
-});
+const props = defineProps<{
+  costCenters: CostCenter[]; // Paginación de los bancos
+  accounts: Account[];
+  journal: Journal;
+}>();
 
 // Inicializador de objetos reactivos
-const journal = useForm({ ...props.journal }); // Precarga los datos del asiento contable
-const errorForm = reactive({}); // Manejo de errores
+const journal = useForm<Journal>({ ...props.journal }); // Precarga los datos del asiento contable
+const errorForm: Record<string, string> = {};
 
 // Métodos
-const eliminarCuenta = (index) => {
+const eliminarCuenta = (index: number) => {
   journal.journalEntries.splice(index, 1);
 };
 
@@ -35,7 +31,6 @@ const save = () => {
     errorForm.cost_center_id = "Seleccione un centro de costo.";
     return; // Salir sin guardar
   }
-
   // Validar si los totales de "Debe" y "Haber" coinciden
   if (totalDebe.value !== totalHaver.value) {
     errorForm.totalMismatch = "El total del Debe y el Haber deben ser iguales.";
@@ -43,39 +38,39 @@ const save = () => {
   }
 
   journal.put(route("journal.update", journal.id), {
-    onError: (errors) => {
+    onError: (errors: Errors) => {
       Object.keys(errors).forEach((key) => {
-        errorForm[key] = errors[key];
+        errorForm[key] = (errors[key] as string[])[0];
       });
     },
   });
 };
 
-const handleAddJournalEntry = (entry) => {
+const handleAddJournalEntry = (entry: JournalEntry) => {
   journal.journalEntries.push(entry);
 };
 
 // Método para recibir el centro de costos seleccionado desde SearchCostCenter
-const handleCostCenterSelect = (costCenter) => {
+const handleCostCenterSelect = (costCenter: CostCenter) => {
   journal.cost_center_id = costCenter.id;
 };
 
 const costcenterOptions = props.costCenters.map((costCenter) => ({
-  value: costCenter.id,
+  value: costCenter.id ?? 0,
   label: costCenter.name,
 }));
 
 // Cálculo de totales para "Debe" y "Haber"
 const totalDebe = computed(() => {
   return journal.journalEntries.reduce(
-    (total, entry) => total + parseFloat(entry.debit || 0),
+    (total:number, entry:JournalEntry) => total + parseFloat(String(entry.debit || 0)),
     0
   );
 });
 
 const totalHaver = computed(() => {
   return journal.journalEntries.reduce(
-    (total, entry) => total + parseFloat(entry.have || 0),
+    (total:number, entry:JournalEntry) => total + parseFloat(String(entry.have || 0)),
     0
   );
 });
@@ -167,7 +162,8 @@ const totalHaver = computed(() => {
         <InputError :message="errorForm.totalMismatch" class="mt-2" />
 
         <div class="mt-4 text-right">
-          <button @click="save" :disabled="journal.processing" class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
+          <button @click="save" :disabled="journal.processing"
+            class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
             Guardar Cambios
           </button>
         </div>

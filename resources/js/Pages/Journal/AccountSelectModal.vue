@@ -1,19 +1,18 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import DialogModal from "@/Components/DialogModal.vue";
-import Table from "@/Components/Table.vue";
 import { ref, computed } from "vue";
-import TextInput from "@/Components/TextInput.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { SecondaryButton, TextInput, Table, DialogModal } from "@/Components";
+import { Account } from "@/types";
 
 // Props
-const props = defineProps({
-  accounts: { type: Array, default: () => [] },
-  show: { type: Boolean, default: false },
-});
+const props = defineProps<{
+  accounts: Account[]; // Paginación de los bancos
+  show: boolean;
+}>();
 
 // Variables reactivas
 const search = ref("");
+const close = () => emit("close");
 
 // Computed para filtrar cuentas combinando filtro principal y búsqueda local
 const filteredAccounts = computed(() => {
@@ -29,7 +28,7 @@ const filteredAccounts = computed(() => {
 });
 
 // Método para seleccionar cuenta
-const handleSelectAccount = (account) => {
+const handleSelectAccount = (account: Account) => {
   emit("selectAccount", { ...account });
   emit("close");
 };
@@ -45,19 +44,12 @@ const emit = defineEmits(["close", "selectAccount"]);
         Seleccionar cuenta
       </h2>
       <div class="w-full flex sm:justify-end">
-        <TextInput
-          v-model="search"
-          type="search"
-          class="block sm:mr-2 h-8 w-full"
-          placeholder="Buscar ..."
-        />
+        <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
       </div>
     </template>
     <template #content>
       <div class="max-h-[300px] overflow-y-auto">
-        <Table
-          class="text-xs sm:text-sm table-auto w-full text-center text-gray-700"
-        >
+        <Table class="text-xs sm:text-sm table-auto w-full text-center text-gray-700">
           <thead>
             <tr class="[&>th]:py-2">
               <th class="w-1">N°</th>
@@ -66,12 +58,8 @@ const emit = defineEmits(["close", "selectAccount"]);
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(account, i) in filteredAccounts"
-              :key="account.id"
-              class="border-t [&>td]:py-2 cursor-pointer"
-              @click="handleSelectAccount(account)"
-            >
+            <tr v-for="(account, i) in filteredAccounts" :key="account.id" class="border-t [&>td]:py-2 cursor-pointer"
+              @click="handleSelectAccount(account)">
               <td>{{ i + 1 }}</td>
               <td>{{ account.code }}</td>
               <td class="text-left">{{ account.name }}</td>
@@ -82,9 +70,7 @@ const emit = defineEmits(["close", "selectAccount"]);
     </template>
 
     <template #footer>
-      <SecondaryButton class="mr-2" type="button" @click="$emit('close')"
-        >Cancelar</SecondaryButton
-      >
+      <SecondaryButton class="mr-2" type="button" @click="$emit('close')">Cancelar</SecondaryButton>
     </template>
   </DialogModal>
 </template>

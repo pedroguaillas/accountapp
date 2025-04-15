@@ -1,77 +1,25 @@
-<script setup>
+<script setup lang="ts">
 // Imports
-import { ref, reactive, watch } from "vue";
+import { ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import { router, useForm, Link } from "@inertiajs/vue3";
-import axios from "axios";
-import Table from "@/Components/Table.vue";
-import TextInput from "@/Components/TextInput.vue";
-import Paginate from "@/Components/Paginate.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
-import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
+import { router, Link } from "@inertiajs/vue3";
+import { TextInput, Table } from "@/Components";
+import { Expense, Filters, GeneralRequest } from "@/types";
 
 //Props
-const props = defineProps({
-  expenses: { type: Object, default: () => ({}) },
-  filters: { type: Object, default: () => ({}) },
-});
+const props = defineProps<{
+  expenses: GeneralRequest<Expense>; // Paginación de los bancos
+  filters: Filters; // Filtros aplicados
+}>();
 
-// Refs
-const modal = ref(false);
+
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
-const modal1 = ref(false);
-
-const date = new Date().toISOString().split("T")[0];
-//El inicializador de objetos
-const initialExpense = {
-  description: "",
-  amount: "",
-  expense_id: "",
-  payment_type: "",
-  payment_method_id:"",
-  document:"",
-};
-
-// Reactives
-const expense = useForm({ ...initialExpense,date });
-const errorForm = reactive({});
-const deleteid = ref(0);
-
-const newExpense = () => {
-  // Reinicio el formularios con valores vacios
-  if (expense.id !== undefined) {
-    delete expense.id;
-  }
-  Object.assign(expense, { ...initialExpense, date });
-  resetErrorForm();
-  // Muestro el modal
-  toggle();
-};
-
-const resetErrorForm = () => {
-  Object.assign(errorForm, initialExpense);
-};
-
-const toggle = () => {
-  modal.value = !modal.value;
-};
-
-const toggle1 = () => {
-  modal1.value = !modal1.value;
-};
-
-const save = () => {
-
-};
 
 watch(
   search,
 
   async (newQuery) => {
     const url = route("transaction.expenses.index");
-    loading.value = true;
 
     try {
       await router.get(
@@ -81,30 +29,10 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
     }
   },
   { immediate: false }
 );
-
-// Función para manejar el cambio de página
-const handlePageChange = async (page) => {
-  const url = route("transaction.expenses.index"); // Ruta hacia el backend
-  loading.value = true;
-
-  try {
-    await router.get(
-      url,
-      { page, search: search.value }, // Incluye tanto la página como el término de búsqueda
-      { preserveState: true }
-    );
-  } catch (error) {
-    console.error("Error al paginar:", error);
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
@@ -117,21 +45,12 @@ const handlePageChange = async (page) => {
           Gastos
         </h2>
         <div class="w-full flex justify-end">
-          <TextInput
-            v-model="search"
-            type="text"
-            class="mt-1 block w-[50%] mr-2 h-8"
-            minlength="3"
-            maxlength="300"
-            required
-            placeholder="Buscar..."
-          />
+          <TextInput v-model="search" type="text" class="mt-1 block w-[50%] mr-2 h-8" minlength="3" maxlength="300"
+            required placeholder="Buscar..." />
         </div>
-         <Link
-          :href="route('transaction.expenses.create')"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
-          +
+        <Link :href="route('transaction.expenses.create')"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
+        +
         </Link>
       </div>
 
@@ -148,11 +67,7 @@ const handlePageChange = async (page) => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(expense, i) in props.expenses.data"
-              :key="expense.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(expense, i) in props.expenses.data" :key="expense.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td class="text-left">{{ expense.name }}</td>
               <td class="text-left">{{ expense.description }}</td>

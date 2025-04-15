@@ -1,14 +1,15 @@
-<script setup>
+<script setup lang="ts">
 
 // Imports
+import { CostCenter } from "@/types";
 import CostCenterSelectModal from "./CostCenterSelectModal.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
 import { ref, computed } from "vue";
 
 // Props
-const props = defineProps({
-  costCenters: { type: Array, default: () => [] },
-});
+const props = defineProps<{
+  costCenters: CostCenter[]; // Paginación de los bancos
+}>();
 
 // Refs
 const modal = ref(false); // Estado del modal
@@ -29,7 +30,7 @@ const toggleModal = () => {
 };
 
 // Método para recibir el centro de costo seleccionado y enviarlo al componente create
-const handleCostCenterSelect = (costCenter) => {
+const handleCostCenterSelect = (costCenter:CostCenter) => {
   name.value = costCenter.name;
   code.value = costCenter.code;
 
