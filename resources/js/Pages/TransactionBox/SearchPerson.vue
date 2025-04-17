@@ -133,11 +133,11 @@ const emit = defineEmits(["selectPerson"]);
 </script>
 
 <template>
-  <div class="block w-full mt-2">
+  <div class="block w-full mt-1">
     <div class="flex">
       <!-- Campo de búsqueda con sugerencias -->
       <div class="flex-1 relative">
-        <input v-model="search" type="search" class="border w-full border-gray-300 px-4 py-2 focus:outline-none"
+        <input v-model="search" type="search" class="border w-full border-gray-300 px-4 py-2 focus:outline-none rounded-l-md"
           placeholder="Buscar persona..." @focus="isDropdownOpen = true" />
         <ul v-if="isDropdownOpen && suggestion.data.length"
           class="absolute z-10 bg-white border-b border-x border-gray-300 rounded-b w-full max-h-40 overflow-y-auto shadow-lg">

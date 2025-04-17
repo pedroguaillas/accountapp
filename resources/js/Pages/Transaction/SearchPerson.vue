@@ -134,7 +134,7 @@ const emit = defineEmits(["selectPerson"]);
 </script>
 
 <template>
-  <div class="block w-full mt-2">
+  <div class="block w-full mt-1">
     <div class="flex">
       <!-- Campo para identificación -->
       <div class="w-[10em] border-y border-l border-gray-300 text-gray-500 px-4 py-2">

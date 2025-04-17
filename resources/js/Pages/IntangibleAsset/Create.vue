@@ -11,7 +11,13 @@ const props = defineProps<{
   payMethods: PayMethod[]; // Filtros aplicados
 }>();
 
-const date = new Date().toISOString().split("T")[0];
+//TODO formato para zona ecuador
+const date = new Date();
+const offset = -5; // GMT-5
+
+// Ajusta la fecha a la zona horaria GMT-5
+const localDate = new Date(date.getTime() + offset * 60 * 60 * 1000);
+const formattedDate = localDate.toISOString().split("T")[0];
 
 // Inicializador de objetos
 const initialIntangibleAsset = {
@@ -19,7 +25,7 @@ const initialIntangibleAsset = {
   pay_method_id: 0,
   is_legal: false,
   vaucher: "",
-  date_acquisition: new Date().toISOString(),
+  date_acquisition: formattedDate,
   detail: "",
   code: "",
   type: "",
@@ -30,7 +36,7 @@ const initialIntangibleAsset = {
 };
 
 // Reactives
-const intangibleAsset = useForm<PayMethod>({ ...initialIntangibleAsset });
+const intangibleAsset = useForm<PayMethod>({ ...initialIntangibleAsset});
 const errorForm = reactive<Errors>({});
 
 // Método de guardar con mensajes

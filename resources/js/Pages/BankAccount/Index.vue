@@ -33,7 +33,7 @@ const initialBankAccount = {
   account_type: "",
   bank_id: props.bank.id,
   current_balance: 0,
-  state: false,
+  state: true,
 };
 
 // Reactives
@@ -128,7 +128,7 @@ watch(
   },
   { immediate: false }
 );
-
+//TODO QUITAR EL TOGGLE STATE
 const toggleState = (bankAccountId: Number, currentState: Boolean) => {
   const newState = !currentState; // Inverse the current state (active to inactive and vice versa)
 
