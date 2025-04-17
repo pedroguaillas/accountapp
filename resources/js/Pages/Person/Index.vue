@@ -35,9 +35,10 @@ const initialPerson = {
 
 // Reactives
 const person = useForm<Person>({ ...initialPerson });
-const errorForm: Record<string, string> = {};
+const errorForm = reactive<Errors>({});
 
 const newPerson = () => {
+  resetErrorForm();
   if (person.id !== undefined) {
     delete person.id;
   }
@@ -46,7 +47,9 @@ const newPerson = () => {
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialPerson);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 };
 
 const toggle = () => {
@@ -70,10 +73,10 @@ const save = () => {
     },
     onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
-      if (error.response?.data?.errors) {
+      if (error) {
         // Iterar sobre los errores recibidos del servidor
-        Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          errorForm[key] = (error[key] as string[])[0];// Mostrar el primer error asociado a cada campo
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
         });
       } else {
         console.error("Error desconocido:", error);
@@ -83,7 +86,7 @@ const save = () => {
   });
 };
 
-const update = (personEdit:Person) => {
+const update = (personEdit: Person) => {
   resetErrorForm();
   Object.keys(personEdit).forEach((key) => {
     person[key] = personEdit[key];
@@ -91,7 +94,7 @@ const update = (personEdit:Person) => {
   toggle();
 };
 
-const removePerson = (personId:number) => {
+const removePerson = (personId: number) => {
   toggleDelete();
   deleteId.value = personId;
 };
@@ -120,7 +123,7 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } 
+    }
   },
   { immediate: false }
 );
@@ -165,7 +168,7 @@ watch(
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="()=>person.id && removePerson(person.id)">
+                  @click="() => person.id && removePerson(person.id)">
                   <TrashIcon class="size-6 text-white" />
                 </button>
                 <button class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white" @click="update(person)">

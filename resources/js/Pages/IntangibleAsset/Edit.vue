@@ -2,7 +2,7 @@
 // Imports
 import { reactive, computed, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, router } from "@inertiajs/vue3";
 import { InputError, TextInput, InputLabel, DynamicSelect, Checkbox } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { IntangibleAsset } from "@/types/intangible-asset";
@@ -18,16 +18,22 @@ const { focusNextField } = useFocusNextField();
 
 // Reactives
 const intangibleAsset = useForm<IntangibleAsset>({ ...props.intangibleAsset });
-const errorForm: Record<string, string> = {};
+const errorForm = reactive<Errors>({});
 
 const save = () => {
   // Enviar el objeto completo 'fixedAsset' con el PUT
   intangibleAsset.put(route("intangibleassets.update", intangibleAsset.id), {
-    onError: (errors:Errors) => {
-      // Mostrar errores de validación desde el backend
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = (errors[key] as string[])[0];
-      });
+    onError: (error: Errors) => {
+      // Asegurarte de limpiar los errores previos
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };
@@ -161,6 +167,9 @@ const payMethodOptions = Array.isArray(props.payMethods)
           </div>
         </div>
         <div class="mt-4 text-right">
+          <SecondaryButton @click="() => router.visit(route('intangibleassets.index'))" class="mr-2">
+            Cancelar
+          </SecondaryButton>
           <button @click="save" :disabled="intangibleAsset.processing"
             class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
             Guardar

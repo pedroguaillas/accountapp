@@ -34,6 +34,7 @@ const errorForm = reactive<Errors>({});
 const deleteid = ref<Number>(0);
 
 const newHour = () => {
+  resetErrorForm();
   // Reinicio el formularios con valores vacios
   if (hour.id !== undefined) {
     delete hour.id;
@@ -46,7 +47,9 @@ const newHour = () => {
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialHour);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 };
 
 const toggle = () => {
@@ -72,10 +75,16 @@ const save = () => {
       router.reload({ only: ["horas"] }); // Recargar datos
     },
     onError: (error: Errors) => {
-      // Iterar sobre los errores recibidos del servidor
-      Object.entries(error).forEach(([key, value]) => {
-        errorForm[key] = value; // Mostrar el primer error asociado a cada campo
-      });
+      resetErrorForm(); // Asegurarte de limpiar los errores previos
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };

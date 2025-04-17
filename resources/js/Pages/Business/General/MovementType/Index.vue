@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 import ModalMovementType from "./ModalMovementType.vue";
-import { router } from "@inertiajs/vue3";
+import { router,usePage  } from "@inertiajs/vue3";
 import { Table } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 import { MovementType } from "@/types";
@@ -14,12 +14,14 @@ const props = defineProps<{
 }>();
 
 const modal = ref(false);
+const page = usePage();
+const errors = computed(() => page.props.errors);
 
 const toggle = () => {
   modal.value = !modal.value;
 };
 
-const selectedMovementType = (movementType:MovementType) => {
+const selectedMovementType = (movementType: MovementType) => {
   router.post(route("busssines.setting.movementtypes.store"), movementType, {
     preserveState: true,
   });
@@ -31,10 +33,11 @@ const selectedMovementType = (movementType:MovementType) => {
   <GeneralSetting title="Movimientos bancarios">
     <div class="p-4 bg-white rounded drop-shadow-md">
       <div class="w-full flex sm:justify-end">
-        <button
-          @click="toggle"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-        >
+        <div v-if="errors?.warning" class="bg-red-500 text-white rounded mb-4 p-2">
+          {{ errors.warning }}
+        </div>
+        <button @click="toggle"
+          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>
@@ -54,16 +57,12 @@ const selectedMovementType = (movementType:MovementType) => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(movementType, i) in props.movementTypes"
-              :key="movementType.id"
-              class="border-t [&>td]:py-2"
-            >
+            <tr v-for="(movementType, i) in props.movementTypes" :key="movementType.id" class="border-t [&>td]:py-2">
               <td>{{ i + 1 }}</td>
               <td>{{ movementType.code }}</td>
               <td class="text-left">{{ movementType.name }}</td>
-              <td >{{ movementType.type }}</td>
-              <td >{{movementType.venue}}</td>
+              <td>{{ movementType.type }}</td>
+              <td>{{ movementType.venue }}</td>
               <td>
                 <span class="rounded px-2 py-1 m-0 text-white bg-success">
                   Activo
@@ -72,9 +71,7 @@ const selectedMovementType = (movementType:MovementType) => {
 
               <td class="flex justify-end">
                 <div class="relative inline-flex gap-1">
-                  <button
-                    class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  >
+                  <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white">
                     <TrashIcon class="size-6 text-white" />
                   </button>
                 </div>
@@ -86,10 +83,6 @@ const selectedMovementType = (movementType:MovementType) => {
     </div>
   </GeneralSetting>
 
-  <ModalMovementType
-    :show="modal"
-    :movementTypes="props.globalMovementTypes"
-    @close="toggle"
-    @selectedMovementType="selectedMovementType"
-  />
+  <ModalMovementType :show="modal" :movementTypes="props.globalMovementTypes" @close="toggle"
+    @selectedMovementType="selectedMovementType" />
 </template>

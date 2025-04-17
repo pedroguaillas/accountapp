@@ -3,8 +3,8 @@
 import AccountLinkLayout from "@/Layouts/AccountLinkLayout.vue";
 import ModalSelectAccount from "../ModalSelectAccount.vue";
 import { MagnifyingGlassIcon } from "@heroicons/vue/24/solid";
-import { router } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { router, usePage } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/outline";
 import { ConfirmationModal, SecondaryButton, PrimaryButton, Table } from "@/Components";
 import { Account, ActiveType } from "@/types";
@@ -21,6 +21,8 @@ const modaldelete = ref(true);
 const activeTypeId = ref(0);
 const activeTypeName = ref("");
 const accounts = ref(props.accounts);
+const page = usePage();
+const errors = computed(() => page.props.errors);
 
 const toggle = () => {
   modal.value = !modal.value;
@@ -69,6 +71,9 @@ const handleInputChange = () => {
 
 <template>
   <AccountLinkLayout title="Vinculacion de Cuentas">
+    <div v-if="errors?.warning" class="bg-red-500 text-white rounded mb-4 p-2">
+      {{ errors.warning }}
+    </div>
     <Table>
       <thead>
         <tr>
@@ -117,13 +122,13 @@ const handleInputChange = () => {
             <div class="flex h-8">
               <input type="text" :value="activeType.ads_info ?? ''"
                 class="block w-full rounded-l border border-gray-300 px-4 py-2 focus:outline-none" disabled />
-              <button class=" px-1 py-1 border border-red-400" @click="()=>activeType.id &&
+              <button class=" px-1 py-1 border border-red-400" @click="() => activeType.id &&
                 removeVinculation(activeType.id, 'account_dep_spent_id')
-                ">
+              ">
                 <TrashIcon class="size-6 text-red-400" />
               </button>
 
-              <button @click="()=> activeType.id && editActiveType(activeType.id, 'account_dep_spent_id')"
+              <button @click="() => activeType.id && editActiveType(activeType.id, 'account_dep_spent_id')"
                 class="bg-slate-500 rounded-r text-white px-3 py-2 hover:bg-slate-600 focus:outline-none">
                 <MagnifyingGlassIcon class="size-4 text-white stroke-[3px]" />
               </button>

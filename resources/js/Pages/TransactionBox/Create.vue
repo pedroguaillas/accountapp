@@ -37,7 +37,7 @@ const transaction = useForm<TransactionBox>({
   beneficiary_id,
 });
 
-const errorForm = reactive<Record<string, string>>({});
+const errorForm = reactive<Errors>({});
 
 const TypeOptions = [
   { value: "Ingreso", label: "Ingreso" },
@@ -124,11 +124,17 @@ const save = () => {
       console.log("Guardado con éxito");
       router.visit(route("transaction.boxes.index"));
     },
-    onError: (errors: Errors) => {
-      console.error("Errores:", errors);
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = (errors[key] as string[])[0];
-      });
+    onError: (error: Errors) => {
+      // Asegurarte de limpiar los errores previos
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };
@@ -204,11 +210,8 @@ const handlePersonSelect = (person: Person) => {
             <InputLabel for="person_id" value="Beneficiario/Remitente" />
             <DynamicSelect v-if="props.countperson < 5" class="mt-1 w-full" v-model="transaction.beneficiary_id"
               :options="peopleOptions" autofocus />
-              <SearchPerson
-              v-else-if="people.length > 5"
-              @selectPerson="handlePersonSelect"
-            />
-              <InputError :message="errorForm.beneficiary_id" class="mt-2" />
+            <SearchPerson v-else-if="people.length > 5" @selectPerson="handlePersonSelect" />
+            <InputError :message="errorForm.beneficiary_id" class="mt-2" />
           </div>
           <div v-else class="col-span-6 sm:col-span-4">
             <p class="text-red-500 mt-2">

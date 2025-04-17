@@ -29,17 +29,17 @@ const toggleDelete = () => {
 const initialBranch = {
   id: undefined,
   company_id: 0,
-  number: 0,
+  number: "",
   name: "",
   city: "",
   phone: "",
   address: "",
   logo_path: "",
   is_matriz: false,
-  enviroment_type: 0,
+  enviroment_type: "",
   email: "",
   pass_email: "",
-  state: false,
+  state: true,
   processing: false,
 };
 
@@ -48,6 +48,7 @@ const branch = useForm<Branch>({ ...initialBranch });
 const errorForm = reactive<Errors>({});
 
 const newBranch = () => {
+  resetErrorForm();
   if (branch.id !== undefined) {
     delete branch.id;
   }
@@ -56,7 +57,9 @@ const newBranch = () => {
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialBranch);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 };
 
 const toggle = () => {
@@ -64,11 +67,6 @@ const toggle = () => {
 };
 
 const save = () => {
-  // Validar campos obligatorios antes de enviar la solicitud
-  if (!branch.number || !branch.name || !branch.city || !branch.address) {
-    alert("Por favor, complete todos los campos obligatorios");
-    return;
-  }
   // Determinar el método HTTP y la ruta correspondiente
   const isUpdate = Boolean(branch.id);
   const routeMethod = isUpdate ? "put" : "post";
@@ -85,10 +83,10 @@ const save = () => {
     },
     onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
-      if (error.response?.data?.errors) {
+      if (error) {
         // Iterar sobre los errores recibidos del servidor
-        Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          errorForm[key] = (value as string[])[0];// Mostrar el primer error asociado a cada campo
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
         });
       } else {
         console.error("Error desconocido:", error);
@@ -135,7 +133,7 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } 
+    }
   },
   { immediate: false }
 );

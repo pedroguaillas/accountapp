@@ -3,6 +3,7 @@
 import { TextInput, SecondaryButton, PrimaryButton, DynamicSelect, InputLabel, InputError, DialogModal } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { Employee, Errors, Hour } from "@/types";
+import { computed } from "vue";
 
 // Props
 const props = defineProps<{
@@ -12,6 +13,8 @@ const props = defineProps<{
   employees: Employee[];
   date:string;
 }>();
+
+const errors = computed(() => props.error);
 
 const { focusNextField } = useFocusNextField();
 
@@ -47,7 +50,7 @@ const typeOptions = [
               :options="employeesOptions"
               autofocus
             />
-            <InputError :message="error.employee_id" class="mt-2" />
+            <InputError :message="errors.employee_id" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
@@ -60,7 +63,7 @@ const typeOptions = [
               maxlength="300"
               required
             />
-            <InputError :message="error.detail" class="mt-2" />
+            <InputError :message="errors.detail" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
@@ -73,7 +76,7 @@ const typeOptions = [
               maxlength="300"
               required
             />
-            <InputError :message="error.amount" class="mt-2" />
+            <InputError :message="errors.amount" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
@@ -84,7 +87,7 @@ const typeOptions = [
               :options="typeOptions"
               autofocus
             />
-            <InputError :message="error.type" class="mt-2" />
+            <InputError :message="errors.type" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
@@ -95,7 +98,7 @@ const typeOptions = [
               class="mt-1 block w-full"
               :max="props.date"
             />
-            <InputError :message="error.date" class="mt-2" />
+            <InputError :message="errors.date" class="mt-2" />
           </div>
         </form>
       </div>

@@ -1,16 +1,18 @@
 <script setup lang="ts">
 // Imports
 import { useFocusNextField } from "@/composables/useFocusNextField";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { Checkbox, TextInput, SecondaryButton, PrimaryButton, DynamicSelect, InputLabel, InputError, DialogModal } from "@/Components";
 import { Branch, Errors } from "@/types";
 
 // Props
-defineProps<{
+const props=defineProps<{
   branch: Branch;
   error: Errors;
   show: boolean;
 }>();
+
+const errors = computed(() => props.error);
 
 const { focusNextField } = useFocusNextField();
 
@@ -35,13 +37,13 @@ defineEmits(["close", "save"]);
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="number" value="Número de establecimiento" />
             <TextInput v-model="branch.number" type="number" class="mt-1 block w-full" min="1" max="999" />
-            <InputError :message="error.number" class="mt-2" />
+            <InputError :message="errors.number" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="name" value="Nombre comercial" />
             <TextInput v-model="branch.name" type="text" class="mt-1 block w-full" minlength="3" maxlength="300" />
-            <InputError :message="error.name" class="mt-2" />
+            <InputError :message="errors.name" class="mt-2" />
           </div>
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="city" value="Ciudad" />
@@ -60,6 +62,7 @@ defineEmits(["close", "save"]);
             <InputLabel for="enviroment_type" value="Ambiente" />
             <DynamicSelect class="mt-1 block w-full" v-model="branch.enviroment_type" :options="enviromentTypeOptions"
               autofocus />
+              <InputError :message="error.enviroment_type" class="mt-2" />
           </div>
         </form>
       </div>

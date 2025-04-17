@@ -42,10 +42,11 @@ const initialCompany = {
 
 // Reactives
 const company = useForm<Company>({ ...initialCompany });
-const errorForm: Record<string, string> = {};
+const errorForm = reactive<Errors>({});
 const deleteId = ref<Number>(0);
 
 const newCompany = () => {
+  resetErrorForm();
   // Reinicio el formularios con valores vacios
   if (company.id !== undefined) {
     delete company.id;
@@ -56,7 +57,9 @@ const newCompany = () => {
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialCompany);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 };
 
 const toggle = () => {
@@ -84,11 +87,15 @@ const save = () => {
     },
     onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
-
-      // Iterar sobre los errores recibidos del servidor
-      Object.entries(error).forEach(([key, value]) => {
-        errorForm[key] = value; // Mostrar el primer error asociado a cada campo
-      });
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };

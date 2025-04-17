@@ -14,7 +14,6 @@ use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Monolog\Formatter\ElasticsearchFormatter;
 
 class FixedAssetController extends Controller
 {
@@ -55,11 +54,13 @@ class FixedAssetController extends Controller
         }
 
         $activeTypes = ActiveType::where('company_id', $company->id)
-            ->whereNotNull('account_id')
-            ->pluck('account_id');
+            ->whereNull('account_id')
+            ->exists();
 
-        if ($activeTypes->count() === 0) {
-            return to_route('setting.account.index');
+        if ($activeTypes) {
+            return redirect()->route('setting.account.index')->withErrors([
+                'warning' => 'Debes vincular las cuentas antes de continuar.',
+            ]);
         }
 
         $payMethods = PayMethod::all();

@@ -49,7 +49,9 @@ const newBankAccount = () => {
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialBankAccount);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 };
 
 const toggle = () => {
@@ -73,10 +75,10 @@ const save = () => {
     },
     onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
-      if (error.response?.data?.errors) {
+      if (error) {
         // Iterar sobre los errores recibidos del servidor
-        Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          errorForm[key] = (value as string[])[0]; // Mostrar el primer error asociado a cada campo
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
         });
       } else {
         console.error("Error desconocido:", error);
@@ -122,7 +124,7 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } 
+    }
   },
   { immediate: false }
 );
@@ -192,7 +194,7 @@ const toggleState = (bankAccountId: Number, currentState: Boolean) => {
             <td class="flex justify-end">
               <div class="relative inline-flex gap-1">
                 <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-                  @click="()=> bankAccount.id && removeBankAccount(bankAccount.id)">
+                  @click="() => bankAccount.id && removeBankAccount(bankAccount.id)">
                   <TrashIcon class="size-6 text-white" />
                 </button>
                 <button class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"

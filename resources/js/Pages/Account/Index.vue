@@ -23,7 +23,7 @@ const search = ref(""); // Término de búsqueda
 const hoveredRow = ref<number | null>(null);
 const accountaux = ref<Account>({
   id: 0,
-company_id: 0,
+  company_id: 0,
   code: '',
   name: '',
   parent_id: 0,
@@ -42,9 +42,10 @@ const toggleDelete = () => {
   modalDelete.value = !modalDelete.value;
 };
 
-
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialAccount);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 }
 
 // Aquí solo actualizamos el método `save` para que reciba los datos del hijo
@@ -64,16 +65,22 @@ const save = () => {
       router.reload({ only: ["plan-de-cuentas"] }); // Recargar datos relacionados con cuentas
     },
     onError: (error: Errors) => {
-      resetErrorForm(); // Limpiar los errores previos
-      // Manejar los errores y asignarlos a `errorForm`
-      Object.entries(error).forEach(([key, value]) => {
-        errorForm[key] = value; // Guardar el error asociado a cada campo
-      });
+      resetErrorForm(); // Asegurarte de limpiar los errores previos
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };
 
 const edit = (accountEdit: Account) => {
+  resetErrorForm();
   Object.assign(account, accountEdit);
   toggle();
 };
@@ -109,7 +116,7 @@ const styleAccount = (code: String) => {
 };
 
 const newAccount = (accountId: Account) => {
-
+  resetErrorForm();
   if (account.id !== undefined) {
     delete account.id;
   }

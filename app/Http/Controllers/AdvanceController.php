@@ -49,6 +49,26 @@ class AdvanceController extends Controller
     {
         $company = Company::first();
 
+        $movementype = MovementType::where('code', '=', 'AES')
+            ->where('company_id', $company->id)
+            ->first();
+
+        if ($movementype === null) {
+            return redirect()->route('busssines.setting.movementtypes.index')->withErrors([
+                'warning' => 'Por favor, agrega el movimiento bancario para anticipo de empleados.',
+            ]);
+        }
+
+        $movementTypeValidate = MovementType::whereNull('account_id')
+            ->where(fn($query) => $query->where('venue', 'ambos')->orWhere('venue', 'caja'))
+            ->exists();
+
+        if ($movementTypeValidate) {
+            return redirect()->route('setting.account.box.index')->withErrors([
+                'warning' => 'Debes vincular las cuentas antes de continuar.',
+            ]);
+        }
+
         $employeeCount = Employee::where('company_id', $company->id)
             ->count();
         $employees = [];

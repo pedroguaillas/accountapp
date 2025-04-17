@@ -1,12 +1,11 @@
-<script setup>
+<script setup lang="ts">
 // Imports
 import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
 } from "@heroicons/vue/24/outline";
 import { WrenchIcon } from "@heroicons/vue/24/solid";
-import Dropdown from "@/Components/Dropdown.vue";
-import DropdownLink from "@/Components/DropdownLink.vue";
+import { Dropdown, DropdownLink } from "@/Components";
 </script>
 
 <template>

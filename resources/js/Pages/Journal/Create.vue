@@ -21,7 +21,7 @@ const page = usePage();
 const errors = computed(() => page.props.errors);
 
 // Inicializador de objetos
-const initialJournal: Journal= {
+const initialJournal: Journal = {
   id: undefined,
   date,
   description: "",
@@ -41,7 +41,8 @@ const journal = useForm<Journal>({
   description: props.countJournals === 0 ? "ASIENTO DE SITUACION INICIAL" : "",
 });
 
-const errorForm: Record<string, string> = {};
+const errorForm = reactive<Errors>({});
+
 const eliminarCuenta = (index: number) => {
   journal.journalEntries.splice(index, 1);
 };
@@ -58,10 +59,17 @@ const save = () => {
   }
 
   journal.post(route("journal.store"), {
-    onError: (errors: Errors) => {
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = (errors[key] as string[])[0];
-      });
+    onError: (error: Errors) => {
+      // Asegurarte de limpiar los errores previos
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };

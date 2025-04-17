@@ -34,7 +34,7 @@ class BankController extends Controller
     {
         //validacion de datos
         $request->validate([
-            'name' => 'nullable|min:3|max:300',
+            'name' => 'required|min:3|max:300',
         ]);
         //llamada a la compania
         $company = Company::first();
@@ -45,10 +45,10 @@ class BankController extends Controller
 
     public function update(Request $request, Bank $bank)
     {
+        //validacion de datos
         $request->validate([
-            'name' => 'nullable|min:3|max:300',
+            'name' => 'required|min:3|max:300',
         ]);
-
         //actulizar los establecimientos
         $bank->update($request->all());
     }

@@ -2,7 +2,7 @@
 // Imports
 import { reactive, computed, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, router } from "@inertiajs/vue3";
 import { TextInput, Checkbox, InputLabel, InputError, DynamicSelect } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { ActiveType, Errors, FixedAsset, PayMethod } from "@/types";
@@ -18,16 +18,21 @@ const { focusNextField } = useFocusNextField();
 
 // Reactives
 const fixedAsset = useForm<FixedAsset>({ ...props.fixedAsset });
-const errorForm: Record<string, string> = {};
+const errorForm = reactive<Errors>({});
 
 const save = () => {
   // Enviar el objeto completo 'fixedAsset' con el PUT
   fixedAsset.put(route("fixedassets.update", fixedAsset.id), {
-    onError: (errors: Errors) => {
-      // Mostrar errores de validación desde el backend
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = errors[key];
-      });
+    onError: (error: Errors) => {
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };
@@ -200,6 +205,9 @@ watch(
         </div>
 
         <div class="flex justify-end items-center space-x-3 mt-4">
+          <SecondaryButton @click="() => router.visit(route('fixedassets.index'))" class="mr-2">
+            Cancelar
+          </SecondaryButton>
           <button type="submit" class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded"
             :disabled="fixedAsset.processing">
             Guardar

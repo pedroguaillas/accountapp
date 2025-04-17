@@ -4,13 +4,16 @@ import { useFocusNextField } from "@/composables/useFocusNextField";
 import { TextInput, SecondaryButton, PrimaryButton, InputLabel, InputError, DialogModal } from "@/Components";
 import { CostCenter } from "@/types/cost-center";
 import { Errors } from "@/types";
+import { computed } from "vue";
 
 // Props
-defineProps<{
+const props = defineProps<{
   costCenter: CostCenter;
   error: Errors;
   show: boolean;
 }>();
+
+const errors = computed(() => props.error);
 
 const { focusNextField } = useFocusNextField();
 
@@ -31,13 +34,13 @@ defineEmits(["close", "save"]);
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="code" value="Código" />
             <TextInput v-model="costCenter.code" type="text" class="mt-1 block w-full" minlength="3" maxlength="50" />
-            <InputError :message="error.code" class="mt-2" />
+            <InputError :message="errors.code" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="name" value="Nombre" />
             <TextInput v-model="costCenter.name" type="text" class="mt-1 block w-full" minlength="3" maxlength="50" />
-            <InputError :message="error.name" class="mt-2" />
+            <InputError :message="errors.name" class="mt-2" />
           </div>
         </form>
       </div>

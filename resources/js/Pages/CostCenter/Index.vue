@@ -29,6 +29,7 @@ const errorForm = reactive<Errors>({});
 
 // Functions
 const newCostCenter = () => {
+  resetErrorForm();
   if (costCenter.id !== undefined) {
     delete costCenter.id;
   }
@@ -37,7 +38,9 @@ const newCostCenter = () => {
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialCostCenter);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 };
 
 const toggle = () => {
@@ -68,10 +71,10 @@ const save = () => {
     },
     onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
-      if (error.response?.data?.errors) {
+      if (error) {
         // Iterar sobre los errores recibidos del servidor
-        Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          errorForm[key] = (value as string[])[0]; // Mostrar el primer error asociado a cada campo
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
         });
       } else {
         console.error("Error desconocido:", error);

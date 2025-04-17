@@ -66,7 +66,6 @@ const save = () => {
 // Refs
 const modal = ref(false);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 const hoveredRow = ref<number | null>(null);
 
 // Filtros de Año y Mes
@@ -101,9 +100,7 @@ const months = computed(() => {
 watch(
   [search, selectedYear, selectedMonth], // Las dependencias observadas
   async (newQuery) => {
-    if (loading.value) return;
     const url = route("paymentrol.index");
-    loading.value = true;
     try {
       await router.get(
         url,
@@ -117,8 +114,6 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
     }
   },
   { immediate: false }

@@ -18,11 +18,10 @@ const props = defineProps<{
 // Refs
 const modal = ref(false);
 const modalDelete = ref(false);
-const deleteid = ref<Number>(0);
+const deleteId = ref<Number>(0);
 const search = ref(props.filters.search); // Término de búsqueda
-const loading = ref(false); // Estado de carga
 
-const toggle1 = () => {
+const toggleDelete = () => {
   modalDelete.value = !modalDelete.value;
 };
 
@@ -38,6 +37,7 @@ const bank = useForm<Bank>({ ...initialBank });
 const errorForm = reactive({ ...initialBank });
 
 const newBank = () => {
+  resetErrorForm();
   if (bank.id !== undefined) {
     delete bank.id;
   }
@@ -46,7 +46,9 @@ const newBank = () => {
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialBank);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 };
 
 const toggle = () => {
@@ -71,10 +73,10 @@ const save = () => {
     },
     onError: (error: Errors) => {
       resetErrorForm(); // Asegurarte de limpiar los errores previos
-      if (error.response?.data?.errors) {
+      if (error) {
         // Iterar sobre los errores recibidos del servidor
-        Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          errorForm[key] = (value as string[])[0]; // Mostrar el primer error
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
         });
       } else {
         console.error("Error desconocido:", error);
@@ -96,14 +98,14 @@ const update = (bankEdit: Bank) => {
 };
 
 const removeBank = (bankId: Number) => {
-  toggle1();
-  deleteid.value = bankId;
+  toggleDelete();
+  deleteId.value = bankId;
 };
 
-const deletebank = () => {
-  router.delete(route("banks.delete", deleteid.value), {
+const deleteBank = () => {
+  router.delete(route("banks.delete", deleteId.value), {
     onSuccess: () => {
-      toggle1();
+      toggleDelete();
     },
     onError: (error) => {
       console.error("Error al eliminar el banco", error);
@@ -116,7 +118,6 @@ watch(
 
   async (newQuery) => {
     const url = route("banks.index");
-    loading.value = true;
     try {
       await router.get(
         url,
@@ -125,8 +126,6 @@ watch(
       );
     } catch (error) {
       console.error("Error al filtrar:", error);
-    } finally {
-      loading.value = false;
     }
   },
   { immediate: false }
@@ -216,7 +215,7 @@ const toggleState = (bankId: Number, currentState: String) => {
     <template #content> Esta seguro de eliminar el banco? </template>
     <template #footer>
       <SecondaryButton @click="modalDelete = !modalDelete" class="mr-2">Cancelar</SecondaryButton>
-      <PrimaryButton type="button" @click="deletebank">Aceptar</PrimaryButton>
+      <PrimaryButton type="button" @click="deleteBank">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

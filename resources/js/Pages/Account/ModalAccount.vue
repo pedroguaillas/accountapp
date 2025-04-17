@@ -3,6 +3,7 @@
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { InputError, InputLabel, TextInput, SecondaryButton, PrimaryButton, DialogModal } from "@/Components";
 import { Account, Errors } from "@/types";
+import { computed } from "vue";
 
 // Props
 const props = defineProps<{
@@ -12,6 +13,7 @@ const props = defineProps<{
   show:boolean;
 }>();
 
+const errors = computed(() => props.error);
 
 const { focusNextField } = useFocusNextField();
 
@@ -29,24 +31,24 @@ const emit = defineEmits(["save", "close"]); // Asegúrate de emitir 'save' al p
           <div v-if="account.id === undefined" class="col-span-6 sm:col-span-4">
             <InputLabel for="code" value="Cuenta padre" />
             <div class="mt-1 block w-full ml-2 italic">{{ parent.code }}</div>
-            <InputError :message="error.code" class="mt-2" />
+            <InputError :message="errors.code" class="mt-2" />
           </div>
           <div v-if="account.id === undefined" class="col-span-6 sm:col-span-4">
             <InputLabel for="code" value="Nombre cuenta padre" />
             <div class="mt-1 block w-full ml-2 italic">{{ parent.name }}</div>
-            <InputError :message="error.code" class="mt-2" />
+            <InputError :message="errors.code" class="mt-2" />
           </div>
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="code" value="Cuenta" />
             <div class="mt-1 block w-full ml-2 italic">{{ account.code }}</div>
-            <InputError :message="error.code" class="mt-2" />
+            <InputError :message="errors.code" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="name" value="Descripción" />
             <TextInput v-model="account.name" type="text" class="mt-1 block w-full" minlength="3" maxlength="300"
               required />
-            <InputError :message="error.name" class="mt-2" />
+            <InputError :message="errors.name" class="mt-2" />
           </div>
         </form>
       </div>

@@ -60,20 +60,24 @@ const transaction = useForm({
   bank_account_id,
   beneficiary_id,
 });
-const errorForm = reactive<Record<string, string>>({});
+const errorForm = reactive<Errors>({});
 
 const save = () => {
   transaction.post(route("transactions.store"), {
     // onSuccess: () => {
     //  // router.visit(route("transactions.index"));
     // },
-    onError: (errors: Errors) => {
-      if (errors.redirect) {
-        redirect.value = errors.redirect;
+    onError: (error: Errors) => {
+      // Asegurarte de limpiar los errores previos
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
       }
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = errors[key];
-      });
     },
   });
 };

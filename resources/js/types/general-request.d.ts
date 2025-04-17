@@ -24,6 +24,11 @@ export interface Errors {
     [key: string]: any;
 }
 
+export interface ErrorModal {
+    
+    [key: string]: any;
+}
+
 export interface Filters {
     search: string;
     [key: string]: any;

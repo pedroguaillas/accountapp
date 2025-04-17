@@ -2,6 +2,7 @@
 // Importaciones
 import { Link, router } from "@inertiajs/vue3";
 import { ref, watch } from "vue";
+import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { SecondaryButton, TextInput, Paginate, PrimaryButton, ConfirmationModal, Table } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 import { IntangibleAsset } from "@/types/intangible-asset";
@@ -118,6 +119,7 @@ watch(
     </div>
     <Paginate :page="props.intangibleAssetss" />
   </AdminLayout>
+
   <ConfirmationModal :show="modal">
     <template #title> ELIMINAR ACTIVOS FIJOS </template>
     <template #content> Esta seguro de eliminar el activo fijo? </template>

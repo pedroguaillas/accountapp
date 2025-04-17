@@ -12,7 +12,6 @@ class TransactionBox extends Model
 
     protected $fillable = [
         'cash_session_id',
-        'type',//ingresos y egresos
         'amount', 
         'movement_type_id',
         'beneficiary_id',

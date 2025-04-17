@@ -30,7 +30,9 @@ const removeJournals = (journalId: number) => {
 
 const deletejournarls = () => {
   router.delete(route("journal.delete", deleteId.value), {
+
     onSuccess: () => {
+      toggle();
     },
     onError: (error) => {
       console.error("Error al eliminar el asiento contable", error);
@@ -66,34 +68,23 @@ watch(
       <p>
         Ajuste los Activos Fijos
         <Link :href="route('fixedassets.index')" class="text-blue-800">
-          aqui
+        aqui
         </Link>
       </p>
     </div>
 
     <div class="flex justify-end mb-3">
       <div class="w-full flex sm:justify-end">
-        <TextInput
-          v-model="search"
-          type="search"
-          class="block sm:mr-2 h-8 w-full"
-          placeholder="Buscar ..."
-        />
+        <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
       </div>
-      <Link
-        :href="route('journal.create')"
-        class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold"
-      >
-        +
+      <Link :href="route('journal.create')"
+        class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
+      +
       </Link>
     </div>
 
     <!-- Card -->
-    <div
-      v-for="(journal,i) in props.journals.data"
-      :key="journal.id"
-      class="p-4 bg-white rounded drop-shadow-md mb-3"
-    >
+    <div v-for="(journal, i) in props.journals.data" :key="journal.id" class="p-4 bg-white rounded drop-shadow-md mb-3">
       <!-- Card Header -->
       <div class="items-center">
         <h2 class="text-sm sm:text-lg">
@@ -117,10 +108,7 @@ watch(
           </tr>
         </thead>
         <tbody class="h-6">
-          <tr
-            v-for="(entry, j) in journal.journal_entries"
-            :key="`journal-${i}-entry-${j}`"
-          >
+          <tr v-for="(entry, j) in journal.journal_entries" :key="`journal-${i}-entry-${j}`">
             <td class="text-left">{{ entry.code }}</td>
             <td class="text-left">{{ entry.name }}</td>
             <td class="text-right">{{ entry.debit.toFixed(2) }}</td>
@@ -137,16 +125,12 @@ watch(
         </tfoot>
       </Table>
       <div class="flex flex-row justify-end gap-2">
-        <Link
-          :href="route('journal.edit', journal.id)"
-          class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white"
-        >
-          <i class="fa fa-edit"> </i> Modificar
+        <Link :href="route('journal.edit', journal.id)"
+          class="rounded px-2 py-1 bg-primary hover:bg-primaryhover text-white">
+        <i class="fa fa-edit"> </i> Modificar
         </Link>
-        <button
-          class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
-          @click="()=>journal.id && removeJournals(journal.id)"
-        >
+        <button class="rounded px-1 py-1 bg-danger hover:bg-dangerhover text-white"
+          @click="() => journal.id && removeJournals(journal.id)">
           <i class="fa fa-trash"></i> Eliminar
         </button>
       </div>
@@ -158,12 +142,8 @@ watch(
     <template #title>Eliminar asiento contable</template>
     <template #content> Esta seguro de eliminar el asiento contable? </template>
     <template #footer>
-      <SecondaryButton @click="modal = !modal" class="mr-2"
-        >Cancelar</SecondaryButton
-      >
-      <PrimaryButton type="button" @click="deletejournarls"
-        >Aceptar</PrimaryButton
-      >
+      <SecondaryButton @click="modal = !modal" class="mr-2">Cancelar</SecondaryButton>
+      <PrimaryButton type="button" @click="deletejournarls">Aceptar</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

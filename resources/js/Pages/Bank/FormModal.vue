@@ -3,6 +3,7 @@
 import { TextInput, DialogModal, InputError, InputLabel, SecondaryButton, PrimaryButton } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { Bank, Errors } from "@/types";
+import { computed } from "vue";
 
 // Props
 const props = defineProps<{
@@ -10,6 +11,8 @@ const props = defineProps<{
   error: Errors;
   show: boolean;
 }>();
+
+const errors = computed(() => props.error);
 
 const { focusNextField } = useFocusNextField();
 
@@ -33,13 +36,13 @@ defineEmits(["close", "save"]);
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="name" value="Nombre del banco" />
             <TextInput v-model="bank.name" type="text" class="mt-1 block w-full" min="1" max="999" />
-            <InputError :message="error.name" class="mt-2" />
+            <InputError :message="errors.name" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="description" value="Descripción" />
             <TextInput v-model="bank.description" type="text" class="mt-1 block w-full" minlength="3" maxlength="300" />
-            <InputError :message="error.description" class="mt-2" />
+            <InputError :message="errors.description" class="mt-2" />
           </div>
         </form>
       </div>

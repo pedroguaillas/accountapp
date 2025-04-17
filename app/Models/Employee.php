@@ -31,7 +31,7 @@ class Employee extends Model
         'is_a_parnert' => 'boolean',
         'is_a_qualified_craftsman' => 'boolean',
         'affiliated_with_spouse' => 'boolean',
-        'date_start' => 'date',
+        //'date_start' => 'date', Cuando transformas en SQL con TO_CHAR(), no uses CAST, porque convierte a DATETIME aunque ya esté en otro formato. 
         'days' => 'integer',
         'salary' => 'float',
         'porcent_aportation' => 'float',

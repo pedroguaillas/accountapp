@@ -21,8 +21,8 @@ const props = defineProps<{
 const modal = ref(false);
 const modalDeleteBox = ref(false);
 const modalOpenBox = ref(false);
-const deleteid = ref<Number>(0);
-const boxid = ref<Number>(0);
+const deleteId = ref<Number>(0);
+const boxId = ref<Number>(0);
 const search = ref(props.filters.search);
 
 // Para el formulario de crear/editar caja
@@ -34,7 +34,7 @@ const errorForm =reactive<Errors>({});
 // Usamos openForm para almacenar el monto inicial
 const openForm = useForm<Cash>({
   id: undefined,              // id es opcional
-  box_id: 0,                  // Asignamos un valor predeterminado para box_id
+  box_id: "",                  // Asignamos un valor predeterminado para box_id
   close_employee_id: 0,       // Asignamos un valor predeterminado para close_employee_id
   state_box: "",              // Asignamos un valor predeterminado para state_box
   initial_value: 0,           // Asignamos un valor numérico para initial_value
@@ -60,7 +60,9 @@ const newBox = () => {
 };
 
 const resetErrorForm = () => {
-  Object.assign(errorForm, initialBox);
+  for (const key in errorForm) {
+    errorForm[key] = "";
+  }
 };
 
 const toggle = () => {
@@ -106,7 +108,7 @@ const update = (boxEdit: Box) => {
 
 const removeBox = (boxId: Number) => {
   toggleDeleteBox();
-  deleteid.value = boxId;
+  deleteId.value = boxId;
 };
 
 const toggleDeleteBox = () => {
@@ -114,11 +116,11 @@ const toggleDeleteBox = () => {
 };
 
 const deletebox = () => {
-  router.delete(route("boxes.delete", deleteid.value), {
+  router.delete(route("boxes.delete", deleteId.value), {
     onSuccess: () => {
       toggleDeleteBox();
     },
-    onError: (error) => {
+    onError: (error: Errors) => {
       console.error("Error al eliminar la sucursal", error);
     },
   });
@@ -186,13 +188,13 @@ watch(
   }
 );
 // Función para cerrar caja y obtener los datos
-const closeBox = (boxId: Number) => {
+const closeBox = (boxIdEdit: number) => {
   if (boxId === null || boxId === undefined) {
     return;
   }
-  boxid.value = boxId;
+  boxId.value = boxIdEdit;
   axios
-    .get(route("boxes.closeinformation", { id: boxId }))
+    .get(route("boxes.closeinformation", { id: boxIdEdit }))
     .then((response) => {
       Object.assign(openForm, response.data);
       openForm.real_balance = response.data.balance;
@@ -204,8 +206,8 @@ const closeBox = (boxId: Number) => {
     });
 };
 
-const closeboxfinally = () => {
-  openForm.post(route("boxes.close", boxid.value), {
+const closeBoxFinally = () => {
+  openForm.post(route("boxes.close", boxId.value), {
     onSuccess: () => {
       closeModal.value = false;
     },
@@ -296,13 +298,13 @@ const closeboxfinally = () => {
     <template #title>Resumen de Cierre</template>
     <template #content>
       <p class="text-justify">
-        <strong>Valor Inicial:</strong> {{ openForm.initial_value.toFixed(2) }}
+        <strong>Valor Inicial:</strong> {{ Number(openForm.initial_value).toFixed(2) }}
       </p>
       <p class="text-justify">
-        <strong>Ingresos:</strong> {{ openForm.ingress.toFixed(2) }}
+        <strong>Ingresos:</strong> {{ Number(openForm.ingress).toFixed(2) }}
       </p>
       <p class="text-justify">
-        <strong>Egresos:</strong> {{ openForm.egress.toFixed(2) }}
+        <strong>Egresos:</strong> {{ Number(openForm.egress).toFixed(2) }}
       </p>
       <p class="text-justify">
         <strong>Saldo de caja(sistema):</strong>
@@ -318,7 +320,7 @@ const closeboxfinally = () => {
     </template>
     <template #footer>
       <SecondaryButton @click="closeModal = false">Cancelar</SecondaryButton>
-      <PrimaryButton @click="closeboxfinally" :disabled="openForm.processing">Cerrar Caja</PrimaryButton>
+      <PrimaryButton @click="closeBoxFinally" :disabled="openForm.processing">Cerrar Caja</PrimaryButton>
     </template>
   </ConfirmationModal>
 </template>

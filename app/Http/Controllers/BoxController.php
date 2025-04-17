@@ -21,7 +21,7 @@ class BoxController extends Controller
         $search = $request->input('search', '');
 
         $boxes = Box::query()
-            ->select('boxes.id', 'boxes.name', 'boxes.type','boxes.owner_id','employees.name as employee_name', 'cash_sessions.state_box', 'cash_sessions.balance')
+            ->select('boxes.id', 'boxes.name', 'boxes.type', 'boxes.owner_id', 'employees.name as employee_name', 'cash_sessions.state_box', 'cash_sessions.balance')
             ->leftJoin('cash_sessions', function ($query) {
                 $query->on('boxes.id', 'box_id')
                     ->where('state_box', 'open');
@@ -252,6 +252,7 @@ class BoxController extends Controller
         $journal->journalentries()->createMany($journalEntries);
         $cashSession->update([
             ...$request->all(),
+            'box_id' => $box->id,
             'state_box' => 'close',
             'close_employee_id' => $closeEmployeeId,
         ]);

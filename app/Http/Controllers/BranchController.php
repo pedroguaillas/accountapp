@@ -39,7 +39,6 @@ class BranchController extends Controller
             'name' => 'nullable|min:3|max:300',
             'city' => 'required',
             'address' => 'required',
-            //'is_matriz' => '',
             'enviroment_type' => 'required',
         ]);
         //llamada a la compania

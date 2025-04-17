@@ -3,6 +3,7 @@
 import { TextInput, SecondaryButton, PrimaryButton, DynamicSelect, InputLabel, InputError, DialogModal } from "@/Components";
 import { useFocusNextField } from "@/composables/useFocusNextField";
 import { Company, ContributorType, EconomiActivity, Errors } from "@/types";
+import { computed } from "vue";
 
 // Props
 const props = defineProps<{
@@ -12,6 +13,8 @@ const props = defineProps<{
   economyActivities: EconomiActivity[];
   contributorTypes: ContributorType[];
 }>();
+
+const errors = computed(() => props.error);
 
 const { focusNextField } = useFocusNextField();
 
@@ -45,28 +48,28 @@ const contributorTypeOptions = props.contributorTypes.map(
             <InputLabel for="ruc" value="RUC" />
             <TextInput v-model="company.ruc" type="text" class="mt-1 block w-full" minlength="13" maxlength="13"
               required />
-            <InputError :message="error.ruc" class="mt-2" />
+            <InputError :message="errors.ruc" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="company" value="Companía" />
             <TextInput v-model="company.company" type="text" class="mt-1 block w-full" minlength="3" maxlength="300"
               required />
-            <InputError :message="error.company" class="mt-2" />
+            <InputError :message="errors.company" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="economic_activity_id" value="Actividad economica" />
             <DynamicSelect class="mt-1 block w-full" v-model="company.economic_activity_id"
               :options="economyActivityOptions" autofocus />
-            <InputError :message="error.economic_activity_id" class="mt-2" />
+            <InputError :message="errors.economic_activity_id" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="contributor_type_id" value="Tipo de contribuyente" />
             <DynamicSelect class="mt-1 block w-full" v-model="company.contributor_type_id"
               :options="contributorTypeOptions" autofocus />
-            <InputError :message="error.contributor_type_id" class="mt-2" />
+            <InputError :message="errors.contributor_type_id" class="mt-2" />
           </div>
         </form>
       </div>

@@ -1,7 +1,6 @@
 export interface TransactionBox {
     id?: number;
     cash_session_id: string;
-    type: string | number;
     amount: string;
     movement_type_id: string;
     beneficiary_id?: string;

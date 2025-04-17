@@ -3,7 +3,7 @@
 import { reactive, computed, ref, watch } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchEmployee from "./SearchEmployee.vue";
-import { useForm, usePage } from "@inertiajs/vue3";
+import { useForm, usePage,router } from "@inertiajs/vue3";
 import { InputError, InputLabel, DynamicSelect, TextInput } from "@/Components";
 import { Advance, BankAccount, Cash, Employee, Errors } from "@/types";
 
@@ -33,15 +33,15 @@ const closeErrorModal = () => {
 const date = new Date().toISOString().split("T")[0];
 
 // Inicializador de objetos
-const initialAdvance:Advance = {
+const initialAdvance: Advance = {
   id: undefined,
-  company_id:0,
+  company_id: 0,
   detail: "",
   amount: "",
   employee_id: 0,
   payment_type: "",
-  payment_method_id: 0, //identificador de caja o banco
-  movement_type_id: 0,
+  payment_method_id: "", //identificador de caja o banco
+  movement_type_id: "",
   date,
   receipt_number: "",
   processing: false,
@@ -54,22 +54,25 @@ const advance = useForm({
   employee_id,
   date,
 });
-const errorForm: Record<string, string> = {};
+const errorForm = reactive<Errors>({});
 
 const save = () => {
   advance.post(route("advances.store"), {
-    onError: (errors: Errors) => {
-      if (errors.redirect) {
-        redirect.value = errors.redirect;
+    onError: (error: Errors) => {
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
       }
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = errors[key];
-      });
     },
   });
 };
 
-const handleEmployeeSelect = (employee:Employee) => {
+const handleEmployeeSelect = (employee: Employee) => {
   advance.employee_id = employee.id; // Asignar el centro de costo al objeto journal
 };
 
@@ -79,8 +82,8 @@ watch(
   () => advance.amount, // Observa cambios en el monto
   (newAmount) => {
     const newAmountAux = String(newAmount);
-    const newAmountRequired =parseFloat(newAmountAux);
-    if (newAmountRequired>= 500) {
+    const newAmountRequired = parseFloat(newAmountAux);
+    if (newAmountRequired >= 500) {
       TypeOptions.value = [{ value: "banco", label: "Bancos" }];
     } else {
       TypeOptions.value = [
@@ -193,6 +196,9 @@ const employeeOptions = props.employees.map((person) => ({
         </div>
 
         <div class="mt-4 text-right">
+          <SecondaryButton @click="() => router.visit(route('advances.index'))" class="mr-2">
+            Cancelar
+          </SecondaryButton>
           <button @click="save" :disabled="advance.processing"
             class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
             Guardar

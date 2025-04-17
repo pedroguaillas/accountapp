@@ -9,6 +9,7 @@ import { ChevronDownIcon } from "@heroicons/vue/24/solid";
 import { Link, usePage } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
 
+
 // Props
 defineProps<{
   menu: boolean;
@@ -18,7 +19,7 @@ defineProps<{
 const isDropdownOpenAccount = ref(false);
 const isDropdownOpenPersonal = ref(false);
 const isDropdownOpenBank = ref(false);
-const current_tenant_id =ref(null);// para identificar cuando un usuario tiene muchos rucs
+const current_tenant_id =ref(null);// para identificar cuando un usuario tiene muchos rucs cambiado la condion del === para finalidades de prueba
 
 // Emits
 defineEmits(["toggle"]);
@@ -53,7 +54,7 @@ const user = computed<AuthUser>(() => page.props.auth.user as AuthUser);
       style="scrollbar-color: #7da8ce transparent; scrollbar-width: thin"
     >
       <ul
-        v-show="current_tenant_id !== null"
+        v-show="current_tenant_id === null"
         class="[&>li>a]:text-white [&>li>a]:inline-block [&>li>a]:w-full [&>li>a]:py-2 [&>li>a>i]:stroke-white"
       >
         <li>
@@ -283,7 +284,7 @@ const user = computed<AuthUser>(() => page.props.auth.user as AuthUser);
         </li>
       </ul>
       <ul
-        v-show="current_tenant_id === null"
+        v-show="current_tenant_id !== null"
         class="[&>li>a]:text-white [&>li>a]:inline-block [&>li>a]:w-full [&>li>a]:p-2 [&>li>a>i]:stroke-white"
       >
         <li>

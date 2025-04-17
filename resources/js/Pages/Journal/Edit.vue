@@ -6,7 +6,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import SearchAccount from "./SearchAccount.vue";
 import SearchCostCenter from "./SearchCostCenter.vue";
 import { useForm } from "@inertiajs/vue3";
-import { Checkbox, DynamicSelect, InputError, InputLabel,TextInput, Table } from "@/Components";
+import { Checkbox, DynamicSelect, InputError, InputLabel, TextInput, Table } from "@/Components";
 import { Account, CostCenter, Errors, Journal, JournalEntry } from "@/types";
 
 // Props
@@ -18,7 +18,7 @@ const props = defineProps<{
 
 // Inicializador de objetos reactivos
 const journal = useForm<Journal>({ ...props.journal }); // Precarga los datos del asiento contable
-const errorForm: Record<string, string> = {};
+const errorForm = reactive<Errors>({});
 
 // Métodos
 const eliminarCuenta = (index: number) => {
@@ -38,10 +38,17 @@ const save = () => {
   }
 
   journal.put(route("journal.update", journal.id), {
-    onError: (errors: Errors) => {
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = (errors[key] as string[])[0];
-      });
+    onError: (error: Errors) => {
+      // Asegurarte de limpiar los errores previos
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };
@@ -63,14 +70,14 @@ const costcenterOptions = props.costCenters.map((costCenter) => ({
 // Cálculo de totales para "Debe" y "Haber"
 const totalDebe = computed(() => {
   return journal.journalEntries.reduce(
-    (total:number, entry:JournalEntry) => total + parseFloat(String(entry.debit || 0)),
+    (total: number, entry: JournalEntry) => total + parseFloat(String(entry.debit || 0)),
     0
   );
 });
 
 const totalHaver = computed(() => {
   return journal.journalEntries.reduce(
-    (total:number, entry:JournalEntry) => total + parseFloat(String(entry.have || 0)),
+    (total: number, entry: JournalEntry) => total + parseFloat(String(entry.have || 0)),
     0
   );
 });

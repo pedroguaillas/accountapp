@@ -1,9 +1,10 @@
 <script setup lang="ts">
 // Imports
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import { useForm } from "@inertiajs/vue3";
-import { TextInput, Checkbox, InputLabel, InputError } from "@/Components";
+import { useForm,router } from "@inertiajs/vue3";
+import { TextInput, Checkbox, InputLabel, InputError, SecondaryButton } from "@/Components";
 import { Employee, Errors } from "@/types";
+import { reactive } from "vue";
 
 const date = new Date().toISOString().split("T")[0];
 
@@ -25,21 +26,27 @@ const initialEmployee: Employee = {
   xiv: false,
   reserve_funds: false,
   email: "",
+  processing: false,
 };
 
 // Reactives
 const employee = useForm<Employee>({ ...initialEmployee });
-const errorForm: Record<string, string> = {};
+const errorForm = reactive<Errors>({});
 
 // Método de guardar con mensajes
 const save = () => {
   // Enviar datos al backend
   employee.post(route("employee.store"), {
-    onError: (errors:Errors) => {
-      // Mostrar errores de validación desde el backend
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = errors[key];
-      });
+    onError: (error: Errors) => {
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };
@@ -159,7 +166,11 @@ const save = () => {
         </div>
       </div>
 
+
       <div class="mt-4 text-right">
+        <SecondaryButton @click="() => router.visit(route('employee.index'))" class="mr-2">
+          Cancelar
+        </SecondaryButton>
         <button :disabled="employee.processing" @click="save"
           class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
           Guardar

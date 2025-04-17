@@ -13,6 +13,8 @@ const props = defineProps<{
   employees: Employee[];
 }>();
 
+const errors = computed(() => props.error);
+
 const { focusNextField } = useFocusNextField();
 
 // Emits
@@ -51,21 +53,21 @@ const TypeOptions = [
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="name" value="Nombre de la caja" />
             <TextInput v-model="box.name" type="text" class="mt-1 block w-full" min="1" max="999" />
-            <InputError :message="error.name" class="mt-2" />
+            <InputError :message="errors.name" class="mt-2" />
           </div>
 
           <div class="col-span-6 sm:col-span-4">
             <InputLabel for="owner_id" value="Empleado a cargo" />
             <DynamicSelect class="mt-1 block w-full" v-model="box.owner_id" :options="EmployeesOptions" autofocus
               :required="true" />
-            <InputError :message="error.owner_id" class="mt-2" />
+            <InputError :message="errors.owner_id" class="mt-2" />
           </div>
 
           <div v-if="box.name !== 'CAJA GENERAL'" class="col-span-6 sm:col-span-4">
             <InputLabel for="owner_id" value="Tipo" />
             <DynamicSelect class="mt-1 block w-full" v-model="box.type" :options="TypeOptions" autofocus
               :required="true" />
-            <InputError :message="error.type" class="mt-2" />
+            <InputError :message="errors.type" class="mt-2" />
           </div>
         </form>
       </div>

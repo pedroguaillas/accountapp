@@ -2,7 +2,7 @@
 // Imports
 import { reactive, computed } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, router } from "@inertiajs/vue3";
 import { InputError, TextInput, InputLabel, DynamicSelect, Checkbox } from "@/Components";
 import { PayMethod, Errors } from "@/types";
 
@@ -31,26 +31,27 @@ const initialIntangibleAsset = {
 
 // Reactives
 const intangibleAsset = useForm<PayMethod>({ ...initialIntangibleAsset });
-const errorForm: Record<string, string> = {};
-
-const resetErrorForm = () => {
-  Object.assign(errorForm, initialIntangibleAsset);
-};
+const errorForm = reactive<Errors>({});
 
 // Método de guardar con mensajes
 const save = () => {
   // Enviar datos al backend
   intangibleAsset.post(route("intangibleassets.store"), {
-    onError: (errors: Errors) => {
-      // Mostrar errores de validación desde el backend
-      Object.keys(errors).forEach((key) => {
-        errorForm[key] = (errors[key] as string[])[0];
-      });
-    },
     onSuccess: () => {
       // Reiniciar el formulario tras éxito
       intangibleAsset.reset();
-      resetErrorForm();
+    },
+    onError: (error: Errors) => {
+      // Asegurarte de limpiar los errores previos
+      if (error) {
+        // Iterar sobre los errores recibidos del servidor
+        Object.entries(error).forEach(([key, value]) => {
+          errorForm[key] = value;// Mostrar el primer error asociado a cada campo
+        });
+      } else {
+        console.error("Error desconocido:", error);
+        alert("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+      }
     },
   });
 };
@@ -189,6 +190,9 @@ const payMethodOptions = Array.isArray(props.payMethods)
       </div>
 
       <div class="mt-4 text-right">
+        <SecondaryButton @click="() => router.visit(route('intangibleassets.index'))" class="mr-2">
+          Cancelar
+        </SecondaryButton>
         <button @click="save" :disabled="intangibleAsset.processing"
           class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
           Guardar
