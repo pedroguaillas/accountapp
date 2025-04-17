@@ -5,6 +5,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import { TextInput, InputError, InputLabel, DynamicSelect } from "@/Components";
 import { BankAccount, Box, Errors, Expense, TransactionExpense } from "@/types";
+import { getEcuadorDate } from "@/helpers/dateHelper";
 
 // Props
 const props = defineProps<{
@@ -29,7 +30,7 @@ const closeErrorModal = () => {
   window.open(route(redirect.value), "_blank");
 };
 
-const date_expense = new Date().toISOString().split("T")[0];
+const date_expense = getEcuadorDate();
 
 // Inicializador de objetos
 const initialTransactionExpense = {

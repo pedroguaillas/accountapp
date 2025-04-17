@@ -220,13 +220,13 @@ const closeBoxFinally = () => {
     <!-- Card -->
     <div class="p-4 bg-white rounded drop-shadow-md">
       <!-- Card Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-center">
+      <div class="flex flex-row gap-2 justify-between items-center">
         <h2 class="text-sm sm:text-lg font-bold w-full pb-2 sm:pb-0">Cajas</h2>
         <div class="w-full flex sm:justify-end">
           <TextInput v-model="search" type="search" class="block sm:mr-2 h-8 w-full" placeholder="Buscar ..." />
         </div>
         <button @click="newBox"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
+          class="px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
           +
         </button>
       </div>

@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import GeneralSetting from "@/Layouts/GeneralSetting.vue";
 import ModalMovementType from "./ModalMovementType.vue";
-import { router,usePage  } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import { Table } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 import { MovementType } from "@/types";
@@ -32,14 +32,16 @@ const selectedMovementType = (movementType: MovementType) => {
 <template>
   <GeneralSetting title="Movimientos bancarios">
     <div class="p-4 bg-white rounded drop-shadow-md">
-      <div class="w-full flex sm:justify-end">
-        <div v-if="errors?.warning" class="bg-red-500 text-white rounded mb-4 p-2">
+      <div class="flex justify-between">
+        <div v-if="errors?.warning" class="bg-red-500 w-fit text-white rounded mb-4 p-2">
           {{ errors.warning }}
         </div>
-        <button @click="toggle"
-          class="mt-2 sm:mt-0 px-2 bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
-          +
-        </button>
+        <div class="flex w-[4em] sm:justify-end">
+          <button @click="toggle"
+            class="px-2 h-fit bg-success dark:bg-green-600 hover:bg-successhover text-2xl text-white rounded font-bold">
+            +
+          </button>
+        </div>
       </div>
 
       <div class="w-full overflow-x-auto">

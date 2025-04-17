@@ -7,6 +7,7 @@ import { router, useForm } from "@inertiajs/vue3";
 import { ConfirmationModal, TextInput, SecondaryButton, PrimaryButton, Table, Paginate } from "@/Components";
 import { TrashIcon, PencilIcon } from "@heroicons/vue/24/solid";
 import { Employee, Errors, Filters, GeneralRequest, Hour } from "@/types";
+import { getEcuadorDate } from "@/helpers/dateHelper";
 //Props
 const props = defineProps<{
   hours: GeneralRequest<Hour>; // Paginación de los bancos
@@ -18,7 +19,8 @@ const props = defineProps<{
 const modal = ref(false);
 const search = ref(props.filters.search); // Término de búsqueda
 const modalDelete = ref(false);
-const date = new Date().toISOString().split("T")[0];
+const date = getEcuadorDate();
+
 //El inicializador de objetos
 const initialHour = {
   id: undefined,

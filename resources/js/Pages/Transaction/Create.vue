@@ -7,6 +7,7 @@ import SearchPerson from "./SearchPerson.vue";
 import { useForm, router, usePage } from "@inertiajs/vue3";
 import { TextInput, InputError, InputLabel, DynamicSelect } from "@/Components";
 import { BankAccount, Errors, MovementType, Person, TransactionBank } from "@/types";
+import { getEcuadorDate } from "@/helpers/dateHelper";
 
 // Props
 const props = defineProps<{
@@ -33,7 +34,7 @@ const closeErrorModal = () => {
   window.open(route(redirect.value), "_blank");
 };
 
-const date = new Date().toISOString().split("T")[0];
+const date = getEcuadorDate();
 
 // Inicializador de objetos
 const initialTransaction = {

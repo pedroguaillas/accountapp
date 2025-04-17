@@ -5,6 +5,7 @@ import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { useForm, router } from "@inertiajs/vue3";
 import { InputError, TextInput, InputLabel, DynamicSelect, Checkbox } from "@/Components";
 import { ActiveType, Errors, FixedAsset, PayMethod } from "@/types";
+import { getEcuadorDate } from "@/helpers/dateHelper";
 
 // Props
 const props = defineProps<{
@@ -12,7 +13,7 @@ const props = defineProps<{
   activeTypes: ActiveType; // Filtros aplicados
 }>();
 
-const date = new Date().toISOString().split("T")[0];
+const date = getEcuadorDate();
 
 // Inicializador de objetos
 const initialFixedAsset = {

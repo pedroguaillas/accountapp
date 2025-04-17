@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import { PropType, ref, onMounted } from "vue";
 
-// defineProps({
-//     modelValue: {
-//         type: [String, Number] as PropType<string | number>,
-//         default: "", // Valor por defecto para modelValue
-//     },
-// });
-withDefaults(defineProps<{
-    modelValue: string | number |undefined;
-}>(), {
-    modelValue: "",
+defineProps({
+    modelValue: {
+        type: [String, Number] as PropType<string | number>,
+        default: "", // Valor por defecto para modelValue
+    },
 });
 
 defineEmits(['update:modelValue']);
@@ -29,7 +24,8 @@ defineExpose({ focus: () => input.value && input.value.focus() });
 <template>
     <input ref="input"
         class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-        :value="modelValue" @change="(event) => {
+        :value="modelValue"
+        @input="(event) => {
             if (event.target) {
                 $emit('update:modelValue', (event.target as HTMLInputElement).value);
             }

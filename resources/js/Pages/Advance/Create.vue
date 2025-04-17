@@ -6,6 +6,8 @@ import SearchEmployee from "./SearchEmployee.vue";
 import { useForm, usePage,router } from "@inertiajs/vue3";
 import { InputError, InputLabel, DynamicSelect, TextInput } from "@/Components";
 import { Advance, BankAccount, Cash, Employee, Errors } from "@/types";
+import { getEcuadorDate } from "@/helpers/dateHelper";
+
 
 const props = defineProps<{
   bankAccounts: BankAccount[]; // Paginación de los bancos
@@ -30,7 +32,7 @@ const closeErrorModal = () => {
   window.open(route(redirect.value), "_blank");
 };
 
-const date = new Date().toISOString().split("T")[0];
+const date = getEcuadorDate();
 
 // Inicializador de objetos
 const initialAdvance: Advance = {
@@ -196,7 +198,7 @@ const employeeOptions = props.employees.map((person) => ({
         </div>
 
         <div class="mt-4 text-right">
-          <SecondaryButton @click="() => router.visit(route('advances.index'))" class="mr-2">
+          <SecondaryButton @click="() => router.visit(route('advances.index'))" class="mr-2 bg-slate-200">
             Cancelar
           </SecondaryButton>
           <button @click="save" :disabled="advance.processing"

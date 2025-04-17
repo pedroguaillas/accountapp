@@ -3,8 +3,9 @@
 import { reactive, computed } from "vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { useForm, router } from "@inertiajs/vue3";
-import { InputError, TextInput, InputLabel, DynamicSelect, Checkbox } from "@/Components";
+import { InputError, TextInput, InputLabel, DynamicSelect, Checkbox,PrimaryButton } from "@/Components";
 import { PayMethod, Errors } from "@/types";
+import { getEcuadorDate } from '@/helpers/dateHelper';
 
 // Props
 const props = defineProps<{
@@ -12,12 +13,7 @@ const props = defineProps<{
 }>();
 
 //TODO formato para zona ecuador
-const date = new Date();
-const offset = -5; // GMT-5
-
-// Ajusta la fecha a la zona horaria GMT-5
-const localDate = new Date(date.getTime() + offset * 60 * 60 * 1000);
-const formattedDate = localDate.toISOString().split("T")[0];
+const formattedDate = getEcuadorDate();
 
 // Inicializador de objetos
 const initialIntangibleAsset = {
@@ -196,13 +192,13 @@ const payMethodOptions = Array.isArray(props.payMethods)
       </div>
 
       <div class="mt-4 text-right">
-        <SecondaryButton @click="() => router.visit(route('intangibleassets.index'))" class="mr-2">
+        <SecondaryButton @click="() => router.visit(route('intangibleassets.index'))" class="mr-2 bg-slate-200 rounded">
           Cancelar
         </SecondaryButton>
-        <button @click="save" :disabled="intangibleAsset.processing"
+        <PrimaryButton @click="save" :disabled="intangibleAsset.processing"
           class="px-4 py-2 bg-primary hover:bg-primaryhover text-white rounded">
           Guardar
-        </button>
+        </PrimaryButton>
       </div>
     </div>
   </AdminLayout>

@@ -8,6 +8,7 @@ import { useForm, usePage } from "@inertiajs/vue3";
 import { TrashIcon } from "@heroicons/vue/24/outline";
 import { Checkbox, DynamicSelect, InputError, InputLabel, TextInput, Table } from "@/Components";
 import { Account, CostCenter, Errors, Journal, JournalEntry } from "@/types";
+import { getEcuadorDate } from "@/helpers/dateHelper";
 
 // Props
 const props = defineProps<{
@@ -16,7 +17,7 @@ const props = defineProps<{
   countJournals: number;
 }>();
 
-const date = new Date().toISOString().split("T")[0];
+const date = getEcuadorDate();
 const page = usePage();
 const errors = computed(() => page.props.errors);
 

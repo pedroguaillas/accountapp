@@ -156,7 +156,7 @@ const filteredAccounts = computed(() => {
         </h2>
         <ImportExcel v-if="accounts.length === 0" />
 
-        <div class="w-full flex justify-end">
+        <div v-else class="w-full flex justify-end">
           <TextInput v-model="search" type="text" class="mt-1 block w-[50%]  h-8" minlength="3" maxlength="300" required
             placeholder="Buscar..." />
         </div>
